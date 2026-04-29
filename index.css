@@ -1,0 +1,207 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    width: 100%;
+    height: auto;
+    background-color: #000;
+    color: #fff;
+}
+
+.navigation-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #fff;
+    padding: 20px 50px;
+    color: #000;
+    width: 100%;
+    height: 70px;
+}
+
+.logo {
+    width: 7%;
+    cursor: pointer;
+}
+
+.navigation-bar ul {
+    list-style-type: none;
+    display: flex;
+    margin-left: 50px;
+}
+
+.navigation-bar ul li{
+    margin: 0px 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.navigation-bar ul a{
+    text-decoration: none;
+    color: inherit;
+    font-size: 13px;
+}
+
+.navigation-bar .nav-btn{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.navigation-bar .nav-btn a{
+    text-decoration: none;
+    color: #fff;
+}
+
+.navigation-bar .nav-btn button{
+    transform: all 0.5s;
+}
+
+.navigation-bar .nav-btn button:hover{
+    transform: scale(1.1);
+}
+
+.login-btn {
+    width: 120px;
+    height: 35px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background-color: rgb(145, 27, 6);
+    color: #fff;
+    font-size: 15px;
+    transform: all 0.5s;
+}
+
+.emp-login-btn {
+    width: 150px;
+    height: 35px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background-color: rgb(3, 61, 52);
+    color: #fff;
+    font-size: 15px;
+}
+/* 
+.highlights {
+    background-color: #fff;
+    color: tomato;
+    margin: 10px;
+    font-size: 20px;
+    padding-left: 10px;
+} */
+
+.registeration-form-box {
+    margin: 30px;
+    height: 70vh;
+    padding: 10px 50px;
+    border: 0px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 50px;
+}
+
+.text{
+    font-size: 50px;
+    margin: 20px 0px;
+}
+
+.second-text{
+    font-size: 30px;
+    text-transform: lowercase;
+}
+
+.left-button {
+    margin: 50px 0px;
+}
+
+.left-button button {
+    width: 200px;
+    height: 40px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    margin-left: 10px;
+    background-color: rgb(19, 126, 129);
+    color: #fff;
+}
+
+.left-col p {
+    font-size: 15px;
+}
+
+.form {
+    border: 1px solid #fff;
+    width: 400px;
+    height: 450px;
+    padding: 20px 20px;
+    background-color: #fff;
+    color: #000;
+}
+
+.form-title{
+    border-bottom: 2px solid tomato;
+    font-size: 25px;
+    margin-bottom: 20px;
+}
+
+.user-feild {
+    display: grid;
+    margin: 10px 0px;
+}
+
+.user-feild label {
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.user-feild input {
+    width: 100%;
+    height: 30px;
+    border: none;
+    outline: none;
+    border: 1px solid #cce;
+    padding-left: 5px;
+}
+
+.form-btn{
+    width: 100%;
+    height: 40px;
+    border: none;
+    outline: none;
+    font-size: 17px;
+    background-color: rgb(3, 61, 52);
+    color: #fff;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.desc {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* .dec-links {
+    text-decoration: none;
+} */
+
+.footer {
+    text-align: center;
+    font-size: 14px;
+}
+
+
+/* code for mobile responsive */
+@media (max-width: 420px){
+    .navigation-bar{
+        display: none;
+    }
+}
