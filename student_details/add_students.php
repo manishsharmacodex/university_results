@@ -4,7 +4,8 @@ include("../server/connection.php");
 $message = "";
 
 // FUNCTION TO CONVERT dd/mm/yyyy → yyyy-mm-dd
-function convertDate($date) {
+function convertDate($date)
+{
     $parts = explode('/', $date);
     if (count($parts) == 3) {
         return $parts[2] . '-' . $parts[1] . '-' . $parts[0];
@@ -31,6 +32,7 @@ if (isset($_POST['submit'])) {
     $address = $_POST['address'];
     $course = $_POST['course'];
     $department = $_POST['department'];
+
     $semester = $_POST['semester'];
 
     $photo_name = "";
@@ -67,6 +69,7 @@ if (isset($_POST['submit'])) {
 
 <!DOCTYPE html>
 <html>
+
 <head>
 <title>Add Student</title>
 
@@ -77,19 +80,22 @@ body{
     background:#f1f5f9;
 }
 
+/* CONTAINER */
 .container{
     max-width:1000px;
     margin:60px auto;
     padding:0 20px;
 }
 
+/* CARD */
 .card{
     background:#fff;
-    padding:25px;
+    padding:35px; /* increased padding for breathing space */
     border-radius:12px;
     box-shadow:0 2px 10px rgba(0,0,0,0.06);
 }
 
+/* MESSAGE */
 .msg{
     padding:12px;
     margin-bottom:15px;
@@ -99,43 +105,56 @@ body{
     font-size:14px;
 }
 
+/* GRID - IMPROVED GAP */
 .form-grid{
     display:grid;
     grid-template-columns:repeat(2, 1fr);
-    gap:15px;
+    column-gap:40px;   /* 👈 LEFT-RIGHT GAP FIX */
+    row-gap:18px;      /* vertical spacing */
 }
 
+/* LABEL */
 label{
     font-size:13px;
     font-weight:600;
     color:#334155;
     display:block;
-    margin-bottom:5px;
+    margin-bottom:6px;
 }
 
-input, select, textarea{
+/* INPUTS */
+input,
+select,
+textarea{
     width:100%;
-    padding:11px;
+    padding:12px;
     border:1px solid #e2e8f0;
     border-radius:8px;
     outline:none;
     font-size:14px;
+    transition:0.2s;
 }
 
-input:focus, select:focus, textarea:focus{
+/* focus effect */
+input:focus,
+select:focus,
+textarea:focus{
     border-color:#2563eb;
     box-shadow:0 0 0 3px rgba(37,99,235,0.15);
 }
 
+/* TEXTAREA */
 textarea{
-    height:90px;
+    height:95px;
     resize:none;
 }
 
+/* FULL WIDTH */
 .full{
     grid-column:span 2;
 }
 
+/* BUTTON */
 button{
     background:#2563eb;
     color:#fff;
@@ -146,15 +165,18 @@ button{
     font-size:15px;
     font-weight:600;
     cursor:pointer;
+    transition:0.2s;
 }
 
 button:hover{
     background:#1d4ed8;
 }
 
+/* RESPONSIVE */
 @media(max-width:768px){
     .form-grid{
         grid-template-columns:1fr;
+        column-gap:0;
     }
     .full{
         grid-column:span 1;
@@ -162,6 +184,13 @@ button:hover{
     button{
         width:100%;
     }
+}
+
+/* DISABLED STYLE */
+input:disabled{
+    background:#e5e7eb;
+    color:#6b7280;
+    cursor:not-allowed;
 }
 </style>
 
@@ -173,7 +202,7 @@ button:hover{
 
 <div class="card">
 
-<?php if($message != "") { ?>
+<?php if ($message != "") { ?>
     <div class="msg"><?php echo $message; ?></div>
 <?php } ?>
 
@@ -201,7 +230,6 @@ button:hover{
         <input type="text" id="dob" name="dob" placeholder="DD/MM/YYYY">
     </div>
 
-    <!-- DEPARTMENT DROPDOWN -->
     <div>
         <label>Department</label>
         <select name="department" id="department" required>
@@ -213,7 +241,6 @@ button:hover{
         </select>
     </div>
 
-    <!-- COURSE DROPDOWN (DYNAMIC) -->
     <div>
         <label>Course</label>
         <select name="course" id="course" required>
@@ -243,7 +270,8 @@ button:hover{
 
     <div>
         <label>Semester</label>
-        <input type="text" name="semester" placeholder="Enter Semester">
+        <input type="text" value="1" disabled>
+        <input type="hidden" name="semester" value="1">
     </div>
 
     <div>
@@ -292,10 +320,9 @@ document.getElementById("admission_date").addEventListener("input", function(){
     formatDate(this);
 });
 
-
-// DEPENDENT DROPDOWN LOGIC
+// DEPENDENT DROPDOWN
 const coursesByDept = {
-    "SET": ["B.Tech CSE", "B.Tech IT", "MCA"],
+    "SET": ["B.Tech CSE", "B.Tech IT", "MCA", "BCA"],
     "SOB": ["BBA", "MBA", "B.Com"],
     "LLM": ["LLB", "LLM"],
     "OTHER": ["Diploma", "Certificate Course"]
