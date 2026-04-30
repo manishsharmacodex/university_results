@@ -2,233 +2,205 @@
 include("../server/connection.php");
 
 $student = null;
-$results = [];
-$message = "";
+$subjects = [];
 
-// SEARCH STUDENT + RESULTS
+/* ================= SEARCH STUDENT ================= */
 if (isset($_POST['search'])) {
 
-    $roll = $_POST['roll_number'];
+    $roll_number = $_POST['roll_number'];
 
-    // FETCH STUDENT
-    $query = "SELECT * FROM student_details WHERE student_roll_number='$roll'";
-    $data = mysqli_query($conn, $query);
-    $student = mysqli_fetch_assoc($data);
+    // student info
+    $q1 = "SELECT * FROM university_results.student_details 
+           WHERE student_roll_number = '$roll_number'";
+    $res1 = mysqli_query($conn, $q1);
+    $student = mysqli_fetch_assoc($res1);
 
-    if ($student) {
-
-        // FETCH SUBJECTS
-        $res = mysqli_query($conn, "SELECT * FROM student_results WHERE roll_number='$roll'");
-        while ($row = mysqli_fetch_assoc($res)) {
-            $results[] = $row;
-        }
-
-    } else {
-        $message = "❌ Student not found!";
+    if (!$student) {
+        $error_message = "No student found";
     }
 }
 
-// SAVE OR UPDATE RESULT
-if (isset($_POST['submit'])) {
+/* ================= LOAD SUBJECTS (AJAX LIKE PHP) ================= */
+if (isset($_POST['load_subjects'])) {
 
-    $roll = $_POST['roll_number'];
-    $department = $_POST['department'];
     $year = $_POST['year'];
     $semester = $_POST['semester'];
 
-    $subjects = $_POST['subject'];
-    $marks = $_POST['marks'];
-    $ids = $_POST['result_id']; // hidden ids for update
+    $q = "SELECT subject_name FROM university_results.subjects 
+          WHERE year='$year' AND semester='$semester'";
 
-    for ($i = 0; $i < count($subjects); $i++) {
+    $res = mysqli_query($conn, $q);
 
-        $sub = $subjects[$i];
-        $mark = $marks[$i];
-
-        if (!empty($sub) && !empty($mark)) {
-
-            // UPDATE EXISTING
-            if (!empty($ids[$i])) {
-
-                $id = $ids[$i];
-
-                $query = "UPDATE student_results 
-                          SET subject_name='$sub', marks='$mark',
-                              department='$department', year='$year', semester='$semester'
-                          WHERE id='$id'";
-
-                mysqli_query($conn, $query);
-
-            } else {
-                // INSERT NEW
-
-                $query = "INSERT INTO student_results 
-                (roll_number, department, year, semester, subject_name, marks)
-                VALUES ('$roll', '$department', '$year', '$semester', '$sub', '$mark')";
-
-                mysqli_query($conn, $query);
-            }
-        }
+    while($row = mysqli_fetch_assoc($res)){
+        $subjects[] = $row['subject_name'];
     }
-
-    $message = "✅ Result Saved/Updated Successfully!";
 }
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Result Management</title>
+<meta charset="UTF-8">
+<title>Dynamic ERP System</title>
 
-    <style>
-        body { font-family: Arial; background: #f4f6f9; }
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-        .container {
-            width: 650px;
-            margin: 30px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-        }
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins;}
 
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-        }
+body{background:#eef2f7;}
 
-        button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-            background: #004aad;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
+.header{
+background:linear-gradient(135deg,#1e3c72,#2a5298);
+color:white;
+padding:15px;
+text-align:center;
+font-weight:600;
+}
 
-        .add-btn { background: green; }
+.wrapper{display:flex;gap:20px;padding:20px;}
 
-        .delete-btn {
-            background: red;
-            width: auto;
-            padding: 5px 10px;
-        }
+.main{
+flex:2;
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 10px 20px rgba(0,0,0,0.08);
+}
 
-        .row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
+.profile{
+flex:1;
+background:white;
+padding:20px;
+border-radius:12px;
+text-align:center;
+box-shadow:0 10px 20px rgba(0,0,0,0.08);
+}
 
-        .row input { width: 40%; }
+.profile img{
+width:120px;height:140px;border-radius:10px;
+object-fit:cover;border:3px solid #2a5298;
+}
 
-        .msg { text-align: center; color: red; }
-    </style>
+input,select{
+width:100%;
+padding:10px;
+margin:6px 0;
+border-radius:6px;
+border:1px solid #ddd;
+}
+
+button{
+width:100%;
+padding:12px;
+border:none;
+border-radius:6px;
+color:white;
+cursor:pointer;
+}
+
+.search{background:#6c757d;}
+.load{background:#2a5298;}
+
+.subject-box{
+margin-top:15px;
+padding:15px;
+background:#f5f7fb;
+border-radius:8px;
+}
+
+.subject-box ul{
+padding-left:20px;
+}
+
+@media(max-width:900px){
+.wrapper{flex-direction:column;}
+}
+</style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="header">
+🎓 Dynamic University ERP - Subject Management System
+</div>
 
-<h2>Result Management System</h2>
+<div class="wrapper">
 
-<p class="msg"><?php echo $message; ?></p>
+<!-- MAIN -->
+<div class="main">
 
 <form method="POST">
 
-    <!-- SEARCH -->
-    <label>Roll Number</label>
-    <input type="text" name="roll_number" value="<?php echo $student['student_roll_number'] ?? ''; ?>" required>
-
-    <button name="search">Search</button>
-
-    <?php if ($student) { ?>
-
-    <!-- STUDENT INFO -->
-    <label>Student Name</label>
-    <input type="text" value="<?php echo $student['student_name']; ?>" readonly>
-
-    <label>Department</label>
-    <input type="text" name="department" value="<?php echo $student['department']; ?>" readonly>
-
-    <!-- YEAR -->
-    <label>Year</label>
-    <select name="year">
-        <option>1st Year</option>
-        <option>2nd Year</option>
-        <option>3rd Year</option>
-    </select>
-
-    <!-- SEM -->
-    <label>Semester</label>
-    <select name="semester">
-        <option>Sem 1</option>
-        <option>Sem 2</option>
-        <option>Sem 3</option>
-        <option>Sem 4</option>
-        <option>Sem 5</option>
-        <option>Sem 6</option>
-    </select>
-
-    <h3>Subjects</h3>
-
-    <div id="subjects">
-
-        <!-- EXISTING SUBJECTS -->
-        <?php if (!empty($results)) {
-            foreach ($results as $row) { ?>
-                
-                <div class="row">
-                    <input type="hidden" name="result_id[]" value="<?php echo $row['id']; ?>">
-                    <input type="text" name="subject[]" value="<?php echo $row['subject_name']; ?>">
-                    <input type="number" name="marks[]" value="<?php echo $row['marks']; ?>">
-                    <button type="button" class="delete-btn" onclick="removeRow(this)">X</button>
-                </div>
-
-        <?php } } else { ?>
-
-            <!-- EMPTY FIRST ROW -->
-            <div class="row">
-                <input type="hidden" name="result_id[]">
-                <input type="text" name="subject[]" placeholder="Subject">
-                <input type="number" name="marks[]" placeholder="Marks">
-                <button type="button" class="delete-btn" onclick="removeRow(this)">X</button>
-            </div>
-
-        <?php } ?>
-
-    </div>
-
-    <button type="button" class="add-btn" onclick="addRow()">+ Add Subject</button>
-
-    <button name="submit">Save / Update Result</button>
-
-    <?php } ?>
+<input type="text" name="roll_number" placeholder="Enter Roll Number" required>
+<button class="search" name="search">Search Student</button>
 
 </form>
 
+<hr>
+
+<form method="POST">
+
+<label>Year</label>
+<select name="year" required>
+<option value="">Select Year</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+</select>
+
+<label>Semester</label>
+<select name="semester" required>
+<option value="">Select Semester</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+</select>
+
+<button class="load" name="load_subjects">Load Subjects</button>
+
+</form>
+
+<!-- SUBJECT DISPLAY -->
+<div class="subject-box">
+
+<?php if(!empty($subjects)) { ?>
+<h3>Subjects:</h3>
+<ul>
+<?php foreach($subjects as $sub){ ?>
+<li><?php echo $sub; ?></li>
+<?php } ?>
+</ul>
+<?php } else { ?>
+<p>Select year and semester to load subjects</p>
+<?php } ?>
+
 </div>
 
-<script>
-function addRow() {
-    let div = document.createElement("div");
-    div.classList.add("row");
+</div>
 
-    div.innerHTML = `
-        <input type="hidden" name="result_id[]">
-        <input type="text" name="subject[]" placeholder="Subject">
-        <input type="number" name="marks[]" placeholder="Marks">
-        <button type="button" class="delete-btn" onclick="removeRow(this)">X</button>
-    `;
+<!-- PROFILE -->
+<div class="profile">
 
-    document.getElementById("subjects").appendChild(div);
-}
+<?php if($student){ ?>
 
-function removeRow(btn) {
-    btn.parentElement.remove();
-}
-</script>
+<img src="../student_details/<?php echo $student['photo']; ?>">
+
+<h3><?php echo $student['student_name']; ?></h3>
+<p><?php echo $student['department']; ?></p>
+<p>Sem: <?php echo $student['semester']; ?></p>
+<p>Year: <?php echo $student['admission_year']; ?></p>
+
+<?php } else { ?>
+<p>No student selected</p>
+<?php } ?>
+
+</div>
+
+</div>
 
 </body>
 </html>

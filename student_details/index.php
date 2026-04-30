@@ -1,159 +1,382 @@
 <?php
 include("../server/connection.php");
 
-if (isset($_POST['submit'])) {
-    $student_roll_number = $_POST['roll_number'];
-    $student_name        = $_POST['student_name'];
-    $student_department  = $_POST['student_department'];
+/* =========================
+   AJAX: LIVE ROLL NUMBER
+========================= */
+if (isset($_GET['get_roll']) && isset($_GET['department'])) {
 
-    $query = "INSERT INTO university_results.student_details 
-              (student_roll_number, student_name, department) 
-              VALUES('$student_roll_number','$student_name','$student_department')";
+    $department = $_GET['department'];
+    $year = date("Y");
 
-    $data = mysqli_query($conn, $query);
-    if ($data) {
-        $success_message = "✅ New student has been added successfully!";
-    } else {
-        $error_message = "❌ Failed to add new student. Please try again.";
+    $query = $conn->prepare("SELECT COUNT(*) as total FROM student_details WHERE department=?");
+    $query->bind_param("s", $department);
+    $query->execute();
+    $result = $query->get_result()->fetch_assoc();
+
+    $count = $result['total'] + 1;
+    $roll = $department . $year . str_pad($count, 4, "0", STR_PAD_LEFT);
+
+    echo $roll;
+    exit;
+}
+
+/* =========================
+   FORM SUBMIT
+========================= */
+$message = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    $department = $_POST['department'];
+
+    $year = date("Y");
+    $query = $conn->prepare("SELECT COUNT(*) as total FROM student_details WHERE department=?");
+    $query->bind_param("s", $department);
+    $query->execute();
+    $result = $query->get_result()->fetch_assoc();
+
+    $count = $result['total'] + 1;
+    $student_id = $department . $year . str_pad($count, 4, "0", STR_PAD_LEFT);
+
+    // upload
+    $photoName = "";
+    if (!empty($_FILES['photo']['name'])) {
+
+        $targetDir = "uploads/";
+        if (!is_dir($targetDir))
+            mkdir($targetDir, 0777, true);
+
+        $fileName = time() . "_" . basename($_FILES["photo"]["name"]);
+        move_uploaded_file($_FILES["photo"]["tmp_name"], $targetDir . $fileName);
+
+        $photoName = $fileName;
     }
+
+    $stmt = $conn->prepare("INSERT INTO student_details 
+    (student_id, full_name, father_name, dob, gender, email, phone, address, course, department, semester, admission_date, photo)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+    $stmt->bind_param(
+        "sssssssssssss",
+        $student_id,
+        $_POST['full_name'],
+        $_POST['father_name'],
+        $_POST['dob'],
+        $_POST['gender'],
+        $_POST['email'],
+        $_POST['phone'],
+        $_POST['address'],
+        $_POST['course'],
+        $department,
+        $_POST['semester'],
+        $_POST['admission_date'],
+        $photoName
+    );
+
+    if ($stmt->execute()) {
+        $message = "Student Added Successfully! Roll No: " . $student_id;
+    } else {
+        $message = "Error: " . $stmt->error;
+    }
+
+    $stmt->close();
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Student - University Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>University ERP - Add Student</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
     <style>
-        /* Reset */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Poppins;
+        }
 
         body {
-            background-color: #f5f7fa;
-            padding: 40px 20px;
-            color: #333;
+            background: #f4f6fb;
+            display: flex;
+            justify-content: center;
         }
 
-        .container {
-            max-width: 700px;
-            margin: auto;
+        /* CARD */
+        .erp-card {
+            width: 950px;
             background: #fff;
-            padding: 40px 50px;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         }
 
-        h1 {
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            padding: 20px;
             text-align: center;
-            margin-bottom: 30px;
-            color: #004aad;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: #555;
-        }
-
-        input[type="text"], select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: border 0.3s;
-        }
-
-        input[type="text"]:focus, select:focus {
-            border-color: #004aad;
-            outline: none;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background-color: #004aad;
             color: #fff;
-            font-size: 18px;
-            font-weight: 500;
+        }
+
+        .header h2 {
+            font-size: 22px;
+        }
+
+        /* ROLL */
+        .roll {
+            background: #f1f5f9;
+            text-align: center;
+            padding: 12px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        /* FORM */
+        .form {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* SECTION TITLE */
+        .section-title {
+            grid-column: span 2;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4f46e5;
+            margin-top: 10px;
+            border-left: 4px solid #4f46e5;
+            padding-left: 10px;
+        }
+
+        /* LABEL */
+        label {
+            font-size: 12px;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        /* INPUT BOX */
+        .input-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* INPUT */
+        input,
+        select,
+        textarea {
+            padding: 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fff;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        textarea {
+            resize: none;
+            height: 80px;
+        }
+
+        .full {
+            grid-column: span 2;
+        }
+
+        /* BUTTON */
+        button {
+            grid-column: span 2;
+            padding: 12px;
             border: none;
-            border-radius: 5px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
         }
 
-        .submit-btn:hover {
-            background-color: #003080;
+        button:hover {
+            opacity: 0.9;
         }
 
-        .message {
+        /* MESSAGE */
+        .msg {
             text-align: center;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            font-weight: 500;
+            margin: 10px;
+            padding: 10px;
+            background: #ecfdf5;
+            color: #065f46;
+            border-radius: 8px;
+            border: 1px solid #a7f3d0;
         }
 
-        .success { background-color: #d4edda; color: #155724; }
-        .error { background-color: #f8d7da; color: #721c24; }
-
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 14px;
-            color: #777;
-        }
-
-        @media (max-width: 600px) {
-            .container { padding: 30px 20px; }
+        /* IMAGE */
+        img {
+            width: 100px;
+            margin-top: 8px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Add New Student</h1>
 
-        <?php if(isset($success_message)) { ?>
-            <div class="message success"><?php echo $success_message; ?></div>
-        <?php } elseif(isset($error_message)) { ?>
-            <div class="message error"><?php echo $error_message; ?></div>
+<body>
+
+    <div class="erp-card">
+
+        <div class="header">
+            <h2>🎓 University ERP - Add Student</h2>
+        </div>
+
+        <div class="roll" id="rollPreview">
+            Roll No: Auto Generate
+        </div>
+
+        <?php if ($message != "") { ?>
+            <div class="msg"><?= $message ?></div>
         <?php } ?>
 
-        <form action="" method="POST">
-            <div class="form-group">
-                <label for="roll_number">Roll Number</label>
-                <input type="text" id="roll_number" name="roll_number" placeholder="Enter Roll Number" required>
-            </div>
+        <form method="POST" enctype="multipart/form-data">
 
-            <div class="form-group">
-                <label for="student_name">Student Name</label>
-                <input type="text" id="student_name" name="student_name" placeholder="Enter Full Name" required>
-            </div>
+            <div class="form">
 
-            <div class="form-group">
-                <label for="student_department">School Department</label>
-                <select id="student_department" name="student_department" required>
-                    <option value="">Select Department</option>
-                    <option value="BCA">BCA</option>
-                    <option value="MCA">MCA</option>
-                    <option value="B.TECH">B.TECH</option>
-                    <option value="M.TECH">M.TECH</option>
-                </select>
-            </div>
+                <div class="section-title">PERSONAL INFORMATION</div>
 
-            <button type="submit" name="submit" class="submit-btn">Add Student</button>
+                <div class="input-box">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" required>
+                </div>
+
+                <div class="input-box">
+                    <label>Father Name</label>
+                    <input type="text" name="father_name">
+                </div>
+
+                <div class="input-box">
+                    <label>Date of Birth</label>
+                    <input type="date" name="dob">
+                </div>
+
+                <div class="input-box">
+                    <label>Gender</label>
+                    <select name="gender">
+                        <option value="">Select</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                    </select>
+                </div>
+
+                <div class="section-title">CONTACT DETAILS</div>
+
+                <div class="input-box">
+                    <label>Email</label>
+                    <input type="email" name="email">
+                </div>
+
+                <div class="input-box">
+                    <label>Phone</label>
+                    <input type="text" name="phone">
+                </div>
+
+                <div class="full input-box">
+                    <label>Address</label>
+                    <textarea name="address"></textarea>
+                </div>
+
+                <div class="section-title">ACADEMIC DETAILS</div>
+
+                <div class="input-box">
+                    <label>Department</label>
+                    <select name="department" id="department" onchange="getRoll()" required>
+                        <option value="">Select</option>
+                        <option>SET</option>
+                        <option>SOB</option>
+                        <option>PHARM</option>
+                        <option>LAW</option>
+                    </select>
+                </div>
+
+                <div class="input-box">
+                    <label>Course (Manual Select)</label>
+                    <select name="course" id="course">
+                        <option value="">Select Course</option>
+                        <option>B.Tech</option>
+                        <option>M.Tech</option>
+                        <option>BCA</option>
+                        <option>BBA</option>
+                        <option>MBA</option>
+                        <option>B.Pharm</option>
+                        <option>M.Pharm</option>
+                        <option>LLB</option>
+                        <option>LLM</option>
+                    </select>
+                </div>
+
+                <div class="input-box">
+                    <label>Semester</label>
+                    <select name="semester">
+                        <option value="">Select Semester</option>
+                        <option>Semester 1</option>
+                        <option>Semester 2</option>
+                        <option>Semester 3</option>
+                        <option>Semester 4</option>
+                        <option>Semester 5</option>
+                        <option>Semester 6</option>
+                        <option>Semester 7</option>
+                        <option>Semester 8</option>
+                    </select>
+                </div>
+
+                <div class="input-box">
+                    <label>Admission Date</label>
+                    <input type="date" name="admission_date">
+                </div>
+
+                <div class="full input-box">
+                    <label>Passport Photo</label>
+                    <input type="file" name="photo" onchange="previewImage(event)">
+                    <img id="preview">
+                </div>
+
+                <button type="submit">Save Student</button>
+
+            </div>
         </form>
 
-        <footer>
-            2025 &copy; Sushant University. All Rights Reserved.
-        </footer>
     </div>
+
+    <script>
+        function getRoll() {
+            let d = document.getElementById("department").value;
+            if (!d) return;
+
+            fetch("?get_roll=1&department=" + d)
+                .then(r => r.text())
+                .then(t => {
+                    document.getElementById("rollPreview").innerHTML = "Roll No: " + t;
+                });
+        }
+
+        function previewImage(e) {
+            let r = new FileReader();
+            r.onload = () => document.getElementById("preview").src = r.result;
+            r.readAsDataURL(e.target.files[0]);
+        }
+    </script>
+
 </body>
+
 </html>

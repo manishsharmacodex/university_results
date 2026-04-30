@@ -1,5 +1,5 @@
 function displayStundet(student_details){
-    const message = "Student Details :";
+    const message = "Student Details : ";
     console.log(message,student_details);
 }
 
@@ -97,8 +97,6 @@ const student_details = [
             subject_6 : "SOCIAL SCIENCE",
         }
     }
-
-
 ]
 
 displayStundet(student_details);
