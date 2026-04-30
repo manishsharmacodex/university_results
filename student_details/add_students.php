@@ -1,382 +1,292 @@
 <?php
 include("../server/connection.php");
 
-/* =========================
-   AJAX: LIVE ROLL NUMBER
-========================= */
-if (isset($_GET['get_roll']) && isset($_GET['department'])) {
-
-    $department = $_GET['department'];
-    $year = date("Y");
-
-    $query = $conn->prepare("SELECT COUNT(*) as total FROM student_details WHERE department=?");
-    $query->bind_param("s", $department);
-    $query->execute();
-    $result = $query->get_result()->fetch_assoc();
-
-    $count = $result['total'] + 1;
-    $roll = $department . $year . str_pad($count, 4, "0", STR_PAD_LEFT);
-
-    echo $roll;
-    exit;
-}
-
-/* =========================
-   FORM SUBMIT
-========================= */
 $message = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// FUNCTION TO CONVERT dd/mm/yyyy → yyyy-mm-dd
+function convertDate($date) {
+    $parts = explode('/', $date);
+    if (count($parts) == 3) {
+        return $parts[2] . '-' . $parts[1] . '-' . $parts[0];
+    }
+    return null;
+}
 
+// HANDLE FORM SUBMISSION
+if (isset($_POST['submit'])) {
+
+    $student_id = $_POST['student_id'];
+    $full_name = $_POST['full_name'];
+    $father_name = $_POST['father_name'];
+
+    $dob_input = $_POST['dob'];
+    $admission_input = $_POST['admission_date'];
+
+    $dob = convertDate($dob_input);
+    $admission_date = convertDate($admission_input);
+
+    $gender = $_POST['gender'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $address = $_POST['address'];
+    $course = $_POST['course'];
     $department = $_POST['department'];
+    $semester = $_POST['semester'];
 
-    $year = date("Y");
-    $query = $conn->prepare("SELECT COUNT(*) as total FROM student_details WHERE department=?");
-    $query->bind_param("s", $department);
-    $query->execute();
-    $result = $query->get_result()->fetch_assoc();
+    $photo_name = "";
 
-    $count = $result['total'] + 1;
-    $student_id = $department . $year . str_pad($count, 4, "0", STR_PAD_LEFT);
+    if (!empty($_FILES["photo"]["name"])) {
 
-    // upload
-    $photoName = "";
-    if (!empty($_FILES['photo']['name'])) {
+        $folder = "uploads/";
+        if (!is_dir($folder)) {
+            mkdir($folder, 0777, true);
+        }
 
-        $targetDir = "uploads/";
-        if (!is_dir($targetDir))
-            mkdir($targetDir, 0777, true);
-
-        $fileName = time() . "_" . basename($_FILES["photo"]["name"]);
-        move_uploaded_file($_FILES["photo"]["tmp_name"], $targetDir . $fileName);
-
-        $photoName = $fileName;
+        $photo_name = time() . "_" . basename($_FILES["photo"]["name"]);
+        move_uploaded_file($_FILES["photo"]["tmp_name"], $folder . $photo_name);
     }
 
-    $stmt = $conn->prepare("INSERT INTO student_details 
-    (student_id, full_name, father_name, dob, gender, email, phone, address, course, department, semester, admission_date, photo)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    if ($dob && $admission_date) {
 
-    $stmt->bind_param(
-        "sssssssssssss",
-        $student_id,
-        $_POST['full_name'],
-        $_POST['father_name'],
-        $_POST['dob'],
-        $_POST['gender'],
-        $_POST['email'],
-        $_POST['phone'],
-        $_POST['address'],
-        $_POST['course'],
-        $department,
-        $_POST['semester'],
-        $_POST['admission_date'],
-        $photoName
-    );
+        $sql = "INSERT INTO student_details 
+        (student_id, full_name, father_name, dob, gender, email, phone, address, course, department, semester, admission_date, photo)
+        VALUES 
+        ('$student_id', '$full_name', '$father_name', '$dob', '$gender', '$email', '$phone', '$address', '$course', '$department', '$semester', '$admission_date', '$photo_name')";
 
-    if ($stmt->execute()) {
-        $message = "Student Added Successfully! Roll No: " . $student_id;
+        if ($conn->query($sql) === TRUE) {
+            $message = "Student added successfully!";
+        } else {
+            $message = "Error: " . $conn->error;
+        }
+
     } else {
-        $message = "Error: " . $stmt->error;
+        $message = "Invalid date format. Use dd/mm/yyyy";
     }
-
-    $stmt->close();
 }
 ?>
 
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>University ERP - Add Student</title>
+<title>Add Student</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f1f5f9;
+}
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Poppins;
-        }
+.container{
+    max-width:1000px;
+    margin:60px auto;
+    padding:0 20px;
+}
 
-        body {
-            background: #f4f6fb;
-            display: flex;
-            justify-content: center;
-        }
+.card{
+    background:#fff;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.06);
+}
 
-        /* CARD */
-        .erp-card {
-            width: 950px;
-            background: #fff;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        }
+.msg{
+    padding:12px;
+    margin-bottom:15px;
+    background:#dcfce7;
+    border:1px solid #86efac;
+    border-radius:8px;
+    font-size:14px;
+}
 
-        /* HEADER */
-        .header {
-            background: linear-gradient(135deg, #4f46e5, #06b6d4);
-            padding: 20px;
-            text-align: center;
-            color: #fff;
-        }
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:15px;
+}
 
-        .header h2 {
-            font-size: 22px;
-        }
+label{
+    font-size:13px;
+    font-weight:600;
+    color:#334155;
+    display:block;
+    margin-bottom:5px;
+}
 
-        /* ROLL */
-        .roll {
-            background: #f1f5f9;
-            text-align: center;
-            padding: 12px;
-            font-weight: 600;
-            color: #111827;
-        }
+input, select, textarea{
+    width:100%;
+    padding:11px;
+    border:1px solid #e2e8f0;
+    border-radius:8px;
+    outline:none;
+    font-size:14px;
+}
 
-        /* FORM */
-        .form {
-            padding: 25px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
+input:focus, select:focus, textarea:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 3px rgba(37,99,235,0.15);
+}
 
-        /* SECTION TITLE */
-        .section-title {
-            grid-column: span 2;
-            font-size: 13px;
-            font-weight: 600;
-            color: #4f46e5;
-            margin-top: 10px;
-            border-left: 4px solid #4f46e5;
-            padding-left: 10px;
-        }
+textarea{
+    height:90px;
+    resize:none;
+}
 
-        /* LABEL */
-        label {
-            font-size: 12px;
-            color: #374151;
-            margin-bottom: 4px;
-        }
+.full{
+    grid-column:span 2;
+}
 
-        /* INPUT BOX */
-        .input-box {
-            display: flex;
-            flex-direction: column;
-        }
+button{
+    background:#2563eb;
+    color:#fff;
+    border:none;
+    padding:12px 18px;
+    width:220px;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+}
 
-        /* INPUT */
-        input,
-        select,
-        textarea {
-            padding: 10px;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            background: #fff;
-            outline: none;
-            transition: 0.2s;
-        }
+button:hover{
+    background:#1d4ed8;
+}
 
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
+@media(max-width:768px){
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+    .full{
+        grid-column:span 1;
+    }
+    button{
+        width:100%;
+    }
+}
+</style>
 
-        textarea {
-            resize: none;
-            height: 80px;
-        }
-
-        .full {
-            grid-column: span 2;
-        }
-
-        /* BUTTON */
-        button {
-            grid-column: span 2;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #fff;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        button:hover {
-            opacity: 0.9;
-        }
-
-        /* MESSAGE */
-        .msg {
-            text-align: center;
-            margin: 10px;
-            padding: 10px;
-            background: #ecfdf5;
-            color: #065f46;
-            border-radius: 8px;
-            border: 1px solid #a7f3d0;
-        }
-
-        /* IMAGE */
-        img {
-            width: 100px;
-            margin-top: 8px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-    </style>
 </head>
 
 <body>
 
-    <div class="erp-card">
+<div class="container">
 
-        <div class="header">
-            <h2>🎓 University ERP - Add Student</h2>
-        </div>
+<div class="card">
 
-        <div class="roll" id="rollPreview">
-            Roll No: Auto Generate
-        </div>
+<?php if($message != "") { ?>
+    <div class="msg"><?php echo $message; ?></div>
+<?php } ?>
 
-        <?php if ($message != "") { ?>
-            <div class="msg"><?= $message ?></div>
-        <?php } ?>
+<form method="POST" enctype="multipart/form-data">
 
-        <form method="POST" enctype="multipart/form-data">
+<div class="form-grid">
 
-            <div class="form">
-
-                <div class="section-title">PERSONAL INFORMATION</div>
-
-                <div class="input-box">
-                    <label>Full Name</label>
-                    <input type="text" name="full_name" required>
-                </div>
-
-                <div class="input-box">
-                    <label>Father Name</label>
-                    <input type="text" name="father_name">
-                </div>
-
-                <div class="input-box">
-                    <label>Date of Birth</label>
-                    <input type="date" name="dob">
-                </div>
-
-                <div class="input-box">
-                    <label>Gender</label>
-                    <select name="gender">
-                        <option value="">Select</option>
-                        <option>Male</option>
-                        <option>Female</option>
-                    </select>
-                </div>
-
-                <div class="section-title">CONTACT DETAILS</div>
-
-                <div class="input-box">
-                    <label>Email</label>
-                    <input type="email" name="email">
-                </div>
-
-                <div class="input-box">
-                    <label>Phone</label>
-                    <input type="text" name="phone">
-                </div>
-
-                <div class="full input-box">
-                    <label>Address</label>
-                    <textarea name="address"></textarea>
-                </div>
-
-                <div class="section-title">ACADEMIC DETAILS</div>
-
-                <div class="input-box">
-                    <label>Department</label>
-                    <select name="department" id="department" onchange="getRoll()" required>
-                        <option value="">Select</option>
-                        <option>SET</option>
-                        <option>SOB</option>
-                        <option>PHARM</option>
-                        <option>LAW</option>
-                    </select>
-                </div>
-
-                <div class="input-box">
-                    <label>Course (Manual Select)</label>
-                    <select name="course" id="course">
-                        <option value="">Select Course</option>
-                        <option>B.Tech</option>
-                        <option>M.Tech</option>
-                        <option>BCA</option>
-                        <option>BBA</option>
-                        <option>MBA</option>
-                        <option>B.Pharm</option>
-                        <option>M.Pharm</option>
-                        <option>LLB</option>
-                        <option>LLM</option>
-                    </select>
-                </div>
-
-                <div class="input-box">
-                    <label>Semester</label>
-                    <select name="semester">
-                        <option value="">Select Semester</option>
-                        <option>Semester 1</option>
-                        <option>Semester 2</option>
-                        <option>Semester 3</option>
-                        <option>Semester 4</option>
-                        <option>Semester 5</option>
-                        <option>Semester 6</option>
-                        <option>Semester 7</option>
-                        <option>Semester 8</option>
-                    </select>
-                </div>
-
-                <div class="input-box">
-                    <label>Admission Date</label>
-                    <input type="date" name="admission_date">
-                </div>
-
-                <div class="full input-box">
-                    <label>Passport Photo</label>
-                    <input type="file" name="photo" onchange="previewImage(event)">
-                    <img id="preview">
-                </div>
-
-                <button type="submit">Save Student</button>
-
-            </div>
-        </form>
-
+    <div>
+        <label>Student ID</label>
+        <input type="text" name="student_id" placeholder="Enter Student ID" required>
     </div>
 
-    <script>
-        function getRoll() {
-            let d = document.getElementById("department").value;
-            if (!d) return;
+    <div>
+        <label>Full Name</label>
+        <input type="text" name="full_name" placeholder="Enter Full Name" required>
+    </div>
 
-            fetch("?get_roll=1&department=" + d)
-                .then(r => r.text())
-                .then(t => {
-                    document.getElementById("rollPreview").innerHTML = "Roll No: " + t;
-                });
-        }
+    <div>
+        <label>Father Name</label>
+        <input type="text" name="father_name" placeholder="Enter Father Name">
+    </div>
 
-        function previewImage(e) {
-            let r = new FileReader();
-            r.onload = () => document.getElementById("preview").src = r.result;
-            r.readAsDataURL(e.target.files[0]);
-        }
-    </script>
+    <div>
+        <label>Date of Birth</label>
+        <input type="text" id="dob" name="dob" placeholder="DDMMYYYY (Auto format)">
+    </div>
+
+    <div>
+        <label>Gender</label>
+        <select name="gender">
+            <option value="">Select Gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+        </select>
+    </div>
+
+    <div>
+        <label>Email</label>
+        <input type="email" name="email" placeholder="Enter Email Address">
+    </div>
+
+    <div>
+        <label>Phone</label>
+        <input type="text" name="phone" placeholder="Enter Phone Number">
+    </div>
+
+    <div>
+        <label>Course</label>
+        <input type="text" name="course" placeholder="Enter Course">
+    </div>
+
+    <div>
+        <label>Department</label>
+        <input type="text" name="department" placeholder="Enter Department">
+    </div>
+
+    <div>
+        <label>Semester</label>
+        <input type="text" name="semester" placeholder="Enter Semester">
+    </div>
+
+    <div>
+        <label>Admission Date</label>
+        <input type="text" id="admission_date" name="admission_date" placeholder="DDMMYYYY (Auto format)">
+    </div>
+
+    <div>
+        <label>Photo</label>
+        <input type="file" name="photo">
+    </div>
+
+    <div class="full">
+        <label>Address</label>
+        <textarea name="address" placeholder="Enter Full Address"></textarea>
+    </div>
+
+    <div class="full">
+        <button type="submit" name="submit">SAVE STUDENT</button>
+    </div>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+// AUTO FORMAT FUNCTION (DD/MM/YYYY)
+function formatDate(input) {
+    let value = input.value.replace(/\D/g, ''); // remove non-digits
+
+    if (value.length > 2) {
+        value = value.slice(0,2) + '/' + value.slice(2);
+    }
+    if (value.length > 5) {
+        value = value.slice(0,5) + '/' + value.slice(5,9);
+    }
+
+    input.value = value;
+}
+
+// APPLY TO BOTH FIELDS
+document.getElementById("dob").addEventListener("input", function(){
+    formatDate(this);
+});
+
+document.getElementById("admission_date").addEventListener("input", function(){
+    formatDate(this);
+});
+</script>
 
 </body>
-
 </html>
