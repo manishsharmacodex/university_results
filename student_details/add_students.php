@@ -198,7 +198,27 @@ button:hover{
 
     <div>
         <label>Date of Birth</label>
-        <input type="text" id="dob" name="dob" placeholder="DDMMYYYY (Auto format)">
+        <input type="text" id="dob" name="dob" placeholder="DD/MM/YYYY">
+    </div>
+
+    <!-- DEPARTMENT DROPDOWN -->
+    <div>
+        <label>Department</label>
+        <select name="department" id="department" required>
+            <option value="">Select Department</option>
+            <option value="SET">SET</option>
+            <option value="SOB">SOB</option>
+            <option value="LLM">LLM</option>
+            <option value="OTHER">OTHER</option>
+        </select>
+    </div>
+
+    <!-- COURSE DROPDOWN (DYNAMIC) -->
+    <div>
+        <label>Course</label>
+        <select name="course" id="course" required>
+            <option value="">Select Course</option>
+        </select>
     </div>
 
     <div>
@@ -222,23 +242,13 @@ button:hover{
     </div>
 
     <div>
-        <label>Course</label>
-        <input type="text" name="course" placeholder="Enter Course">
-    </div>
-
-    <div>
-        <label>Department</label>
-        <input type="text" name="department" placeholder="Enter Department">
-    </div>
-
-    <div>
         <label>Semester</label>
         <input type="text" name="semester" placeholder="Enter Semester">
     </div>
 
     <div>
         <label>Admission Date</label>
-        <input type="text" id="admission_date" name="admission_date" placeholder="DDMMYYYY (Auto format)">
+        <input type="text" id="admission_date" name="admission_date" placeholder="DD/MM/YYYY">
     </div>
 
     <div>
@@ -264,27 +274,47 @@ button:hover{
 </div>
 
 <script>
-// AUTO FORMAT FUNCTION (DD/MM/YYYY)
+// DATE FORMAT
 function formatDate(input) {
-    let value = input.value.replace(/\D/g, ''); // remove non-digits
+    let value = input.value.replace(/\D/g, '');
 
-    if (value.length > 2) {
-        value = value.slice(0,2) + '/' + value.slice(2);
-    }
-    if (value.length > 5) {
-        value = value.slice(0,5) + '/' + value.slice(5,9);
-    }
+    if (value.length > 2) value = value.slice(0,2) + '/' + value.slice(2);
+    if (value.length > 5) value = value.slice(0,5) + '/' + value.slice(5,9);
 
     input.value = value;
 }
 
-// APPLY TO BOTH FIELDS
 document.getElementById("dob").addEventListener("input", function(){
     formatDate(this);
 });
 
 document.getElementById("admission_date").addEventListener("input", function(){
     formatDate(this);
+});
+
+
+// DEPENDENT DROPDOWN LOGIC
+const coursesByDept = {
+    "SET": ["B.Tech CSE", "B.Tech IT", "MCA"],
+    "SOB": ["BBA", "MBA", "B.Com"],
+    "LLM": ["LLB", "LLM"],
+    "OTHER": ["Diploma", "Certificate Course"]
+};
+
+document.getElementById("department").addEventListener("change", function(){
+    let dept = this.value;
+    let courseSelect = document.getElementById("course");
+
+    courseSelect.innerHTML = '<option value="">Select Course</option>';
+
+    if (coursesByDept[dept]) {
+        coursesByDept[dept].forEach(course => {
+            let option = document.createElement("option");
+            option.value = course;
+            option.textContent = course;
+            courseSelect.appendChild(option);
+        });
+    }
 });
 </script>
 
