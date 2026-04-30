@@ -305,12 +305,12 @@ include("./server/connection.php");
         <div class="logo">🎓 Sushant University</div>
 
         <ul>
-            <li>Home</li>
+            <a href="./index.php"><li>Home</li></a>
             <li>Programs</li>
             <li>Admissions</li>
-            <li>Exam & Results</li>
-            <a href="./school/school.php">
-                <li>Campus</li>
+            <a href="./results_check/results.php"><li>Exam & Results</li></a>
+            <a href="./school/school_information.php">
+                <li>School Informations</li>
             </a>
             <li>Contact</li>
         </ul>

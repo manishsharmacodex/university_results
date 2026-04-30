@@ -216,7 +216,7 @@
                 `;
 
                 try {
-                    const res = await fetch("../student_details/index.php");
+                    const res = await fetch("../student_details/add_students.php");
                     const html = await res.text();
                     document.getElementById("studentBox").innerHTML = html;
                 } catch (error) {
