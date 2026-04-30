@@ -141,7 +141,7 @@ body {
 
 <div class="login-container">
 
-    <h2>ERP Admin</h2>
+    <h2>ERP Admin Login</h2>
 
     <form method="POST" autocomplete="off">
 
