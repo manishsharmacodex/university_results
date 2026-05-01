@@ -394,7 +394,7 @@ if (isset($_POST['submit'])) {
     <!-- POPUP -->
     <div class="popup-overlay" id="popup">
         <div class="popup-box">
-            <h2>Student Created Successfully 🎉</h2>
+            <h2>Student Created Successfully</h2>
             <div class="popup-id">
                 <?php
                 if (isset($student_id)) {
