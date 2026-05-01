@@ -137,6 +137,7 @@ if (isset($_POST['submit'])) {
             font-size: 14px;
         }
 
+        /* GRID */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -152,18 +153,29 @@ if (isset($_POST['submit'])) {
             margin-bottom: 6px;
         }
 
+        /* ✅ UNIFIED INPUT / SELECT / TEXTAREA SIZE */
         input,
         select,
         textarea {
             width: 100%;
-            padding: 12px;
+            height: 45px;
+            /* equal height */
+            padding: 10px 12px;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             outline: none;
             font-size: 14px;
+            box-sizing: border-box;
             transition: 0.2s;
         }
 
+        /* TEXTAREA FIX (keep bigger but aligned width) */
+        textarea {
+            height: 95px;
+            resize: none;
+        }
+
+        /* FOCUS */
         input:focus,
         select:focus,
         textarea:focus {
@@ -171,15 +183,12 @@ if (isset($_POST['submit'])) {
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
-        textarea {
-            height: 95px;
-            resize: none;
-        }
-
+        /* FULL WIDTH */
         .full {
             grid-column: span 2;
         }
 
+        /* BUTTON */
         button {
             background: #2563eb;
             color: #fff;
@@ -197,6 +206,7 @@ if (isset($_POST['submit'])) {
             background: #1d4ed8;
         }
 
+        /* MOBILE */
         @media(max-width:768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -212,12 +222,13 @@ if (isset($_POST['submit'])) {
             }
         }
 
+        /* DISABLED */
         input:disabled {
             background: #e5e7eb;
             color: #6b7280;
-            cursor: not-allowed;
         }
 
+        /* POPUP (UNCHANGED) */
         .popup-overlay {
             display: none;
             position: fixed;
@@ -225,19 +236,10 @@ if (isset($_POST['submit'])) {
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.6);
             justify-content: center;
             align-items: center;
             z-index: 9999;
-        }
-
-        .popup-overlay.show {
-            animation: fadeIn 0.25s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         .popup-box {
@@ -246,23 +248,6 @@ if (isset($_POST['submit'])) {
             border-radius: 12px;
             text-align: center;
             min-width: 300px;
-            animation: popUp 0.35s ease;
-        }
-
-        @keyframes popUp {
-            0% {
-                transform: scale(0.7);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .popup-box h2 {
-            margin: 0;
-            font-size: 18px;
         }
 
         .popup-id {
@@ -270,16 +255,6 @@ if (isset($_POST['submit'])) {
             font-size: 20px;
             font-weight: bold;
             color: #16a34a;
-        }
-
-        .popup-close {
-            margin-top: 20px;
-            padding: 8px 14px;
-            background: #ef4444;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
         }
     </style>
 
@@ -301,23 +276,23 @@ if (isset($_POST['submit'])) {
 
                     <div>
                         <label>Student Name</label>
-                        <input type="text" name="full_name" placeholder="Enter Full Name" required>
+                        <input type="text" name="full_name" placeholder="Enter Full Name" autocomplete="off" required>
                     </div>
 
                     <div>
                         <label>Father Name</label>
-                        <input type="text" name="father_name" placeholder="Enter Father Name">
+                        <input type="text" name="father_name" placeholder="Enter Father Name" autocomplete="off">
                     </div>
 
                     <!-- ✅ ONLY NEW FIELD -->
                     <div>
                         <label>Mother Name</label>
-                        <input type="text" name="mother_name" placeholder="Enter Mother Name">
+                        <input type="text" name="mother_name" placeholder="Enter Mother Name" autocomplete="off">
                     </div>
 
                     <div>
                         <label>Date of Birth</label>
-                        <input type="text" id="dob" name="dob" placeholder="DD/MM/YYYY">
+                        <input type="text" id="dob" name="dob" placeholder="DD/MM/YYYY" autocomplete="off">
                     </div>
 
                     <div>
@@ -350,23 +325,40 @@ if (isset($_POST['submit'])) {
 
                     <div>
                         <label>Email</label>
-                        <input type="email" name="email" placeholder="Enter Email Address">
+                        <input type="email" name="email" placeholder="Enter Email Address" autocomplete="off">
                     </div>
 
                     <div>
                         <label>Phone</label>
-                        <input type="text" name="phone" placeholder="Enter Phone Number">
+                        <input type="text" name="phone" placeholder="Enter Phone Number" autocomplete="off">
                     </div>
 
-                    <div>
+                    <!-- <div>
                         <label>Semester</label>
                         <input type="text" value="1" disabled>
                         <input type="hidden" name="semester" value="1">
+                    </div> -->
+
+                    <!-- <div>
+                        <label>Semester</label>
+                        <select name="semester" required>
+                            <option value="Select Semester" selected>Select Semester</option>
+                            <option value="Semester 1" selected>Semester 1</option>
+                        </select>
+                    </div> -->
+
+                    <div>
+                        <label>Semester</label>
+                        <select name="semester" required>
+                            <option value="Select Semester" selected>Select Semester</option>
+                            <option value="Semester 1">Semester 1</option>
+                        </select>
                     </div>
 
                     <div>
                         <label>Admission Date</label>
-                        <input type="text" id="admission_date" name="admission_date" placeholder="DD/MM/YYYY">
+                        <input type="text" id="admission_date" name="admission_date" placeholder="DD/MM/YYYY"
+                            autocomplete="off">
                     </div>
 
                     <div>
@@ -376,11 +368,11 @@ if (isset($_POST['submit'])) {
 
                     <div class="full">
                         <label>Address</label>
-                        <textarea name="address" placeholder="Enter Full Address"></textarea>
+                        <textarea name="address" placeholder="Enter Full Address" autocomplete="off"></textarea>
                     </div>
 
                     <div class="full">
-                        <button type="submit" name="submit">SAVE STUDENT</button>
+                        <button type="submit" name="submit">ADD STUDENT</button>
                     </div>
 
                 </div>
