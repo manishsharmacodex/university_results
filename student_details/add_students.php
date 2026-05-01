@@ -70,6 +70,8 @@ if (isset($_POST['submit'])) {
 
     $semester = $_POST['semester'];
 
+    $university = $_POST['university'];
+
     $photo_name = "";
 
     if (!empty($_FILES["photo"]["name"])) {
@@ -86,9 +88,9 @@ if (isset($_POST['submit'])) {
     if ($dob && $admission_date) {
 
         $sql = "INSERT INTO student_details 
-        (student_id, full_name, father_name, mother_name, dob, gender, email, phone, address, course, department, semester, admission_date, photo)
+        (student_id, full_name, father_name, mother_name, dob, gender, email, phone, address, course, department, semester, admission_date, photo, university)
         VALUES 
-        ('$student_id', '$full_name', '$father_name', '$mother_name', '$dob', '$gender', '$email', '$phone', '$address', '$course', '$department', '$semester', '$admission_date', '$photo_name')";
+        ('$student_id', '$full_name', '$father_name', '$mother_name', '$dob', '$gender', '$email', '$phone', '$address', '$course', '$department', '$semester', '$admission_date', '$photo_name', '$university')";
 
         if ($conn->query($sql) === TRUE) {
             $message = "Student added successfully! Student ID: " . $student_id;
@@ -270,8 +272,9 @@ if (isset($_POST['submit'])) {
         }
 
         .preview-box {
+            width: 120px;
+            height: 120px;
             position: relative;
-            display: inline-block;
             margin-top: 10px;
         }
 
@@ -282,6 +285,15 @@ if (isset($_POST['submit'])) {
             border-radius: 10px;
             border: 2px solid #e2e8f0;
             display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .remove-photo {
+            position: absolute;
+            top: -8px;
+            right: -8px;
         }
 
         /* ✅ TOP RIGHT CROSS ICON */
@@ -306,6 +318,16 @@ if (isset($_POST['submit'])) {
         .remove-photo:hover {
             background: #dc2626;
         }
+
+        .form-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1e293b;
+            border-bottom: 1px solid #6b7280;
+            padding-bottom: 10px;
+        }
     </style>
 
 </head>
@@ -315,6 +337,8 @@ if (isset($_POST['submit'])) {
     <div class="container">
 
         <div class="card">
+
+            <h2 class="form-title">Register New Student</h2>
 
             <?php if ($message != "") { ?>
                 <div class="msg"><?php echo $message; ?></div>
@@ -326,7 +350,8 @@ if (isset($_POST['submit'])) {
 
                     <div>
                         <label>Student Name</label>
-                        <input type="text" name="full_name" placeholder="Enter Student Name" autocomplete="off" required>
+                        <input type="text" name="full_name" placeholder="Enter Student Name" autocomplete="off"
+                            required>
                     </div>
 
                     <div>
@@ -411,6 +436,14 @@ if (isset($_POST['submit'])) {
                             autocomplete="off">
                     </div>
 
+                    <div>
+                        <label>University</label>
+                        <select name="university" required>
+                            <option value="">Select University</option>
+                            <option value="Sushant University">Sushant University</option>
+                        </select>
+                    </div>
+
                     <!-- <div>
                         <label>Photo</label>
                         <input type="file" name="photo">
@@ -422,14 +455,16 @@ if (isset($_POST['submit'])) {
 
                         <div class="preview-box">
                             <img id="photoPreview">
-
                             <span id="removePhoto" class="remove-photo">✕</span>
                         </div>
                     </div>
 
+
+
                     <div class="full">
                         <label>Permanent Address</label>
-                        <textarea name="address" placeholder="Enter Permanent Full Address" autocomplete="off"></textarea>
+                        <textarea name="address" placeholder="Enter Permanent Full Address"
+                            autocomplete="off"></textarea>
                     </div>
 
                     <div class="full">
