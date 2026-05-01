@@ -249,7 +249,7 @@
 
                 return;
             }
-            
+
             content.innerHTML = pages[page] || "<h1>Page Not Found</h1>";
         }
     </script>

@@ -335,7 +335,7 @@ include("./server/connection.php");
 
             <div class="hero-buttons">
                 <button class="primary">Apply Now</button>
-                <button class="secondary">Explore Programs</button>
+                <a href="./school/school_information.php"><button class="secondary">Explore Programs</button></a>
             </div>
         </div>
 
