@@ -224,11 +224,11 @@
             <a href="../index.php"><li>Home</li></a>
             <li>Programs</li>
             <li>Admissions</li>
-            <li>Exam & Results</li>
+            <a href="../results_check/results.php"><li>Exam & Results</li></a>
             <a href="./school.php">
                 <li>Campus</li>
             </a>
-            <li>Contact</li>
+            <a href="../src/pages/contact.php"><li>Contact</li></a>
         </ul>
 
         <button class="btn-primary">Login</button>
