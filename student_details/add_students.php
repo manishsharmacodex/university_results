@@ -256,6 +256,56 @@ if (isset($_POST['submit'])) {
             font-weight: bold;
             color: #16a34a;
         }
+
+
+        /* photoPreview */
+        #photoPreview {
+            margin-top: 10px;
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            display: none;
+        }
+
+        .preview-box {
+            position: relative;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        #photoPreview {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            display: none;
+        }
+
+        /* ✅ TOP RIGHT CROSS ICON */
+        .remove-photo {
+            display: none;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .remove-photo:hover {
+            background: #dc2626;
+        }
     </style>
 
 </head>
@@ -276,7 +326,7 @@ if (isset($_POST['submit'])) {
 
                     <div>
                         <label>Student Name</label>
-                        <input type="text" name="full_name" placeholder="Enter Full Name" autocomplete="off" required>
+                        <input type="text" name="full_name" placeholder="Enter Student Name" autocomplete="off" required>
                     </div>
 
                     <div>
@@ -329,7 +379,7 @@ if (isset($_POST['submit'])) {
                     </div>
 
                     <div>
-                        <label>Phone</label>
+                        <label>Phone Number</label>
                         <input type="text" name="phone" placeholder="Enter Phone Number" autocomplete="off">
                     </div>
 
@@ -348,7 +398,7 @@ if (isset($_POST['submit'])) {
                     </div> -->
 
                     <div>
-                        <label>Semester</label>
+                        <label>Semester Allotment</label>
                         <select name="semester" required>
                             <option value="Select Semester" selected>Select Semester</option>
                             <option value="Semester 1">Semester 1</option>
@@ -361,14 +411,25 @@ if (isset($_POST['submit'])) {
                             autocomplete="off">
                     </div>
 
-                    <div>
+                    <!-- <div>
                         <label>Photo</label>
                         <input type="file" name="photo">
+                    </div> -->
+
+                    <div class="photo-wrapper">
+                        <label>Photo</label>
+                        <input type="file" name="photo" id="photoInput">
+
+                        <div class="preview-box">
+                            <img id="photoPreview">
+
+                            <span id="removePhoto" class="remove-photo">✕</span>
+                        </div>
                     </div>
 
                     <div class="full">
-                        <label>Address</label>
-                        <textarea name="address" placeholder="Enter Full Address" autocomplete="off"></textarea>
+                        <label>Permanent Address</label>
+                        <textarea name="address" placeholder="Enter Permanent Full Address" autocomplete="off"></textarea>
                     </div>
 
                     <div class="full">
@@ -447,6 +508,36 @@ if (isset($_POST['submit'])) {
             document.getElementById("popup").style.display = "flex";
             document.getElementById("popup").classList.add("show");
         <?php } ?>
+
+
+
+
+
+        // script code for image photoPreview
+        let photoInput = document.getElementById("photoInput");
+        let preview = document.getElementById("photoPreview");
+        let removeBtn = document.getElementById("removePhoto");
+
+        photoInput.addEventListener("change", function (event) {
+            let file = event.target.files[0];
+
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                    removeBtn.style.display = "inline-block";
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        removeBtn.addEventListener("click", function () {
+            photoInput.value = "";
+            preview.src = "";
+            preview.style.display = "none";
+            removeBtn.style.display = "none";
+        });
     </script>
 
 </body>
