@@ -55,6 +55,7 @@ if (isset($_POST['submit'])) {
 
     $full_name = $_POST['full_name'];
     $father_name = $_POST['father_name'];
+    $mother_name = $_POST['mother_name']; // ✅ ADDED
 
     $dob_input = $_POST['dob'];
     $admission_input = $_POST['admission_date'];
@@ -85,9 +86,9 @@ if (isset($_POST['submit'])) {
     if ($dob && $admission_date) {
 
         $sql = "INSERT INTO student_details 
-        (student_id, full_name, father_name, dob, gender, email, phone, address, course, department, semester, admission_date, photo)
+        (student_id, full_name, father_name, mother_name, dob, gender, email, phone, address, course, department, semester, admission_date, photo)
         VALUES 
-        ('$student_id', '$full_name', '$father_name', '$dob', '$gender', '$email', '$phone', '$address', '$course', '$department', '$semester', '$admission_date', '$photo_name')";
+        ('$student_id', '$full_name', '$father_name', '$mother_name', '$dob', '$gender', '$email', '$phone', '$address', '$course', '$department', '$semester', '$admission_date', '$photo_name')";
 
         if ($conn->query($sql) === TRUE) {
             $message = "Student added successfully! Student ID: " . $student_id;
@@ -217,7 +218,6 @@ if (isset($_POST['submit'])) {
             cursor: not-allowed;
         }
 
-        /* ================= POPUP ADDED ================= */
         .popup-overlay {
             display: none;
             position: fixed;
@@ -231,7 +231,6 @@ if (isset($_POST['submit'])) {
             z-index: 9999;
         }
 
-        /* ✨ ANIMATION ADDED (NEW ONLY) */
         .popup-overlay.show {
             animation: fadeIn 0.25s ease-in-out;
         }
@@ -247,8 +246,6 @@ if (isset($_POST['submit'])) {
             border-radius: 12px;
             text-align: center;
             min-width: 300px;
-
-            /* ✨ NEW ANIMATION */
             animation: popUp 0.35s ease;
         }
 
@@ -310,6 +307,12 @@ if (isset($_POST['submit'])) {
                     <div>
                         <label>Father Name</label>
                         <input type="text" name="father_name" placeholder="Enter Father Name">
+                    </div>
+
+                    <!-- ✅ ONLY NEW FIELD -->
+                    <div>
+                        <label>Mother Name</label>
+                        <input type="text" name="mother_name" placeholder="Enter Mother Name">
                     </div>
 
                     <div>

@@ -3,6 +3,7 @@ CREATE TABLE student_details (
     student_id VARCHAR(50) UNIQUE,
     full_name VARCHAR(100) NOT NULL,
     father_name VARCHAR(100),
+    mother_name VARCHAR(100), -- ✅ ADDED
     dob DATE,
     gender ENUM('Male', 'Female', 'Other'),
     email VARCHAR(100),
