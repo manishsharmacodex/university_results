@@ -155,11 +155,11 @@ if (isset($_POST['submit'])) {
 <head>
     <title>Add Student</title>
     <link rel="stylesheet" type="text/css" href="../css/font.css">
-
     <style>
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            padding: 0;
+            box-sizing: border-box;
             background: #f1f5f9;
         }
 
@@ -305,18 +305,13 @@ if (isset($_POST['submit'])) {
             color: #16a34a;
         }
 
-
-        /* photoPreview */
-        #photoPreview {
-            margin-top: 10px;
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid #e2e8f0;
-            display: none;
+        /* success icon */
+        .success_icon {
+            width: 100px;
+            height: 60px;
         }
 
+        /* photoPreview */
         .preview-box {
             width: 120px;
             height: 120px;
@@ -334,12 +329,6 @@ if (isset($_POST['submit'])) {
             position: absolute;
             top: 0;
             left: 0;
-        }
-
-        .remove-photo {
-            position: absolute;
-            top: -8px;
-            right: -8px;
         }
 
         /* ✅ TOP RIGHT CROSS ICON */
@@ -374,54 +363,156 @@ if (isset($_POST['submit'])) {
             border-bottom: 1px solid #6b7280;
             padding-bottom: 20px;
         }
-    </style>
 
+
+        /* ===== GLASS PREVIEW POPUP ===== */
+        #previewPopup {
+            backdrop-filter: blur(8px);
+        }
+
+        #previewPopup .popup-box {
+            width: 90%;
+            max-width: 600px;
+            padding: 18px 20px;
+            border-radius: 14px;
+
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+
+            text-align: left;
+        }
+
+        /* TITLE */
+        #previewPopup h2 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        /* ===== COMPACT GRID ===== */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px 14px;
+            margin-top: 10px;
+        }
+
+        /* FIELD CARD */
+        .preview-item {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            padding: 8px 10px;
+            border-radius: 8px;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* LABEL */
+        .preview-item span {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 2px;
+        }
+
+        /* VALUE */
+        .preview-item b {
+            font-size: 13px;
+            color: #0f172a;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        /* FULL WIDTH */
+        .preview-item.full {
+            grid-column: span 2;
+        }
+
+        /* BUTTONS */
+        .preview-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .preview-actions button {
+            flex: 1;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* CONFIRM */
+        .btn-confirm {
+            background: rgba(34, 197, 94, 0.9);
+            color: #fff;
+        }
+
+        .btn-confirm:hover {
+            background: rgba(22, 163, 74, 1);
+        }
+
+        /* EDIT */
+        .btn-edit {
+            background: rgba(226, 232, 240, 0.8);
+            color: #0f172a;
+        }
+
+        .btn-edit:hover {
+            background: rgba(203, 213, 225, 1);
+        }
+
+        /* SCROLL CONTROL */
+        #previewContent {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+    </style>
 </head>
 
 <body>
-
     <div class="container">
-
         <div class="card">
-
             <h2 class="form-title">Register New Student</h2>
-
             <?php if ($message != "") { ?>
                 <div class="msg"><?php echo $message; ?></div>
             <?php } ?>
 
-            <form method="POST" enctype="multipart/form-data">
-
+            <form id="studentForm" method="POST" enctype="multipart/form-data">
                 <div class="form-grid">
-
                     <div>
                         <label>Student Name</label>
-                        <input type="text" name="full_name" placeholder="Enter Student Name" autocomplete="off"
-                            required>
+                        <input type="text" name="full_name" placeholder="Enter Student Name" autocomplete="off">
                     </div>
 
                     <div>
                         <label>Father Name</label>
-                        <input type="text" name="father_name" placeholder="Enter Father Name" autocomplete="off"
-                            required>
+                        <input type="text" name="father_name" placeholder="Enter Father Name" autocomplete="off">
                     </div>
 
-                    <!-- ✅ ONLY NEW FIELD -->
                     <div>
                         <label>Mother Name</label>
-                        <input type="text" name="mother_name" placeholder="Enter Mother Name" autocomplete="off"
-                            required>
+                        <input type="text" name="mother_name" placeholder="Enter Mother Name" autocomplete="off">
                     </div>
 
                     <div>
                         <label>Date of Birth</label>
-                        <input type="text" id="dob" name="dob" placeholder="DD/MM/YYYY" autocomplete="off" required>
+                        <input type="text" id="dob" name="dob" placeholder="DD/MM/YYYY" autocomplete="off">
                     </div>
 
 
                     <div>
                         <label>Gender</label>
-                        <select name="gender" required>
+                        <select name="gender">
                             <option value="">Select Gender</option>
                             <option>Male</option>
                             <option>Female</option>
@@ -431,18 +522,18 @@ if (isset($_POST['submit'])) {
 
                     <div>
                         <label>Email Address</label>
-                        <input type="email" name="email" placeholder="Enter Email Address" autocomplete="off" required>
+                        <input type="email" name="email" placeholder="Enter Email Address" autocomplete="off">
                     </div>
 
                     <div>
                         <label>Phone Number</label>
                         <input type="text" name="phone" placeholder="Enter Phone Number" autocomplete="off"
-                            maxlength="10" required>
+                            maxlength="10">
                     </div>
 
                     <div>
                         <label>Department</label>
-                        <select name="department" id="department" required>
+                        <select name="department" id="department">
                             <option value="">Select Department</option>
                             <option value="SET">SET</option>
                             <option value="SOB">SOB</option>
@@ -453,28 +544,14 @@ if (isset($_POST['submit'])) {
 
                     <div>
                         <label>School</label>
-                        <select name="course" id="course" required>
+                        <select name="course" id="course">
                             <option value="">Select Course</option>
                         </select>
                     </div>
 
-                    <!-- <div>
-                        <label>Semester</label>
-                        <input type="text" value="1" disabled>
-                        <input type="hidden" name="semester" value="1">
-                    </div> -->
-
-                    <!-- <div>
-                        <label>Semester</label>
-                        <select name="semester" required>
-                            <option value="Select Semester" selected>Select Semester</option>
-                            <option value="Semester 1" selected>Semester 1</option>
-                        </select>
-                    </div> -->
-
                     <div>
                         <label>Semester Allotment</label>
-                        <select name="semester" required>
+                        <select name="semester">
                             <option value="" selected>Select Semester</option>
                             <option value="Semester 1">Semester 1</option>
                         </select>
@@ -485,31 +562,26 @@ if (isset($_POST['submit'])) {
                     <!-- <div>
                         <label>Section</label>
                         <input type="text" name="section" readonly placeholder="Auto Generated Section"
-                            required>
+                            >
                     </div> -->
 
                     <div>
                         <label>Admission Date</label>
                         <input type="text" id="admission_date" name="admission_date" placeholder="DD/MM/YYYY"
-                            autocomplete="off" required>
+                            autocomplete="off">
                     </div>
 
                     <div>
                         <label>University</label>
-                        <select name="university" required>
+                        <select name="university">
                             <option value="">Select University</option>
                             <option value="Sushant University">Sushant University</option>
                         </select>
                     </div>
 
-                    <!-- <div>
-                        <label>Photo</label>
-                        <input type="file" name="photo">
-                    </div> -->
-
                     <div class="photo-wrapper">
                         <label>Photo</label>
-                        <input type="file" name="photo" id="photoInput" required>
+                        <input type="file" name="photo" id="photoInput">
 
                         <div class="preview-box">
                             <img id="photoPreview">
@@ -517,30 +589,48 @@ if (isset($_POST['submit'])) {
                         </div>
                     </div>
 
-
-
                     <div class="full">
                         <label>Permanent Address</label>
-                        <textarea name="address" placeholder="Enter Permanent Full Address" autocomplete="off"
-                            required></textarea>
+                        <textarea name="address" placeholder="Enter Permanent Full Address"
+                            autocomplete="off"></textarea>
                     </div>
 
                     <div class="full">
-                        <button type="submit" name="submit">ADD STUDENT</button>
+                        <button type="button" onclick="openPreview()">ADD STUDENT</button>
                     </div>
 
                 </div>
-
             </form>
-
         </div>
-
     </div>
 
-    <!-- POPUP -->
+
+
+    <!-- PREVIEW POPUP -->
+    <div class="popup-overlay" id="previewPopup">
+        <div class="popup-box" style="text-align:left; max-width:500px;">
+            <h2>Confirm Student Details</h2>
+
+            <div id="previewContent" style="font-size:14px; margin-top:15px;"></div>
+
+            <div class="preview-actions">
+                <button type="button" class="btn-confirm" onclick="submitFinal()">Confirm & Add</button>
+                <button type="button" class="btn-edit" onclick="closePreview()">Edit</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SUCCESS POPUP -->
     <div class="popup-overlay" id="popup">
         <div class="popup-box">
-            <h2>Student Created Successfully</h2>
+
+            <div class="success-icon">
+                <img src="../src/images/success_icon.png" alt="Success OK" class="success_icon">
+            </div>
+
+            <h2>Student Added Successfully</h2>
+
             <div class="popup-id">
                 <?php
                 if (isset($student_id)) {
@@ -548,7 +638,8 @@ if (isset($_POST['submit'])) {
                 }
                 ?>
             </div>
-            <button class="popup-close" onclick="closePopup()">Close</button>
+
+            <button class="popup-close" onclick="closePopup()">Done</button>
         </div>
     </div>
 
@@ -594,6 +685,8 @@ if (isset($_POST['submit'])) {
             }
         });
 
+
+        // close popup script code
         function closePopup() {
             document.getElementById("popup").style.display = "none";
         }
@@ -666,6 +759,71 @@ if (isset($_POST['submit'])) {
         // // attach events
         // document.getElementById("department").addEventListener("change", updateSection);
         // document.getElementById("course").addEventListener("change", updateSection);
+
+
+
+
+        function openPreview() {
+
+            let form = document.getElementById("studentForm");
+
+            if (!form) {
+                alert("Form not found");
+                return;
+            }
+
+            let html = `
+    <div class="preview-grid">
+
+        <div class="preview-item"><span>Name</span><b>${form.full_name.value}</b></div>
+        <div class="preview-item"><span>Father</span><b>${form.father_name.value}</b></div>
+
+        <div class="preview-item"><span>Mother</span><b>${form.mother_name.value}</b></div>
+        <div class="preview-item"><span>DOB</span><b>${form.dob.value}</b></div>
+
+        <div class="preview-item"><span>Gender</span><b>${form.gender.value}</b></div>
+        <div class="preview-item"><span>Email</span><b>${form.email.value}</b></div>
+
+        <div class="preview-item"><span>Phone</span><b>${form.phone.value}</b></div>
+        <div class="preview-item"><span>Department</span><b>${form.department.value}</b></div>
+
+        <div class="preview-item"><span>Course</span><b>${form.course.value}</b></div>
+        <div class="preview-item"><span>Semester</span><b>${form.semester.value}</b></div>
+
+        <div class="preview-item"><span>University</span><b>${form.university.value}</b></div>
+
+        <div class="preview-item full"><span>Address</span><b>${form.address.value}</b></div>
+
+    </div>
+`;
+
+            document.getElementById("previewContent").innerHTML = html;
+            document.getElementById("previewPopup").style.display = "flex";
+        }
+
+        function closePreview() {
+            document.getElementById("previewPopup").style.display = "none";
+        }
+
+        function submitFinal() {
+
+            let form = document.getElementById("studentForm");
+
+            if (!form) {
+                alert("Form not found");
+                return;
+            }
+
+            // create REAL submit button
+            let btn = document.createElement("button");
+            btn.type = "submit";
+            btn.name = "submit";
+            btn.style.display = "none";
+
+            form.appendChild(btn);
+
+            btn.click(); // trigger submit
+        }
     </script>
 </body>
 
