@@ -1,7 +1,7 @@
 <?php
 include("../../server/connection.php");
 
-if(isset($_POST['save'])){
+if (isset($_POST['save'])) {
     $name = $_POST['name'];
 
     $sql = "INSERT INTO university_results.departments (name) VALUES ('$name')";

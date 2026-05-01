@@ -1,7 +1,7 @@
 <?php
 include("../../server/connection.php");
 
-if(isset($_POST['save'])){
+if (isset($_POST['save'])) {
     $semester = $_POST['semester'];
 
     $sql = "INSERT INTO university_results.semesters (semester_name) VALUES ('$semester')";
@@ -13,7 +13,7 @@ if(isset($_POST['save'])){
 <form method="POST">
     <label>Semester Allotment</label>
     <!-- <input type="text" name="semester" placeholder="Enter Semester"> -->
-     <select name="semester" required>
+    <select name="semester" required>
         <option value="Select Semester" selected>Select Semester</option>
         <option value="Semester 1">Semester 1</option>
         <option value="Semester 2">Semester 2</option>
@@ -23,6 +23,6 @@ if(isset($_POST['save'])){
         <option value="Semester 6">Semester 6</option>
         <option value="Semester 7">Semester 7</option>
         <option value="Semester 8">Semester 8</option>
-     </select>
+    </select>
     <button name="save">Add</button>
 </form>

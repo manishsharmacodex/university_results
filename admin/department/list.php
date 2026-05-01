@@ -9,15 +9,15 @@ $result = $conn->query("SELECT * FROM departments");
 <a href="add.php">Add New</a>
 
 <table border="1">
-<tr>
-    <th>ID</th>
-    <th>Name</th>
-</tr>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+    </tr>
 
-<?php while($row = $result->fetch_assoc()){ ?>
-<tr>
-    <td><?= $row['id'] ?></td>
-    <td><?= $row['name'] ?></td>
-</tr>
-<?php } ?>
+    <?php while ($row = $result->fetch_assoc()) { ?>
+        <tr>
+            <td><?= $row['id'] ?></td>
+            <td><?= $row['name'] ?></td>
+        </tr>
+    <?php } ?>
 </table>
