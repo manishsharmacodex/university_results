@@ -17,7 +17,7 @@ $result = $conn->query("SELECT * FROM semesters");
 <?php while($row = $result->fetch_assoc()){ ?>
 <tr>
     <td><?= $row['id'] ?></td>
-    <td><?= $row['name'] ?></td>
+    <td><?= $row['semester_name'] ?></td>
 </tr>
 <?php } ?>
 </table>
