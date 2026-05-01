@@ -300,7 +300,7 @@ if (isset($_POST['submit'])) {
                 <div class="form-grid">
 
                     <div>
-                        <label>Full Name</label>
+                        <label>Student Name</label>
                         <input type="text" name="full_name" placeholder="Enter Full Name" required>
                     </div>
 
@@ -332,7 +332,7 @@ if (isset($_POST['submit'])) {
                     </div>
 
                     <div>
-                        <label>Course</label>
+                        <label>School</label>
                         <select name="course" id="course" required>
                             <option value="">Select Course</option>
                         </select>
