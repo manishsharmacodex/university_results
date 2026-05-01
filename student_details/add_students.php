@@ -217,7 +217,7 @@ if (isset($_POST['submit'])) {
             cursor: not-allowed;
         }
 
-        /* ================= POPUP ADDED (ONLY NEW CODE) ================= */
+        /* ================= POPUP ADDED ================= */
         .popup-overlay {
             display: none;
             position: fixed;
@@ -231,12 +231,36 @@ if (isset($_POST['submit'])) {
             z-index: 9999;
         }
 
+        /* ✨ ANIMATION ADDED (NEW ONLY) */
+        .popup-overlay.show {
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .popup-box {
             background: #fff;
             padding: 30px;
             border-radius: 12px;
             text-align: center;
             min-width: 300px;
+
+            /* ✨ NEW ANIMATION */
+            animation: popUp 0.35s ease;
+        }
+
+        @keyframes popUp {
+            0% {
+                transform: scale(0.7);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         .popup-box h2 {
@@ -364,7 +388,7 @@ if (isset($_POST['submit'])) {
 
     </div>
 
-    <!-- ================= POPUP (ONLY ADDED) ================= -->
+    <!-- POPUP -->
     <div class="popup-overlay" id="popup">
         <div class="popup-box">
             <h2>Student Created Successfully 🎉</h2>
@@ -420,13 +444,13 @@ if (isset($_POST['submit'])) {
             }
         });
 
-        // ================= POPUP LOGIC (ONLY ADDED) =================
         function closePopup() {
             document.getElementById("popup").style.display = "none";
         }
 
         <?php if ($message != "" && strpos($message, "Student added successfully") !== false) { ?>
             document.getElementById("popup").style.display = "flex";
+            document.getElementById("popup").classList.add("show");
         <?php } ?>
     </script>
 
