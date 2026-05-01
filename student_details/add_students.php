@@ -107,7 +107,15 @@ if (isset($_POST['submit'])) {
     $university = $_POST['university'];
 
     // $section = $_POST['section'];
-    $section = generateSection($conn, $department, $course, $semester);
+    // $section = generateSection($conn, $department, $course, $semester);
+
+    $semester = $_POST['semester'];
+
+    if ($semester == "" || $semester == "Select Semester") {
+        $message = "Please select semester before submitting!";
+    } else {
+        $section = generateSection($conn, $department, $course, $semester);
+    }
 
     $photo_name = "";
 
@@ -467,16 +475,18 @@ if (isset($_POST['submit'])) {
                     <div>
                         <label>Semester Allotment</label>
                         <select name="semester" required>
-                            <option value="Select Semester" selected>Select Semester</option>
+                            <option value="" selected>Select Semester</option>
                             <option value="Semester 1">Semester 1</option>
                         </select>
                     </div>
 
-                    <div>
+
+                    <!-- in future this option will work for live section value -->
+                    <!-- <div>
                         <label>Section</label>
-                        <input type="text" name="section" id="section" readonly placeholder="Auto Generated Section"
+                        <input type="text" name="section" readonly placeholder="Auto Generated Section"
                             required>
-                    </div>
+                    </div> -->
 
                     <div>
                         <label>Admission Date</label>
@@ -627,7 +637,7 @@ if (isset($_POST['submit'])) {
 
 
 
-        // script code for auto generate section
+        // script code for auto generate section if not condition check from php just random section generate
         // function generateSection() {
         //     const sections = ["A", "B", "C", "D", "E"];
 
@@ -658,4 +668,5 @@ if (isset($_POST['submit'])) {
         // document.getElementById("course").addEventListener("change", updateSection);
     </script>
 </body>
+
 </html>
