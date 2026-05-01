@@ -561,28 +561,46 @@ if (isset($_POST['submit'])) {
                     </div>
 
                     <div>
+                        <?php
+                        $deptResult = $conn->query("SELECT * FROM departments");
+                        ?>
                         <label>Department</label>
                         <select name="department" id="department">
-                            <option value="" selected>Select Department</option>
+                            <!-- <option value="" selected>Select Department</option>
                             <option value="SET">SET</option>
                             <option value="SOB">SOB</option>
                             <option value="LLM">LLM</option>
-                            <option value="OTHER">OTHER</option>
+                            <option value="OTHER">OTHER</option> -->
+                            <option value="">Select Department</option>
+                            <?php while ($row = $deptResult->fetch_assoc()) { ?>
+                                <option value="<?= $row['id'] ?>">
+                                    <?= $row['name'] ?>
+                                </option>
+                            <?php } ?>
                         </select>
                     </div>
 
                     <div>
                         <label>School</label>
                         <select name="course" id="course">
-                            <option value="" selected>Select Course</option>
+                            <option value="">Select Course</option>
                         </select>
                     </div>
 
                     <div>
+                        <?php
+                        $semResult = $conn->query("SELECT * FROM semesters");
+                        ?>
                         <label>Semester Allotment</label>
                         <select name="semester">
-                            <option value="" selected>Select Semester</option>
-                            <option value="Semester 1">Semester 1</option>
+                            <option value="">Select Semester</option>
+
+                            <?php while ($row = $semResult->fetch_assoc()) { ?>
+                                <option value="<?= $row['semester_name'] ?>">
+                                    <?= $row['semester_name'] ?>
+                                </option>
+                            <?php } ?>
+
                         </select>
                     </div>
 
@@ -673,7 +691,7 @@ if (isset($_POST['submit'])) {
     </div>
 
     <script>
-        // funtion for work filter data like department and course
+        // funtion for date of birth /
         function formatDate(input) {
             let value = input.value.replace(/\D/g, '');
 
@@ -691,6 +709,8 @@ if (isset($_POST['submit'])) {
             formatDate(this);
         });
 
+
+
         const coursesByDept = {
             "SET": ["B.Tech CSE", "B.Tech IT", "MCA", "BCA"],
             "SOB": ["BBA", "MBA", "B.Com"],
@@ -698,21 +718,53 @@ if (isset($_POST['submit'])) {
             "OTHER": ["Diploma", "Certificate Course"]
         };
 
+
+
+
+        // this is filter data from department to courses
+        // document.getElementById("department").addEventListener("change", function () {
+        //     let dept = this.value;
+        //     let courseSelect = document.getElementById("course");
+
+        //     courseSelect.innerHTML = '<option value="">Select Course</option>';
+
+        //     if (coursesByDept[dept]) {
+        //         coursesByDept[dept].forEach(course => {
+        //             let option = document.createElement("option");
+        //             option.value = course;
+        //             option.textContent = course;
+        //             courseSelect.appendChild(option);
+        //         });
+        //     }
+        // });
+
+
+
+
+        // ajax with backend logic filters
         document.getElementById("department").addEventListener("change", function () {
-            let dept = this.value;
+
+            let dept_id = this.value;
             let courseSelect = document.getElementById("course");
 
-            courseSelect.innerHTML = '<option value="">Select Course</option>';
+            courseSelect.innerHTML = '<option value="">Loading...</option>';
 
-            if (coursesByDept[dept]) {
-                coursesByDept[dept].forEach(course => {
-                    let option = document.createElement("option");
-                    option.value = course;
-                    option.textContent = course;
-                    courseSelect.appendChild(option);
+            fetch("get_courses.php?dept_id=" + dept_id)
+                .then(res => res.json())
+                .then(data => {
+
+                    courseSelect.innerHTML = '<option value="">Select Course</option>';
+
+                    data.forEach(course => {
+                        let opt = document.createElement("option");
+                        opt.value = course.id;
+                        opt.textContent = course.course_name;
+                        courseSelect.appendChild(opt);
+                    });
                 });
-            }
         });
+
+
 
 
         // close popup script code
@@ -726,9 +778,7 @@ if (isset($_POST['submit'])) {
         <?php } ?>
 
 
-
-
-
+        
         // script code for image photoPreview
         let photoInput = document.getElementById("photoInput");
         let preview = document.getElementById("photoPreview");
