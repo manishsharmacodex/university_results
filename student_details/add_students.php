@@ -44,6 +44,40 @@ function generateStudentId($conn, $department, $course)
     return $prefix . "-" . str_pad($number, 4, "0", STR_PAD_LEFT);
 }
 
+
+// functions for auto generate sections with check department and course and semester check
+function generateSection($conn, $department, $course, $semester)
+{
+    $sections = range('A', 'Z');
+
+    $sql = "SELECT section, COUNT(*) as total 
+            FROM student_details 
+            WHERE department='$department' 
+            AND course='$course' 
+            AND semester='$semester'
+            GROUP BY section
+            ORDER BY section ASC";
+
+    $result = $conn->query($sql);
+
+    $sectionCounts = [];
+
+    if ($result) {
+        while ($row = $result->fetch_assoc()) {
+            $sectionCounts[$row['section']] = $row['total'];
+        }
+    }
+
+    // find available section with < 5 students
+    foreach ($sections as $sec) {
+        if (!isset($sectionCounts[$sec]) || $sectionCounts[$sec] < 2) {
+            return $sec;
+        }
+    }
+
+    return "A"; // fallback (should rarely happen)
+}
+
 // HANDLE FORM SUBMISSION
 if (isset($_POST['submit'])) {
 
@@ -72,7 +106,8 @@ if (isset($_POST['submit'])) {
 
     $university = $_POST['university'];
 
-    $section = $_POST['section'];
+    // $section = $_POST['section'];
+    $section = generateSection($conn, $department, $course, $semester);
 
     $photo_name = "";
 
@@ -108,6 +143,7 @@ if (isset($_POST['submit'])) {
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Add Student</title>
     <link rel="stylesheet" type="text/css" href="../css/font.css">
@@ -507,6 +543,7 @@ if (isset($_POST['submit'])) {
     </div>
 
     <script>
+        // funtion for work filter data like department and course
         function formatDate(input) {
             let value = input.value.replace(/\D/g, '');
 
@@ -591,34 +628,34 @@ if (isset($_POST['submit'])) {
 
 
         // script code for auto generate section
-        function generateSection() {
-            const sections = ["A", "B", "C", "D", "E"];
+        // function generateSection() {
+        //     const sections = ["A", "B", "C", "D", "E"];
 
-            // shuffle array
-            for (let i = sections.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [sections[i], sections[j]] = [sections[j], sections[i]];
-            }
+        //     // shuffle array
+        //     for (let i = sections.length - 1; i > 0; i--) {
+        //         const j = Math.floor(Math.random() * (i + 1));
+        //         [sections[i], sections[j]] = [sections[j], sections[i]];
+        //     }
 
-            // pick first section after shuffle
-            return sections[0];
-        }
+        //     // pick first section after shuffle
+        //     return sections[0];
+        // }
 
-        // trigger on department OR course change
-        function updateSection() {
-            let dept = document.getElementById("department").value;
-            let course = document.getElementById("course").value;
+        // // trigger on department OR course change
+        // function updateSection() {
+        //     let dept = document.getElementById("department").value;
+        //     let course = document.getElementById("course").value;
 
-            if (dept !== "" && course !== "") {
-                document.getElementById("section").value = generateSection();
-            } else {
-                document.getElementById("section").value = "";
-            }
-        }
+        //     if (dept !== "" && course !== "") {
+        //         document.getElementById("section").value = generateSection();
+        //     } else {
+        //         document.getElementById("section").value = "";
+        //     }
+        // }
 
-        // attach events
-        document.getElementById("department").addEventListener("change", updateSection);
-        document.getElementById("course").addEventListener("change", updateSection);
+        // // attach events
+        // document.getElementById("department").addEventListener("change", updateSection);
+        // document.getElementById("course").addEventListener("change", updateSection);
     </script>
 
 </body>
