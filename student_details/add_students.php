@@ -70,7 +70,7 @@ function generateSection($conn, $department, $course, $semester)
 
     // find available section with < 5 students
     foreach ($sections as $sec) {
-        if (!isset($sectionCounts[$sec]) || $sectionCounts[$sec] < 2) {
+        if (!isset($sectionCounts[$sec]) || $sectionCounts[$sec] < 50) {
             return $sec;
         }
     }
@@ -657,7 +657,5 @@ if (isset($_POST['submit'])) {
         // document.getElementById("department").addEventListener("change", updateSection);
         // document.getElementById("course").addEventListener("change", updateSection);
     </script>
-
 </body>
-
 </html>
