@@ -72,6 +72,8 @@ if (isset($_POST['submit'])) {
 
     $university = $_POST['university'];
 
+    $section = $_POST['section'];
+
     $photo_name = "";
 
     if (!empty($_FILES["photo"]["name"])) {
@@ -88,9 +90,9 @@ if (isset($_POST['submit'])) {
     if ($dob && $admission_date) {
 
         $sql = "INSERT INTO student_details 
-        (student_id, full_name, father_name, mother_name, dob, gender, email, phone, address, course, department, semester, admission_date, photo, university)
+        (student_id, full_name, father_name, mother_name, dob, gender, email, phone, address, course, department, semester, admission_date, photo, university, section)
         VALUES 
-        ('$student_id', '$full_name', '$father_name', '$mother_name', '$dob', '$gender', '$email', '$phone', '$address', '$course', '$department', '$semester', '$admission_date', '$photo_name', '$university')";
+        ('$student_id', '$full_name', '$father_name', '$mother_name', '$dob', '$gender', '$email', '$phone', '$address', '$course', '$department', '$semester', '$admission_date', '$photo_name', '$university', '$section')";
 
         if ($conn->query($sql) === TRUE) {
             $message = "Student added successfully! Student ID: " . $student_id;
@@ -106,9 +108,9 @@ if (isset($_POST['submit'])) {
 
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Add Student</title>
+    <link rel="stylesheet" type="text/css" href="../css/font.css">
 
     <style>
         body {
@@ -326,7 +328,7 @@ if (isset($_POST['submit'])) {
             margin-bottom: 20px;
             color: #1e293b;
             border-bottom: 1px solid #6b7280;
-            padding-bottom: 10px;
+            padding-bottom: 20px;
         }
     </style>
 
@@ -356,18 +358,42 @@ if (isset($_POST['submit'])) {
 
                     <div>
                         <label>Father Name</label>
-                        <input type="text" name="father_name" placeholder="Enter Father Name" autocomplete="off">
+                        <input type="text" name="father_name" placeholder="Enter Father Name" autocomplete="off"
+                            required>
                     </div>
 
                     <!-- ✅ ONLY NEW FIELD -->
                     <div>
                         <label>Mother Name</label>
-                        <input type="text" name="mother_name" placeholder="Enter Mother Name" autocomplete="off">
+                        <input type="text" name="mother_name" placeholder="Enter Mother Name" autocomplete="off"
+                            required>
                     </div>
 
                     <div>
                         <label>Date of Birth</label>
-                        <input type="text" id="dob" name="dob" placeholder="DD/MM/YYYY" autocomplete="off">
+                        <input type="text" id="dob" name="dob" placeholder="DD/MM/YYYY" autocomplete="off" required>
+                    </div>
+
+
+                    <div>
+                        <label>Gender</label>
+                        <select name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Email Address</label>
+                        <input type="email" name="email" placeholder="Enter Email Address" autocomplete="off" required>
+                    </div>
+
+                    <div>
+                        <label>Phone Number</label>
+                        <input type="text" name="phone" placeholder="Enter Phone Number" autocomplete="off"
+                            maxlength="10" required>
                     </div>
 
                     <div>
@@ -386,26 +412,6 @@ if (isset($_POST['submit'])) {
                         <select name="course" id="course" required>
                             <option value="">Select Course</option>
                         </select>
-                    </div>
-
-                    <div>
-                        <label>Gender</label>
-                        <select name="gender">
-                            <option value="">Select Gender</option>
-                            <option>Male</option>
-                            <option>Female</option>
-                            <option>Other</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label>Email</label>
-                        <input type="email" name="email" placeholder="Enter Email Address" autocomplete="off">
-                    </div>
-
-                    <div>
-                        <label>Phone Number</label>
-                        <input type="text" name="phone" placeholder="Enter Phone Number" autocomplete="off">
                     </div>
 
                     <!-- <div>
@@ -431,9 +437,15 @@ if (isset($_POST['submit'])) {
                     </div>
 
                     <div>
+                        <label>Section</label>
+                        <input type="text" name="section" id="section" readonly placeholder="Auto Generated Section"
+                            required>
+                    </div>
+
+                    <div>
                         <label>Admission Date</label>
                         <input type="text" id="admission_date" name="admission_date" placeholder="DD/MM/YYYY"
-                            autocomplete="off">
+                            autocomplete="off" required>
                     </div>
 
                     <div>
@@ -451,7 +463,7 @@ if (isset($_POST['submit'])) {
 
                     <div class="photo-wrapper">
                         <label>Photo</label>
-                        <input type="file" name="photo" id="photoInput">
+                        <input type="file" name="photo" id="photoInput" required>
 
                         <div class="preview-box">
                             <img id="photoPreview">
@@ -463,8 +475,8 @@ if (isset($_POST['submit'])) {
 
                     <div class="full">
                         <label>Permanent Address</label>
-                        <textarea name="address" placeholder="Enter Permanent Full Address"
-                            autocomplete="off"></textarea>
+                        <textarea name="address" placeholder="Enter Permanent Full Address" autocomplete="off"
+                            required></textarea>
                     </div>
 
                     <div class="full">
@@ -573,6 +585,40 @@ if (isset($_POST['submit'])) {
             preview.style.display = "none";
             removeBtn.style.display = "none";
         });
+
+
+
+
+
+        // script code for auto generate section
+        function generateSection() {
+            const sections = ["A", "B", "C", "D", "E"];
+
+            // shuffle array
+            for (let i = sections.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [sections[i], sections[j]] = [sections[j], sections[i]];
+            }
+
+            // pick first section after shuffle
+            return sections[0];
+        }
+
+        // trigger on department OR course change
+        function updateSection() {
+            let dept = document.getElementById("department").value;
+            let course = document.getElementById("course").value;
+
+            if (dept !== "" && course !== "") {
+                document.getElementById("section").value = generateSection();
+            } else {
+                document.getElementById("section").value = "";
+            }
+        }
+
+        // attach events
+        document.getElementById("department").addEventListener("change", updateSection);
+        document.getElementById("course").addEventListener("change", updateSection);
     </script>
 
 </body>

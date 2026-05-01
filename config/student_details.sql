@@ -12,6 +12,7 @@ CREATE TABLE student_details (
     course VARCHAR(50),
     department VARCHAR(100),
     semester VARCHAR(20),
+    section VARCHAR(10), NOT NULL,
     university VARCHAR(255) NOT NULL,
     admission_date DATE,
     photo VARCHAR(255),
