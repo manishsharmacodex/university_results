@@ -156,134 +156,211 @@ if (isset($_POST['submit'])) {
     <title>Add Student</title>
     <link rel="stylesheet" type="text/css" href="../css/font.css">
     <style>
+        /* =========================
+   PREMIUM UI SYSTEM (FINAL CLEAN)
+========================= */
+
         body {
+            background: linear-gradient(135deg, #eef2ff, #f8fafc);
+            color: #0f172a;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            background: #f1f5f9;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: 60px auto;
-            padding: 0 20px;
-        }
-
+        /* =========================
+   CARD (GLASS PREMIUM)
+========================= */
         .card {
-            background: #fff;
-            padding: 35px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+            padding: 40px;
+            transition: all 0.3s ease;
         }
 
-        .msg {
-            padding: 12px;
-            margin-bottom: 15px;
-            background: #dcfce7;
-            border: 1px solid #86efac;
-            border-radius: 8px;
-            font-size: 14px;
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 25px 70px rgba(15, 23, 42, 0.12);
         }
 
-        /* GRID */
+        /* =========================
+   TITLE
+========================= */
+        .form-title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            background: linear-gradient(90deg, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* =========================
+   FORM GRID
+========================= */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            column-gap: 40px;
-            row-gap: 18px;
+            gap: 22px 28px;
         }
 
+        /* =========================
+   LABELS
+========================= */
         label {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
-            color: #334155;
-            display: block;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #475569;
             margin-bottom: 6px;
+            display: block;
         }
 
-        /* ✅ UNIFIED INPUT / SELECT / TEXTAREA SIZE */
+        /* =========================
+   INPUTS / SELECT / TEXTAREA
+========================= */
         input,
         select,
         textarea {
             width: 100%;
             height: 45px;
-            /* equal height */
             padding: 10px 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            outline: none;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            background: #f9fafb;
             font-size: 14px;
+            transition: all 0.25s ease;
             box-sizing: border-box;
-            transition: 0.2s;
         }
 
-        /* TEXTAREA FIX (keep bigger but aligned width) */
         textarea {
             height: 95px;
             resize: none;
         }
 
-        /* FOCUS */
+        input:hover,
+        select:hover,
+        textarea:hover {
+            background: #fff;
+            border-color: #c7d2fe;
+        }
+
         input:focus,
         select:focus,
         textarea:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+            background: #fff;
         }
 
-        /* FULL WIDTH */
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        /* =========================
+   BUTTON
+========================= */
+        button {
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 12px;
+            width: 220px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 26px rgba(37, 99, 235, 0.35);
+        }
+
+        /* =========================
+   FULL WIDTH FIELD
+========================= */
         .full {
             grid-column: span 2;
         }
 
-        /* BUTTON */
-        button {
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            padding: 12px 18px;
-            width: 220px;
-            border-radius: 8px;
-            font-size: 15px;
+        /* =========================
+   SUCCESS MESSAGE
+========================= */
+        .msg {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            border: 1px solid #86efac;
+            color: #166534;
             font-weight: 600;
+        }
+
+        /* =========================
+   PHOTO UPLOAD
+========================= */
+        .preview-box {
+            width: 120px;
+            height: 120px;
+            margin-top: 10px;
+            position: relative;
+            border-radius: 14px;
+            border: 2px dashed #cbd5e1;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #photoPreview {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 12px;
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border: none;
+        }
+
+        /* REMOVE PHOTO BUTTON */
+        .remove-photo {
+            display: none;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #ef4444;
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
+            font-size: 14px;
         }
 
-        button:hover {
-            background: #1d4ed8;
-        }
-
-        /* MOBILE */
-        @media(max-width:768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-                column-gap: 0;
-            }
-
-            .full {
-                grid-column: span 1;
-            }
-
-            button {
-                width: 100%;
-            }
-        }
-
-        /* DISABLED */
-        input:disabled {
-            background: #e5e7eb;
-            color: #6b7280;
-        }
-
-        /* POPUP (UNCHANGED) */
+        /* =========================
+   POPUP BASE
+========================= */
         .popup-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             background: rgba(0, 0, 0, 0.6);
             justify-content: center;
             align-items: center;
@@ -293,188 +370,140 @@ if (isset($_POST['submit'])) {
         .popup-box {
             background: #fff;
             padding: 30px;
-            border-radius: 12px;
+            border-radius: 16px;
             text-align: center;
-            min-width: 300px;
+            min-width: 320px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
         }
 
+        /* SUCCESS ID */
         .popup-id {
             margin-top: 15px;
             font-size: 20px;
-            font-weight: bold;
+            font-weight: 700;
             color: #16a34a;
         }
 
-        /* success icon */
+        /* SUCCESS ICON */
         .success_icon {
             width: 100px;
             height: 60px;
         }
 
-        /* photoPreview */
-        .preview-box {
-            width: 120px;
-            height: 120px;
-            position: relative;
-            margin-top: 10px;
-        }
-
-        #photoPreview {
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 10px;
-            border: 2px solid #e2e8f0;
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        /* ✅ TOP RIGHT CROSS ICON */
-        .remove-photo {
-            display: none;
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 24px;
-            height: 24px;
-            background: #ef4444;
-            color: white;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .remove-photo:hover {
-            background: #dc2626;
-        }
-
-        .form-title {
-            text-align: center;
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #1e293b;
-            border-bottom: 1px solid #6b7280;
-            padding-bottom: 20px;
-        }
-
-
-        /* ===== GLASS PREVIEW POPUP ===== */
+        /* =========================
+   PREVIEW MODAL (FULL SCREEN)
+========================= */
         #previewPopup {
-            backdrop-filter: blur(8px);
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
 
         #previewPopup .popup-box {
-            width: 90%;
-            max-width: 600px;
-            padding: 18px 20px;
-            border-radius: 14px;
-
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-
-            text-align: left;
+            width: 98%;
+            max-width: 1200px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
         }
 
-        /* TITLE */
+        /* HEADER */
         #previewPopup h2 {
+            margin: 0;
+            padding: 16px 20px;
             font-size: 16px;
-            margin-bottom: 8px;
-            color: #0f172a;
-            font-weight: 600;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(90deg, #1e3a8a, #2563eb, #1d4ed8);
         }
 
-        /* ===== COMPACT GRID ===== */
+        /* CONTENT */
+        #previewContent {
+            flex: 1;
+            overflow-y: auto;
+            padding: 22px;
+            background: #f1f5f9;
+        }
+
+        /* GRID */
         .preview-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px 14px;
-            margin-top: 10px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
         }
 
-        /* FIELD CARD */
+        /* ITEM */
         .preview-item {
-            background: rgba(255, 255, 255, 0.6);
-            border: 1px solid rgba(226, 232, 240, 0.6);
-            padding: 8px 10px;
-            border-radius: 8px;
-
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
         }
 
-        /* LABEL */
         .preview-item span {
             font-size: 11px;
+            font-weight: 600;
             color: #64748b;
-            margin-bottom: 2px;
         }
 
-        /* VALUE */
         .preview-item b {
-            font-size: 13px;
+            font-size: 14px;
             color: #0f172a;
-            font-weight: 600;
-            word-break: break-word;
         }
 
-        /* FULL WIDTH */
+        /* FULL */
         .preview-item.full {
-            grid-column: span 2;
+            grid-column: span 3;
         }
 
-        /* BUTTONS */
+        /* ACTIONS */
         .preview-actions {
-            margin-top: 12px;
             display: flex;
-            gap: 10px;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 14px 20px;
+            border-top: 1px solid #e5e7eb;
         }
 
-        .preview-actions button {
-            flex: 1;
-            padding: 8px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-        }
-
-        /* CONFIRM */
         .btn-confirm {
-            background: rgba(34, 197, 94, 0.9);
-            color: #fff;
+            background: #2563eb;
         }
 
-        .btn-confirm:hover {
-            background: rgba(22, 163, 74, 1);
-        }
-
-        /* EDIT */
         .btn-edit {
-            background: rgba(226, 232, 240, 0.8);
+            background: #f1f5f9;
             color: #0f172a;
+            border: 1px solid #e2e8f0;
         }
 
-        .btn-edit:hover {
-            background: rgba(203, 213, 225, 1);
-        }
+        /* =========================
+   RESPONSIVE
+========================= */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
 
-        /* SCROLL CONTROL */
-        #previewContent {
-            max-height: 300px;
-            overflow-y: auto;
-            padding-right: 4px;
+            button {
+                width: 100%;
+            }
+
+            .preview-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-item.full {
+                grid-column: span 1;
+            }
         }
     </style>
 </head>
@@ -513,10 +542,10 @@ if (isset($_POST['submit'])) {
                     <div>
                         <label>Gender</label>
                         <select name="gender">
-                            <option value="">Select Gender</option>
-                            <option>Male</option>
-                            <option>Female</option>
-                            <option>Other</option>
+                            <option value="Select Gender" selected>Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
 
@@ -534,7 +563,7 @@ if (isset($_POST['submit'])) {
                     <div>
                         <label>Department</label>
                         <select name="department" id="department">
-                            <option value="">Select Department</option>
+                            <option value="" selected>Select Department</option>
                             <option value="SET">SET</option>
                             <option value="SOB">SOB</option>
                             <option value="LLM">LLM</option>
@@ -545,7 +574,7 @@ if (isset($_POST['submit'])) {
                     <div>
                         <label>School</label>
                         <select name="course" id="course">
-                            <option value="">Select Course</option>
+                            <option value="" selected>Select Course</option>
                         </select>
                     </div>
 
@@ -710,11 +739,15 @@ if (isset($_POST['submit'])) {
 
             if (file) {
                 let reader = new FileReader();
+
                 reader.onload = function (e) {
+                    selectedPhotoDataURL = e.target.result; // ✅ store for modal
+
                     preview.src = e.target.result;
                     preview.style.display = "block";
                     removeBtn.style.display = "inline-block";
                 };
+
                 reader.readAsDataURL(file);
             }
         });
@@ -761,7 +794,7 @@ if (isset($_POST['submit'])) {
         // document.getElementById("course").addEventListener("change", updateSection);
 
 
-
+        let selectedPhotoDataURL = "";
 
         function openPreview() {
 
@@ -789,10 +822,16 @@ if (isset($_POST['submit'])) {
 
         <div class="preview-item"><span>Course</span><b>${form.course.value}</b></div>
         <div class="preview-item"><span>Semester</span><b>${form.semester.value}</b></div>
+        <div class="preview-item"><span>Admission Date</span><b>${form.admission_date.value}</b></div>
 
         <div class="preview-item"><span>University</span><b>${form.university.value}</b></div>
 
         <div class="preview-item full"><span>Address</span><b>${form.address.value}</b></div>
+        <div class="preview-item full">
+    <span>Photo</span>
+    <img src="${selectedPhotoDataURL}" 
+         style="width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #ddd;margin-top:8px;">
+</div>
 
     </div>
 `;
