@@ -166,6 +166,7 @@ if (isset($_POST['submit'])) {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            text-transform: capitalize;
         }
 
         /* =========================
@@ -227,8 +228,7 @@ if (isset($_POST['submit'])) {
    INPUTS / SELECT / TEXTAREA
 ========================= */
         input,
-        select,
-        textarea {
+        select {
             width: 100%;
             height: 45px;
             padding: 10px 12px;
@@ -238,11 +238,6 @@ if (isset($_POST['submit'])) {
             font-size: 14px;
             transition: all 0.25s ease;
             box-sizing: border-box;
-        }
-
-        textarea {
-            height: 95px;
-            resize: none;
         }
 
         input:hover,
@@ -263,6 +258,37 @@ if (isset($_POST['submit'])) {
 
         input::placeholder {
             color: #94a3b8;
+        }
+
+
+
+        /* TEXTAREA SAME HEIGHT AS INPUT */
+        textarea {
+            width: 49%;
+            height: 100px;
+            /* match input height */
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            background: #f9fafb;
+            font-size: 14px;
+            resize: none;
+            /* optional: disable resizing */
+            transition: all 0.25s ease;
+            box-sizing: border-box;
+        }
+
+        /* Hover & focus (keep consistent) */
+        textarea:hover {
+            background: #fff;
+            border-color: #c7d2fe;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+            background: #fff;
         }
 
         /* =========================
@@ -405,8 +431,8 @@ if (isset($_POST['submit'])) {
         }
 
         #previewPopup .popup-box {
-            width: 98%;
-            max-width: 1200px;
+            width: 100%;
+            max-width: 1500px;
             height: 80vh;
             display: flex;
             flex-direction: column;
@@ -436,7 +462,7 @@ if (isset($_POST['submit'])) {
         /* GRID */
         .preview-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, 2fr);
             gap: 12px;
         }
 
@@ -542,10 +568,10 @@ if (isset($_POST['submit'])) {
                     <div>
                         <label>Gender</label>
                         <select name="gender">
-                            <option value="Select Gender" selected>Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
+                            <option value="SELECT GENDER" selected>SELECT GENDER</option>
+                            <option value="MALE">MALE</option>
+                            <option value="FEMALE">FEMALE</option>
+                            <option value="OTHER">OTHER</option>
                         </select>
                     </div>
 
@@ -564,14 +590,14 @@ if (isset($_POST['submit'])) {
                         <?php
                         $deptResult = $conn->query("SELECT * FROM departments");
                         ?>
-                        <label>Department</label>
+                        <label>School</label>
                         <select name="department" id="department">
                             <!-- <option value="" selected>Select Department</option>
                             <option value="SET">SET</option>
                             <option value="SOB">SOB</option>
                             <option value="LLM">LLM</option>
                             <option value="OTHER">OTHER</option> -->
-                            <option value="">Select Department</option>
+                            <option value="">SELECT SCHOOL</option>
                             <?php while ($row = $deptResult->fetch_assoc()) { ?>
                                 <option value="<?= $row['id'] ?>">
                                     <?= $row['name'] ?>
@@ -581,9 +607,9 @@ if (isset($_POST['submit'])) {
                     </div>
 
                     <div>
-                        <label>School</label>
+                        <label>Course</label>
                         <select name="course" id="course">
-                            <option value="">Select Course</option>
+                            <option value="">SELECT COURSE</option>
                         </select>
                     </div>
 
@@ -593,7 +619,7 @@ if (isset($_POST['submit'])) {
                         ?>
                         <label>Semester Allotment</label>
                         <select name="semester">
-                            <option value="">Select Semester</option>
+                            <option value="">SELECT SEMESTER</option>
 
                             <?php while ($row = $semResult->fetch_assoc()) { ?>
                                 <option value="<?= $row['semester_name'] ?>">
@@ -621,8 +647,8 @@ if (isset($_POST['submit'])) {
                     <div>
                         <label>University</label>
                         <select name="university">
-                            <option value="">Select University</option>
-                            <option value="Sushant University">Sushant University</option>
+                            <option value="">SELECT UNIVERSITY</option>
+                            <option value="SUSHANT UNIVERSITY">SUSHANT UNIVERSITY</option>
                         </select>
                     </div>
 
@@ -720,6 +746,11 @@ if (isset($_POST['submit'])) {
 
 
 
+        document.querySelectorAll("input[type='text'], textarea").forEach(field => {
+            field.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
+        });
 
         // this is filter data from department to courses
         // document.getElementById("department").addEventListener("change", function () {
@@ -737,8 +768,6 @@ if (isset($_POST['submit'])) {
         //         });
         //     }
         // });
-
-
 
 
         // ajax with backend logic filters
@@ -778,7 +807,7 @@ if (isset($_POST['submit'])) {
         <?php } ?>
 
 
-        
+
         // script code for image photoPreview
         let photoInput = document.getElementById("photoInput");
         let preview = document.getElementById("photoPreview");
@@ -858,31 +887,37 @@ if (isset($_POST['submit'])) {
             let html = `
     <div class="preview-grid">
 
-        <div class="preview-item"><span>Name</span><b>${form.full_name.value}</b></div>
-        <div class="preview-item"><span>Father</span><b>${form.father_name.value}</b></div>
+        <div class="preview-item"><span>STUDENT NAME</span><b>${form.full_name.value}</b></div>
 
-        <div class="preview-item"><span>Mother</span><b>${form.mother_name.value}</b></div>
-        <div class="preview-item"><span>DOB</span><b>${form.dob.value}</b></div>
+        <div class="preview-item"><span>FATHER NAME</span><b>${form.father_name.value}</b></div>
 
-        <div class="preview-item"><span>Gender</span><b>${form.gender.value}</b></div>
-        <div class="preview-item"><span>Email</span><b>${form.email.value}</b></div>
+        <div class="preview-item"><span>MOTHER NAME</span><b>${form.mother_name.value}</b></div>
 
-        <div class="preview-item"><span>Phone</span><b>${form.phone.value}</b></div>
-        <div class="preview-item"><span>Department</span><b>${form.department.value}</b></div>
+        <div class="preview-item"><span>DATE OF BIRTH</span><b>${form.dob.value}</b></div>
 
-        <div class="preview-item"><span>Course</span><b>${form.course.value}</b></div>
-        <div class="preview-item"><span>Semester</span><b>${form.semester.value}</b></div>
-        <div class="preview-item"><span>Admission Date</span><b>${form.admission_date.value}</b></div>
+        <div class="preview-item"><span>GENDER</span><b>${form.gender.value}</b></div>
 
-        <div class="preview-item"><span>University</span><b>${form.university.value}</b></div>
+        <div class="preview-item"><span>EMAIL ADDRESS</span><b>${form.email.value}</b></div>
 
-        <div class="preview-item full"><span>Address</span><b>${form.address.value}</b></div>
+        <div class="preview-item"><span>PHONE NUMBER</span><b>${form.phone.value}</b></div>
+
+        <div class="preview-item"><span>SCHOOL</span><b>${form.department.value}</b></div>
+
+        <div class="preview-item"><span>COURSE</span><b>${form.course.value}</b></div>
+
+        <div class="preview-item"><span>SEMESTER</span><b>${form.semester.value}</b></div>
+
+        <div class="preview-item"><span>ADMISSION DATE</span><b>${form.admission_date.value}</b></div>
+
+        <div class="preview-item"><span>UNIVERSITY</span><b>${form.university.value}</b></div>
+
+        <div class="preview-item full"><span>PERMANENT ADDRESS</span><b>${form.address.value}</b></div>
+
         <div class="preview-item full">
-    <span>Photo</span>
-    <img src="${selectedPhotoDataURL}" 
-         style="width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #ddd;margin-top:8px;">
-</div>
-
+            <span>Photo</span>
+                <img src="${selectedPhotoDataURL}" 
+                style="width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #ddd;margin-top:8px;">
+        </div>
     </div>
 `;
 

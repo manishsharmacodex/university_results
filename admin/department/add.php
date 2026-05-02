@@ -28,3 +28,13 @@ if (isset($_POST['save'])) {
     <input type="text" name="name" placeholder="Department Name" required>
     <button name="save">Add</button>
 </form>
+
+
+
+<script>
+    document.querySelectorAll("input[type='text'], textarea").forEach(field => {
+        field.addEventListener("input", function () {
+            this.value = this.value.toUpperCase();
+        });
+    });
+</script>

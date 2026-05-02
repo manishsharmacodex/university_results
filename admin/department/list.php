@@ -8,7 +8,7 @@ $result = $conn->query("SELECT * FROM departments");
 
 <p><a href="../dashboard/index.php">Home</a>/Departments</p>
 
-<a href="add.php">Add New</a>
+<a href="./add.php">Add New</a>
 
 <table border="1">
     <tr>

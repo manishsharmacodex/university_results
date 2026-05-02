@@ -16,15 +16,15 @@ if (isset($_POST['save'])) {
     <label>Semester Allotment</label>
     <!-- <input type="text" name="semester" placeholder="Enter Semester"> -->
     <select name="semester" required>
-        <option value="Select Semester" selected>Select Semester</option>
-        <option value="Semester 1">Semester 1</option>
-        <option value="Semester 2">Semester 2</option>
-        <option value="Semester 3">Semester 3</option>
-        <option value="Semester 4">Semester 4</option>
-        <option value="Semester 5">Semester 5</option>
-        <option value="Semester 6">Semester 6</option>
-        <option value="Semester 7">Semester 7</option>
-        <option value="Semester 8">Semester 8</option>
+        <option value="Select Semester" selected>SELECT SEMESTER</option>
+        <option value="SEMESTER 1">SEMESTER 1</option>
+        <option value="SEMESTER 2">SEMESTER 2</option>
+        <option value="SEMESTER 3">SEMESTER 3</option>
+        <option value="SEMESTER 4">SEMESTER 4</option>
+        <option value="SEMESTER 5">SEMESTER 5</option>
+        <option value="SEMESTER 6">SEMESTER 6</option>
+        <option value="SEMESTER 7">SEMESTER 7</option>
+        <option value="SEMESTER 8">SEMESTER 8</option>
     </select>
     <button name="save">Add</button>
 </form>
