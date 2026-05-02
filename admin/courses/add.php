@@ -10,8 +10,10 @@ if(isset($_POST['save'])){
     $sql = "INSERT INTO courses (department_id, course_name)
             VALUES ('$department_id', '$course_name')";
     $conn->query($sql);
+    echo "Courses added";
 }
 ?>
+<p><a href="./list.php">Go Back</a>/Courses</p>
 
 <form method="POST">
     <select name="department_id">

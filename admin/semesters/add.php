@@ -10,6 +10,8 @@ if (isset($_POST['save'])) {
 }
 ?>
 
+<p><a href="./list.php">GO Back</a>/Semester</p>
+
 <form method="POST">
     <label>Semester Allotment</label>
     <!-- <input type="text" name="semester" placeholder="Enter Semester"> -->

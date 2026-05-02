@@ -150,12 +150,12 @@ if (isset($_POST["login"])) {
 
             <div class="input-box">
                 <label>Username</label>
-                <input type="text" name="userName" required>
+                <input type="text" name="userName" placeholder="Enter Username" maxlength="12" required>
             </div>
 
             <div class="input-box">
                 <label>Password</label>
-                <input type="password" name="password" required>
+                <input type="password" name="password" placeholder="Enter Password" required>
             </div>
 
             <input type="submit" name="login" value="Login" class="login-btn">

@@ -6,6 +6,8 @@ $result = $conn->query("SELECT * FROM semesters");
 
 <h2>Semester</h2>
 
+<p><a href="../dashboard/index.php">Home</a>/Semester</p>
+
 <a href="add.php">Add New</a>
 
 <table border="1">

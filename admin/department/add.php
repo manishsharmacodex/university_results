@@ -4,14 +4,27 @@ include("../../server/connection.php");
 if (isset($_POST['save'])) {
     $name = $_POST['name'];
 
-    $sql = "INSERT INTO university_results.departments (name) VALUES ('$name')";
-    $conn->query($sql);
+    // Prepare statement
+    $stmt = $conn->prepare("INSERT INTO university_results.departments (name) VALUES (?)");
 
-    echo "Department added";
+    // Bind parameter
+    $stmt->bind_param("s", $name);
+
+    // Execute
+    if ($stmt->execute()) {
+        echo "Department added";
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+
+    // Close statement
+    $stmt->close();
 }
 ?>
 
+<p><a href="./list.php">Go Back</a> / Add Department</p>
+
 <form method="POST">
-    <input type="text" name="name" placeholder="Department Name">
+    <input type="text" name="name" placeholder="Department Name" required>
     <button name="save">Add</button>
 </form>

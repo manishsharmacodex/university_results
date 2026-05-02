@@ -10,6 +10,8 @@ $result = $conn->query("
 
 <h2>Courses</h2>
 
+<p><a href="../dashboard/index.php">Home</a>/Courses</p>
+
 <a href="add.php">Add New</a>
 
 <table border="1">
