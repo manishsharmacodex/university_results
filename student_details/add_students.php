@@ -320,6 +320,7 @@ if (isset($_POST['submit'])) {
             grid-column: span 2;
         }
 
+
         /* =========================
    SUCCESS MESSAGE
 ========================= */
@@ -381,7 +382,7 @@ if (isset($_POST['submit'])) {
         }
 
         /* =========================
-   POPUP BASE
+   POPUP BASE success model
 ========================= */
         .popup-overlay {
             display: none;
@@ -432,7 +433,7 @@ if (isset($_POST['submit'])) {
 
         #previewPopup .popup-box {
             width: 100%;
-            max-width: 1500px;
+            max-width: 1080px;
             height: 80vh;
             display: flex;
             flex-direction: column;
@@ -475,6 +476,7 @@ if (isset($_POST['submit'])) {
             display: flex;
             flex-direction: column;
         }
+        
 
         .preview-item span {
             font-size: 11px;
@@ -681,10 +683,10 @@ if (isset($_POST['submit'])) {
 
     <!-- PREVIEW POPUP -->
     <div class="popup-overlay" id="previewPopup">
-        <div class="popup-box" style="text-align:left; max-width:500px;">
+        <div class="popup-box">
             <h2>Confirm Student Details</h2>
 
-            <div id="previewContent" style="font-size:14px; margin-top:15px;"></div>
+            <div id="previewContent"></div>
 
             <div class="preview-actions">
                 <button type="button" class="btn-confirm" onclick="submitFinal()">Confirm & Add</button>
@@ -913,7 +915,7 @@ if (isset($_POST['submit'])) {
 
         <div class="preview-item full"><span>PERMANENT ADDRESS</span><b>${form.address.value}</b></div>
 
-        <div class="preview-item full">
+        <div class="preview-item">
             <span>Photo</span>
                 <img src="${selectedPhotoDataURL}" 
                 style="width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #ddd;margin-top:8px;">
