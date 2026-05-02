@@ -4,11 +4,17 @@ include("../../server/connection.php");
 
 $id = $_GET['id'] ?? null;
 
+if (!$id) {
+    die("Invalid ID");
+}
+
 $stmt = $conn->prepare("DELETE FROM banks WHERE id=?");
 $stmt->bind_param("i", $id);
 
-$stmt->execute();
-
-header("Location: list.php");
-exit;
+if ($stmt->execute()) {
+    header("Location: list.php");
+    exit;
+} else {
+    echo "Error deleting record: " . $stmt->error;
+}
 ?>

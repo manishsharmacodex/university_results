@@ -6,6 +6,7 @@ $result = $conn->query("
     SELECT banks.id, bank_master.bank_name
     FROM banks
     JOIN bank_master ON banks.bank_master_id = bank_master.id
+    ORDER BY banks.id ASC
 ");
 ?>
 
@@ -29,7 +30,12 @@ $result = $conn->query("
             <td><?= $row['bank_name'] ?></td>
 
             <td><a href="edit.php?id=<?= $row['id'] ?>">Edit</a></td>
-            <td><a href="delete.php?id=<?= $row['id'] ?>">Delete</a></td>
+            <td>
+                <a href="delete.php?id=<?= $row['id'] ?>"
+                    onclick="return confirm('Are you sure you want to delete this bank?');">
+                    Delete
+                </a>
+            </td>
         </tr>
     <?php } ?>
 </table>
