@@ -34,6 +34,8 @@ if (isset($_POST['update'])) {
 
 <h3>Edit Bank</h3>
 
+<p><a href="./list.php">Go Back</a>/Update Bank</p>
+
 <form method="POST">
     <select name="bank_master_id" required>
         <?php while ($row = $master->fetch_assoc()) { ?>

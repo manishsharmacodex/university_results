@@ -21,6 +21,7 @@ if (isset($_POST['save'])) {
 ?>
 
 <h3>Add Bank</h3>
+<p><a href="./list.php">Go Back</a>/Bank Master</p>
 
 <form method="POST">
     <select name="bank_master_id" required>

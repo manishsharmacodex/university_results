@@ -11,6 +11,8 @@ $result = $conn->query("
 
 <h2>Banks</h2>
 
+<p><a href="../dashboard/index.php">Home</a>/Banks List</p>
+
 <a href="add.php">Add New</a>
 
 <table border="1">
