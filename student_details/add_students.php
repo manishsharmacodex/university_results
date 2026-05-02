@@ -476,7 +476,7 @@ if (isset($_POST['submit'])) {
             display: flex;
             flex-direction: column;
         }
-        
+
 
         .preview-item span {
             font-size: 11px;
@@ -501,6 +501,23 @@ if (isset($_POST['submit'])) {
             gap: 12px;
             padding: 14px 20px;
             border-top: 1px solid #e5e7eb;
+        }
+
+        .photo-container {
+            width: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+        }
+
+        .preview-img {
+            width: 120px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-top: 8px;
         }
 
         .btn-confirm {
@@ -810,39 +827,6 @@ if (isset($_POST['submit'])) {
 
 
 
-        // script code for image photoPreview
-        let photoInput = document.getElementById("photoInput");
-        let preview = document.getElementById("photoPreview");
-        let removeBtn = document.getElementById("removePhoto");
-
-        photoInput.addEventListener("change", function (event) {
-            let file = event.target.files[0];
-
-            if (file) {
-                let reader = new FileReader();
-
-                reader.onload = function (e) {
-                    selectedPhotoDataURL = e.target.result; // ✅ store for modal
-
-                    preview.src = e.target.result;
-                    preview.style.display = "block";
-                    removeBtn.style.display = "inline-block";
-                };
-
-                reader.readAsDataURL(file);
-            }
-        });
-
-        removeBtn.addEventListener("click", function () {
-            photoInput.value = "";
-            preview.src = "";
-            preview.style.display = "none";
-            removeBtn.style.display = "none";
-        });
-
-
-
-
 
         // script code for auto generate section if not condition check from php just random section generate
         // function generateSection() {
@@ -874,6 +858,37 @@ if (isset($_POST['submit'])) {
         // document.getElementById("department").addEventListener("change", updateSection);
         // document.getElementById("course").addEventListener("change", updateSection);
 
+
+
+        // script code for image photoPreview
+        let photoInput = document.getElementById("photoInput");
+        let preview = document.getElementById("photoPreview");
+        let removeBtn = document.getElementById("removePhoto");
+
+        photoInput.addEventListener("change", function (event) {
+            let file = event.target.files[0];
+
+            if (file) {
+                let reader = new FileReader();
+
+                reader.onload = function (e) {
+                    selectedPhotoDataURL = e.target.result; // ✅ store for modal
+
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                    removeBtn.style.display = "inline-block";
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+
+        removeBtn.addEventListener("click", function () {
+            photoInput.value = "";
+            preview.src = "";
+            preview.style.display = "none";
+            removeBtn.style.display = "none";
+        });
 
         let selectedPhotoDataURL = "";
 
@@ -915,10 +930,9 @@ if (isset($_POST['submit'])) {
 
         <div class="preview-item full"><span>PERMANENT ADDRESS</span><b>${form.address.value}</b></div>
 
-        <div class="preview-item">
+        <div class="preview-item photo-container">
             <span>Photo</span>
-                <img src="${selectedPhotoDataURL}" 
-                style="width:120px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #ddd;margin-top:8px;">
+                <img class="preview-img" src="${selectedPhotoDataURL}">
         </div>
     </div>
 `;
