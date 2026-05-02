@@ -1,4 +1,5 @@
 <?php
+include("../../config/auth.php");
 include("../../server/connection.php");
 
 // Step 1: Get ID from URL

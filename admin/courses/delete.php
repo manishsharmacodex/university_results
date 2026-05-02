@@ -1,4 +1,5 @@
 <?php
+include("../../config/auth.php");
 include("../../server/connection.php");
 
 $id = $_GET['id'] ?? null;

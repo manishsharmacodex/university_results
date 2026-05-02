@@ -322,7 +322,7 @@ include("./server/connection.php");
         <!-- ✅ NEW BUTTONS -->
         <div class="nav-buttons">
             <button class="nav-btn student-btn">Student Login</button>
-            <a href="./admin/admin_login.php" target="_BLANK"><button class="nav-btn admin-btn">Admin Login</button></a>
+            <a href="./admin/auth/login.php" target="_BLANK"><button class="nav-btn admin-btn">Admin Login</button></a>
         </div>
     </div>
 
