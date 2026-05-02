@@ -15,6 +15,7 @@ CREATE TABLE student_details (
     section VARCHAR(10), NOT NULL,
     university VARCHAR(255) NOT NULL,
     admission_date DATE,
+    aadhaar_number VARCHAR(12),
     photo VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

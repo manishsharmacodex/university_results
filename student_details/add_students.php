@@ -106,6 +106,8 @@ if (isset($_POST['submit'])) {
 
     $university = $_POST['university'];
 
+    $aadhaar_number = $_POST['aadhaar_number'];
+
     // $section = $_POST['section'];
     // $section = generateSection($conn, $department, $course, $semester);
 
@@ -133,9 +135,9 @@ if (isset($_POST['submit'])) {
     if ($dob && $admission_date) {
 
         $sql = "INSERT INTO student_details 
-        (student_id, full_name, father_name, mother_name, dob, gender, email, phone, address, course, department, semester, admission_date, photo, university, section)
+        (student_id, full_name, father_name, mother_name, dob, gender, email, phone, address, course, department, semester, admission_date, aadhaar_number, photo, university, section)
         VALUES 
-        ('$student_id', '$full_name', '$father_name', '$mother_name', '$dob', '$gender', '$email', '$phone', '$address', '$course', '$department', '$semester', '$admission_date', '$photo_name', '$university', '$section')";
+        ('$student_id', '$full_name', '$father_name', '$mother_name', '$dob', '$gender', '$email', '$phone', '$address', '$course', '$department', '$semester', '$admission_date', '$aadhaar_number', '$photo_name', '$university', '$section')";
 
         if ($conn->query($sql) === TRUE) {
             $message = "Student added successfully! Student ID: " . $student_id;
@@ -671,6 +673,12 @@ if (isset($_POST['submit'])) {
                         </select>
                     </div>
 
+                    <div>
+                        <label>Aadhaar Number</label>
+                        <input type="text" name="aadhaar_number" placeholder="Enter Aadhaar Number" maxlength="12"
+                            autocomplete="off">
+                    </div>
+
                     <div class="photo-wrapper">
                         <label>Photo</label>
                         <input type="file" name="photo" id="photoInput">
@@ -927,6 +935,7 @@ if (isset($_POST['submit'])) {
         <div class="preview-item"><span>ADMISSION DATE</span><b>${form.admission_date.value}</b></div>
 
         <div class="preview-item"><span>UNIVERSITY</span><b>${form.university.value}</b></div>
+        <div class="preview-item"><span>AADHAAR NUMBER</span><b>${form.aadhaar_number.value}</b></div>
 
         <div class="preview-item full"><span>PERMANENT ADDRESS</span><b>${form.address.value}</b></div>
 
