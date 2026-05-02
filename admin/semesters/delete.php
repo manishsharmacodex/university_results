@@ -7,13 +7,13 @@ if (!$id) {
     die("Invalid ID");
 }
 
-$stmt = $conn->prepare("DELETE FROM courses WHERE id = ?");
+$stmt = $conn->prepare("DELETE FROM semesters WHERE id = ?");
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {
     header("Location: list.php");
     exit;
 } else {
-    echo "Error deleting course: " . $stmt->error;
+    echo "Error deleting semester: " . $stmt->error;
 }
 ?>
