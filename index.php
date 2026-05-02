@@ -316,7 +316,9 @@ include("./server/connection.php");
             <a href="./school/school_information.php">
                 <li>School Informations</li>
             </a>
-            <a href="./src/pages/contact.php"><li>Contact</li></a>
+            <a href="./src/pages/contact.php">
+                <li>Contact</li>
+            </a>
         </ul>
 
         <!-- ✅ NEW BUTTONS -->
