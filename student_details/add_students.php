@@ -1,6 +1,14 @@
 <?php
 include("../server/connection.php");
 
+$bankResult = $conn->query("
+    SELECT banks.id, bank_master.bank_name
+    FROM banks
+    JOIN bank_master ON banks.bank_master_id = bank_master.id
+    ORDER BY bank_master.bank_name ASC
+");
+
+
 $message = "";
 
 // FUNCTION TO CONVERT dd/mm/yyyy → yyyy-mm-dd
@@ -108,6 +116,8 @@ if (isset($_POST['submit'])) {
 
     $aadhaar_number = $_POST['aadhaar_number'];
 
+    $bank_name = $_POST['bank_id'];
+
     // $section = $_POST['section'];
     // $section = generateSection($conn, $department, $course, $semester);
 
@@ -135,9 +145,9 @@ if (isset($_POST['submit'])) {
     if ($dob && $admission_date) {
 
         $sql = "INSERT INTO student_details 
-        (student_id, full_name, father_name, mother_name, dob, gender, email, phone, address, course, department, semester, admission_date, aadhaar_number, photo, university, section)
+        (student_id, full_name, father_name, mother_name, dob, gender, email, phone, address, course, department, semester, admission_date, aadhaar_number, bank_name, photo, university, section)
         VALUES 
-        ('$student_id', '$full_name', '$father_name', '$mother_name', '$dob', '$gender', '$email', '$phone', '$address', '$course', '$department', '$semester', '$admission_date', '$aadhaar_number', '$photo_name', '$university', '$section')";
+        ('$student_id', '$full_name', '$father_name', '$mother_name', '$dob', '$gender', '$email', '$phone', '$address', '$course', '$department', '$semester', '$admission_date', '$aadhaar_number', '$bank_name', '$photo_name', '$university', '$section')";
 
         if ($conn->query($sql) === TRUE) {
             $message = "Student added successfully! Student ID: " . $student_id;
@@ -677,6 +687,20 @@ if (isset($_POST['submit'])) {
                         <label>Aadhaar Number</label>
                         <input type="text" name="aadhaar_number" placeholder="Enter Aadhaar Number" maxlength="12"
                             autocomplete="off">
+                    </div>
+
+                    <div>
+                        <label>Bank</label>
+                        <select name="bank_id" required>
+                            <option value="">SELECT BANK</option>
+
+                            <?php while ($row = $bankResult->fetch_assoc()) { ?>
+                                <option value="<?= $row['id'] ?>">
+                                    <?= $row['bank_name'] ?>
+                                </option>
+                            <?php } ?>
+
+                        </select>
                     </div>
 
                     <div class="photo-wrapper">
