@@ -1,0 +1,14 @@
+<?php
+include("../../config/auth.php");
+include("../../server/connection.php");
+
+$id = $_GET['id'] ?? null;
+
+$stmt = $conn->prepare("DELETE FROM banks WHERE id=?");
+$stmt->bind_param("i", $id);
+
+$stmt->execute();
+
+header("Location: list.php");
+exit;
+?>

@@ -9,6 +9,7 @@ include("../../server/connection.php");
     <li><a href="../department/list.php">Departments</a></li>
     <li><a href="../courses/list.php">Courses</a></li>
     <li><a href="../semesters/list.php">Semesters</a></li>
+    <li><a href="../bank/list.php">Banks</a></li>
 </ul>
 
 <br><br>
