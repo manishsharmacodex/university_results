@@ -1,18 +1,14 @@
 <?php
-
-include("./server/connection.php");
-
+    include("./server/connection.php");
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sushant University - Homepage</title>
     <link rel="stylesheet" type="text/css" href="./css/font.css">
-
     <style>
         :root {
             --bg: #0b1220;
@@ -297,13 +293,11 @@ include("./server/connection.php");
         }
     </style>
 </head>
-
 <body>
 
     <!-- NAVBAR -->
     <div class="navbar">
         <div class="logo">🎓 Sushant University</div>
-
         <ul>
             <a href="./index.php">
                 <li>Home</li>
@@ -320,7 +314,6 @@ include("./server/connection.php");
                 <li>Contact</li>
             </a>
         </ul>
-
         <!-- ✅ NEW BUTTONS -->
         <div class="nav-buttons">
             <button class="nav-btn student-btn">Student Login</button>
@@ -447,7 +440,6 @@ include("./server/connection.php");
 </body>
 
 </html>
-
 
 
 <!-- insert admission data into database -->
