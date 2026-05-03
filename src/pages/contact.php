@@ -242,7 +242,7 @@ function toggleCustomSubject(val){
 
     <div class="nav-buttons">
         <button class="student-btn">Student Login</button>
-        <a href="../../admin/admin_login.php"><button class="admin-btn">Admin</button></a>
+        <a href="../../admin/auth/login.php"><button class="admin-btn">Admin Login</button></a>
     </div>
 </div>
 
@@ -308,7 +308,7 @@ function toggleCustomSubject(val){
                 <textarea name="message" placeholder="Your Message" required></textarea>
             </div>
 
-            <button class="btn">Send Message 🚀</button>
+            <button class="btn">Send Message</button>
 
         </form>
     </div>

@@ -51,6 +51,7 @@
             display: flex;
             list-style: none;
             gap: 25px;
+            cursor: pointer;
         }
 
         .nav-links a {
@@ -225,13 +226,13 @@
             <li>Programs</li>
             <li>Admissions</li>
             <a href="../results_check/results.php"><li>Exam & Results</li></a>
-            <a href="./school.php">
+            <a href="./school_information.php">
                 <li>Campus</li>
             </a>
             <a href="../src/pages/contact.php"><li>Contact</li></a>
         </ul>
 
-        <button class="btn-primary">Login</button>
+        <a href="../admin/auth/login.php"><button class="btn-primary">Admin Login</button></a>
     </nav>
 
     <!-- PAGE -->
