@@ -691,7 +691,7 @@ if (isset($_POST['submit'])) {
 
                     <div>
                         <label>Bank</label>
-                        <select name="bank_id" required>
+                        <select name="bank_id">
                             <option value="">SELECT BANK</option>
 
                             <?php while ($row = $bankResult->fetch_assoc()) { ?>
