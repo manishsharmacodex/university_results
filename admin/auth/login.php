@@ -239,5 +239,14 @@ if (isset($_POST['login'])) {
     </div>
 
 </body>
-
 </html>
+
+
+<script>
+    if (window.history && window.history.pushState) {
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function () {
+            window.location.href = "../dashboard/index.php";
+        };
+    }
+</script>

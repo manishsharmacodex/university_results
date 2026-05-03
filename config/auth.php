@@ -1,10 +1,17 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// If admin is not logged in, redirect to login page
+// Prevent cache
+header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+// Force login
 if (!isset($_SESSION['admin'])) {
     // header("Location: ../../admin/auth/login.php"); this is also work
-    header("Location: /university_results/admin/auth/login.php");
-    exit();
+    header("Location: ../auth/login.php");
+    exit;
 }
 ?>
