@@ -1,6 +1,11 @@
 <?php
 include("../../config/auth.php");
 include("../../server/connection.php");
+
+// Prevent browser cache
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
 ?>
 
 <h1>Admin Dashboard</h1>

@@ -1,16 +1,49 @@
 <?php
 session_start();
-include("../../server/connection.php");
 
-// Generate CAPTCHA only once
-if (!isset($_SESSION['num1']) || !isset($_SESSION['num2'])) {
-    $_SESSION['num1'] = rand(1, 20);
-    $_SESSION['num2'] = rand(1, 20);
+// If already logged in → redirect to dashboard
+if (isset($_SESSION['admin'])) {
+    header("Location: ../dashboard/index.php");
+    exit;
 }
 
-$captcha_answer = $_SESSION['num1'] + $_SESSION['num2'];
+// Prevent browser cache
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+include("../../server/connection.php");
+
+// Function to generate captcha
+function generateCaptcha()
+{
+    $_SESSION['num1'] = rand(1, 20);
+    $_SESSION['num2'] = rand(1, 20);
+
+    // Random operator
+    $_SESSION['operator'] = rand(0, 1) ? '+' : '-';
+}
+
+// Generate CAPTCHA initially
+if (!isset($_SESSION['num1']) || !isset($_SESSION['num2']) || !isset($_SESSION['operator'])) {
+    generateCaptcha();
+}
+
+// Calculate answer
+if ($_SESSION['operator'] === '+') {
+    $captcha_answer = $_SESSION['num1'] + $_SESSION['num2'];
+} else {
+    $captcha_answer = $_SESSION['num1'] - $_SESSION['num2'];
+}
 
 $error = "";
+
+// AJAX request for refreshing captcha
+if (isset($_POST['refresh_captcha'])) {
+    generateCaptcha();
+    echo $_SESSION['num1'] . "|" . $_SESSION['operator'] . "|" . $_SESSION['num2'];
+    exit;
+}
 
 if (isset($_POST['login'])) {
 
@@ -18,14 +51,18 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'];
     $captcha = $_POST['captcha'];
 
+    // Recalculate answer again (important)
+    if ($_SESSION['operator'] === '+') {
+        $captcha_answer = $_SESSION['num1'] + $_SESSION['num2'];
+    } else {
+        $captcha_answer = $_SESSION['num1'] - $_SESSION['num2'];
+    }
+
     // CAPTCHA check
     if ((int) $captcha !== $captcha_answer) {
 
         $error = "Wrong CAPTCHA answer";
-
-        // regenerate CAPTCHA
-        $_SESSION['num1'] = rand(1, 20);
-        $_SESSION['num2'] = rand(1, 20);
+        generateCaptcha();
 
     } else {
 
@@ -40,6 +77,7 @@ if (isset($_POST['login'])) {
 
             unset($_SESSION['num1']);
             unset($_SESSION['num2']);
+            unset($_SESSION['operator']);
 
             header("Location: ../dashboard/index.php");
             exit;
@@ -47,19 +85,37 @@ if (isset($_POST['login'])) {
         } else {
 
             $error = "Invalid username or password";
-
-            // regenerate CAPTCHA
-            $_SESSION['num1'] = rand(1, 20);
-            $_SESSION['num2'] = rand(1, 20);
+            generateCaptcha();
         }
     }
 }
 ?>
+
 <html>
 
 <head>
     <title>ERP Login</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
+
+    <script>
+        function refreshCaptcha() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "", true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    let data = this.responseText.split("|");
+                    document.getElementById("num1").innerText = data[0];
+                    document.getElementById("operator").innerText = data[1];
+                    document.getElementById("num2").innerText = data[2];
+                }
+            };
+
+            xhr.send("refresh_captcha=1");
+        }
+    </script>
+
     <style>
         body {
             margin: 0;
@@ -111,10 +167,30 @@ if (isset($_POST['login'])) {
             background: #1e3c72;
         }
 
-        .captcha {
+        .captcha-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-top: 10px;
+        }
+
+        .captcha-text {
             font-weight: bold;
             color: #333;
+        }
+
+        .refresh-btn {
+            padding: 6px 10px;
+            background: #2a5298;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .refresh-btn:hover {
+            background: #1e3c72;
         }
 
         .error {
@@ -140,8 +216,18 @@ if (isset($_POST['login'])) {
 
             <input type="password" name="password" placeholder="Password" required>
 
-            <div class="captcha">
-                What is <?= $_SESSION['num1'] ?> + <?= $_SESSION['num2'] ?> ?
+            <!-- CAPTCHA -->
+            <div class="captcha-container">
+                <div class="captcha-text">
+                    What is
+                    <span id="num1"><?= $_SESSION['num1'] ?></span>
+                    <span id="operator"><?= $_SESSION['operator'] ?></span>
+                    <span id="num2"><?= $_SESSION['num2'] ?></span> ?
+                </div>
+
+                <button type="button" class="refresh-btn" onclick="refreshCaptcha()">
+                    ↻ Refresh
+                </button>
             </div>
 
             <input type="text" name="captcha" placeholder="Enter Answer" required>
