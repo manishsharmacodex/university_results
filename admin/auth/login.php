@@ -68,7 +68,7 @@ if (isset($_POST['login'])) {
 
             $row = $result->fetch_assoc();
 
-            // 🔐 VERIFY HASH PASSWORD
+            // VERIFY HASH PASSWORD
             if (password_verify($password, $row['password'])) {
 
                 $_SESSION['admin'] = $username;
