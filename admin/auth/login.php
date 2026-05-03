@@ -19,21 +19,22 @@ function generateCaptcha()
 {
     $_SESSION['num1'] = rand(1, 20);
     $_SESSION['num2'] = rand(1, 20);
-
-    // Random operator
     $_SESSION['operator'] = rand(0, 1) ? '+' : '-';
 }
 
 // Generate CAPTCHA initially
-if (!isset($_SESSION['num1']) || !isset($_SESSION['num2']) || !isset($_SESSION['operator'])) {
+if (!isset($_SESSION['num1'])) {
     generateCaptcha();
 }
 
 // Calculate answer
-if ($_SESSION['operator'] === '+') {
-    $captcha_answer = $_SESSION['num1'] + $_SESSION['num2'];
-} else {
-    $captcha_answer = $_SESSION['num1'] - $_SESSION['num2'];
+function getCaptchaAnswer()
+{
+    if ($_SESSION['operator'] === '+') {
+        return $_SESSION['num1'] + $_SESSION['num2'];
+    } else {
+        return $_SESSION['num1'] - $_SESSION['num2'];
+    }
 }
 
 $error = "";
@@ -47,52 +48,52 @@ if (isset($_POST['refresh_captcha'])) {
 
 if (isset($_POST['login'])) {
 
-    $username = $_POST['username'];
+    $username = trim($_POST['username']);
     $password = $_POST['password'];
-    $captcha = $_POST['captcha'];
-
-    // Recalculate answer again (important)
-    if ($_SESSION['operator'] === '+') {
-        $captcha_answer = $_SESSION['num1'] + $_SESSION['num2'];
-    } else {
-        $captcha_answer = $_SESSION['num1'] - $_SESSION['num2'];
-    }
+    $captcha  = $_POST['captcha'];
 
     // CAPTCHA check
-    if ((int) $captcha !== $captcha_answer) {
-
+    if ((int)$captcha !== getCaptchaAnswer()) {
         $error = "Wrong CAPTCHA answer";
         generateCaptcha();
-
     } else {
 
-        $sql = "SELECT * FROM university_results.admin_user 
-                WHERE user_name='$username' AND password='$password'";
-
-        $result = $conn->query($sql);
+        // 🔐 SECURE QUERY (Prepared Statement)
+        $stmt = $conn->prepare("SELECT user_name, password FROM university_results.admin_user WHERE user_name = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
 
-            $_SESSION['admin'] = $username;
+            $row = $result->fetch_assoc();
 
-            unset($_SESSION['num1']);
-            unset($_SESSION['num2']);
-            unset($_SESSION['operator']);
+            // 🔐 VERIFY HASH PASSWORD
+            if (password_verify($password, $row['password'])) {
 
-            header("Location: ../dashboard/index.php");
-            exit;
+                $_SESSION['admin'] = $username;
+
+                unset($_SESSION['num1'], $_SESSION['num2'], $_SESSION['operator']);
+
+                header("Location: ../dashboard/index.php");
+                exit;
+
+            } else {
+                $error = "Invalid username or password";
+                generateCaptcha();
+            }
 
         } else {
-
             $error = "Invalid username or password";
             generateCaptcha();
         }
+
+        $stmt->close();
     }
 }
 ?>
 
 <html>
-
 <head>
     <title>ERP Login</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
@@ -148,7 +149,6 @@ if (isset($_POST['login'])) {
             margin: 8px 0;
             border: 1px solid #ccc;
             border-radius: 6px;
-            outline: none;
         }
 
         .login-box input[type="submit"] {
@@ -176,7 +176,6 @@ if (isset($_POST['login'])) {
 
         .captcha-text {
             font-weight: bold;
-            color: #333;
         }
 
         .refresh-btn {
@@ -186,11 +185,6 @@ if (isset($_POST['login'])) {
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
-        }
-
-        .refresh-btn:hover {
-            background: #1e3c72;
         }
 
         .error {
@@ -202,51 +196,47 @@ if (isset($_POST['login'])) {
 
 <body>
 
-    <div class="login-box">
+<div class="login-box">
 
-        <h2>University ERP Login</h2>
+    <h2>University ERP Login</h2>
 
-        <?php if ($error != "") { ?>
-            <div class="error"><?= $error ?></div>
-        <?php } ?>
+    <?php if ($error != "") { ?>
+        <div class="error"><?= $error ?></div>
+    <?php } ?>
 
-        <form method="POST">
+    <form method="POST">
 
-            <input type="text" name="username" placeholder="Username" required>
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
 
-            <input type="password" name="password" placeholder="Password" required>
-
-            <!-- CAPTCHA -->
-            <div class="captcha-container">
-                <div class="captcha-text">
-                    What is
-                    <span id="num1"><?= $_SESSION['num1'] ?></span>
-                    <span id="operator"><?= $_SESSION['operator'] ?></span>
-                    <span id="num2"><?= $_SESSION['num2'] ?></span> ?
-                </div>
-
-                <button type="button" class="refresh-btn" onclick="refreshCaptcha()">
-                    ↻ Refresh
-                </button>
+        <!-- CAPTCHA -->
+        <div class="captcha-container">
+            <div class="captcha-text">
+                What is
+                <span id="num1"><?= $_SESSION['num1'] ?></span>
+                <span id="operator"><?= $_SESSION['operator'] ?></span>
+                <span id="num2"><?= $_SESSION['num2'] ?></span> ?
             </div>
 
-            <input type="text" name="captcha" placeholder="Enter Answer" required>
+            <button type="button" class="refresh-btn" onclick="refreshCaptcha()">↻</button>
+        </div>
 
-            <input type="submit" name="login" value="LOGIN">
+        <input type="text" name="captcha" placeholder="Enter Answer" required>
 
-        </form>
+        <input type="submit" name="login" value="LOGIN">
 
-    </div>
+    </form>
+
+</div>
 
 </body>
 </html>
 
-
 <script>
-    if (window.history && window.history.pushState) {
-        window.history.pushState(null, null, window.location.href);
-        window.onpopstate = function () {
-            window.location.href = "../dashboard/index.php";
-        };
-    }
+if (window.history && window.history.pushState) {
+    window.history.pushState(null, null, window.location.href);
+    window.onpopstate = function () {
+        window.location.href = "../dashboard/index.php";
+    };
+}
 </script>
