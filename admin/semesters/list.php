@@ -190,6 +190,7 @@ $result = $conn->query("SELECT * FROM semesters ORDER BY id ASC LIMIT $limit OFF
             color: white;
         }
 
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -197,8 +198,8 @@ $result = $conn->query("SELECT * FROM semesters ORDER BY id ASC LIMIT $limit OFF
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
+            /* background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px); */
             justify-content: center;
             align-items: center;
             z-index: 999;
@@ -323,7 +324,7 @@ $result = $conn->query("SELECT * FROM semesters ORDER BY id ASC LIMIT $limit OFF
 
         <div class="main">
             <h2 class="breadcrum-header">Semesters</h2>
-            <div class="breadcrumb"><a href="../dashboard/index.php">Home</a> / Semesters</div>
+            <div class="breadcrumb"><a href="../dashboard/index.php">Dashboard</a> / Semesters</div>
 
             <?php if ($message != '')
                 echo "<div class='message'>$message</div>"; ?>

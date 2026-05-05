@@ -341,7 +341,7 @@ $result = $conn->query($sql);
         <div class="main">
             <h2 class="header-title breadcrum-header">Student Lists</h2>
             <div class="breadcrumb">
-                <a href="../../../admin/dashboard/index.php">Home</a> / Student Lists
+                <a href="../../../admin/dashboard/index.php">Dashboard</a> / Student Lists
             </div>
 
             <div class="card">

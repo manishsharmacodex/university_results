@@ -203,6 +203,7 @@ $departments = $conn->query("SELECT * FROM departments");
             color: white;
         }
 
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -210,8 +211,8 @@ $departments = $conn->query("SELECT * FROM departments");
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
+            /* background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px); */
             justify-content: center;
             align-items: center;
             z-index: 999;
@@ -337,7 +338,7 @@ $departments = $conn->query("SELECT * FROM departments");
 
         <div class="main">
             <h2 class="breadcrum-header">Courses</h2>
-            <div class="breadcrumb"><a href="../dashboard/index.php">Home</a> / Courses</div>
+            <div class="breadcrumb"><a href="../dashboard/index.php">Dashboard</a> / Courses</div>
 
             <?php if ($message != ''): ?>
                 <div class="message"><?= $message ?></div>

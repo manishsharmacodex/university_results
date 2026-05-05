@@ -201,8 +201,8 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
+            /* background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px); */
             justify-content: center;
             align-items: center;
             z-index: 999;
@@ -332,7 +332,7 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             <h2 class="breadcrum-header">Departments</h2>
 
             <div class="breadcrumb">
-                <a href="../dashboard/index.php">Home</a> / Departments
+                <a href="../dashboard/index.php">Dashboard</a> / Departments
             </div>
 
             <?php if ($message != ''): ?>

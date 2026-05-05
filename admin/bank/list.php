@@ -200,6 +200,7 @@ $bank_master_result = $conn->query("SELECT * FROM bank_master ORDER BY bank_name
             color: white;
         }
 
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -207,8 +208,8 @@ $bank_master_result = $conn->query("SELECT * FROM bank_master ORDER BY bank_name
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px);
+            /* background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px); */
             justify-content: center;
             align-items: center;
             z-index: 999;
@@ -333,7 +334,7 @@ $bank_master_result = $conn->query("SELECT * FROM bank_master ORDER BY bank_name
 
         <div class="main">
             <h2 class="breadcrum-header">Banks</h2>
-            <div class="breadcrumb"><a href="../dashboard/index.php">Home</a> / Banks</div>
+            <div class="breadcrumb"><a href="../dashboard/index.php">Dashboard</a> / Banks</div>
 
             <?php if ($message != '')
                 echo "<div class='message'>$message</div>"; ?>
