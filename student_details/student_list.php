@@ -36,7 +36,7 @@ $result = $conn->query($sql);
 
 <head>
     <title>Student List</title>
-    <link rel="stylesheet" type="text/css" href="../../css/font.css">
+    <link rel="stylesheet" type="text/css" href="../css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -47,8 +47,7 @@ $result = $conn->query($sql);
         }
 
         body {
-            background: #f4f6fb;
-            font-family: Arial;
+            background: linear-gradient(120deg, #eef2ff, #f8fafc);
         }
 
         .container {
@@ -56,8 +55,9 @@ $result = $conn->query($sql);
             min-height: 100vh;
         }
 
+        /* SIDEBAR */
         .sidebar {
-            width: 260px;
+            width: 250px;
             background: #111827;
             color: white;
             padding: 20px;
@@ -77,6 +77,7 @@ $result = $conn->query($sql);
             padding: 12px;
             margin: 6px 0;
             border-radius: 8px;
+            transition: 0.3s;
         }
 
         .sidebar a:hover,
@@ -273,7 +274,7 @@ $result = $conn->query($sql);
 
     <div class="container">
 
-       <!-- SIDEBAR -->
+        <!-- SIDEBAR -->
         <div class="sidebar">
             <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
             <a href="../admin/dashboard/index.php" class="<?= $activePage == 'dashboard' ? 'active' : '' ?>">
@@ -296,13 +297,11 @@ $result = $conn->query($sql);
                 <i class="fa-solid fa-bank"></i>Bank
             </a>
 
-            <a href="./add_students.php"
-                class="<?= $activePage == 'add_students' ? 'active' : '' ?>">
-                <i class="fa-solid fa-user-plus"></i>AddStudent
+            <a href="./add_students.php" class="<?= $activePage == 'add_students' ? 'active' : '' ?>">
+                <i class="fa-solid fa-user-plus"></i>Add Student
             </a>
 
-            <a href="./student_list.php"
-                class="<?= $activePage == 'student_list' ? 'active' : '' ?>">
+            <a href="./student_list.php" class="<?= $activePage == 'student_list' ? 'active' : '' ?>">
                 <i class="fa-solid fa-users"></i>Student List
             </a>
 

@@ -51,7 +51,7 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
         }
 
         body {
-            background: #f4f6fb;
+            background: linear-gradient(120deg, #eef2ff, #f8fafc);
         }
 
         .container {
@@ -59,8 +59,9 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             min-height: 100vh;
         }
 
+        /* SIDEBAR */
         .sidebar {
-            width: 260px;
+            width: 250px;
             background: #111827;
             color: white;
             padding: 20px;
@@ -285,7 +286,7 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
 
             <a href="../../student_details/add_students.php"
                 class="<?= $activePage == 'add_students' ? 'active' : '' ?>">
-                <i class="fa-solid fa-user-plus"></i>AddStudent
+                <i class="fa-solid fa-user-plus"></i>Add Student
             </a>
 
             <a href="../../student_details/student_list.php"

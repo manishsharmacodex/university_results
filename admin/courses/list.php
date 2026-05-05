@@ -54,7 +54,6 @@ $departments = $conn->query("SELECT * FROM departments");
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ====== Copy your department page CSS ====== */
         * {
             margin: 0;
             padding: 0;
@@ -62,7 +61,7 @@ $departments = $conn->query("SELECT * FROM departments");
         }
 
         body {
-            background: #f4f6fb;
+            background: linear-gradient(120deg, #eef2ff, #f8fafc);
         }
 
         .container {
@@ -70,8 +69,9 @@ $departments = $conn->query("SELECT * FROM departments");
             min-height: 100vh;
         }
 
+        /* SIDEBAR */
         .sidebar {
-            width: 260px;
+            width: 250px;
             background: #111827;
             color: white;
             padding: 20px;
@@ -294,7 +294,7 @@ $departments = $conn->query("SELECT * FROM departments");
 
             <a href="../../student_details/add_students.php"
                 class="<?= $activePage == 'add_students' ? 'active' : '' ?>">
-                <i class="fa-solid fa-user-plus"></i>AddStudent
+                <i class="fa-solid fa-user-plus"></i>Add Student
             </a>
 
             <a href="../../student_details/student_list.php"

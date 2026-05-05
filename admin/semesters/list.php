@@ -41,7 +41,6 @@ $result = $conn->query("SELECT * FROM semesters ORDER BY id ASC LIMIT $limit OFF
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* --- CSS same as your previous code --- */
         * {
             margin: 0;
             padding: 0;
@@ -49,7 +48,7 @@ $result = $conn->query("SELECT * FROM semesters ORDER BY id ASC LIMIT $limit OFF
         }
 
         body {
-            background: #f4f6fb;
+            background: linear-gradient(120deg, #eef2ff, #f8fafc);
         }
 
         .container {
@@ -57,8 +56,9 @@ $result = $conn->query("SELECT * FROM semesters ORDER BY id ASC LIMIT $limit OFF
             min-height: 100vh;
         }
 
+        /* SIDEBAR */
         .sidebar {
-            width: 260px;
+            width: 250px;
             background: #111827;
             color: white;
             padding: 20px;
@@ -280,7 +280,7 @@ $result = $conn->query("SELECT * FROM semesters ORDER BY id ASC LIMIT $limit OFF
 
             <a href="../../student_details/add_students.php"
                 class="<?= $activePage == 'add_students' ? 'active' : '' ?>">
-                <i class="fa-solid fa-user-plus"></i>AddStudent
+                <i class="fa-solid fa-user-plus"></i>Add Student
             </a>
 
             <a href="../../student_details/student_list.php"

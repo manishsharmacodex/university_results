@@ -220,7 +220,7 @@ $activePage = "dashboard"; // change per page
 
             <a href="../../student_details/add_students.php"
                 class="<?= $activePage == 'add_students' ? 'active' : '' ?>">
-                <i class="fa-solid fa-user-plus"></i>AddStudent
+                <i class="fa-solid fa-user-plus"></i>Add Student
             </a>
 
             <a href="../../student_details/student_list.php"

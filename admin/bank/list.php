@@ -51,7 +51,6 @@ $bank_master_result = $conn->query("SELECT * FROM bank_master ORDER BY bank_name
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* Same CSS as your semesters page */
         * {
             margin: 0;
             padding: 0;
@@ -59,7 +58,7 @@ $bank_master_result = $conn->query("SELECT * FROM bank_master ORDER BY bank_name
         }
 
         body {
-            background: #f4f6fb;
+            background: linear-gradient(120deg, #eef2ff, #f8fafc);
         }
 
         .container {
@@ -67,8 +66,9 @@ $bank_master_result = $conn->query("SELECT * FROM bank_master ORDER BY bank_name
             min-height: 100vh;
         }
 
+        /* SIDEBAR */
         .sidebar {
-            width: 260px;
+            width: 250px;
             background: #111827;
             color: white;
             padding: 20px;
@@ -290,7 +290,7 @@ $bank_master_result = $conn->query("SELECT * FROM bank_master ORDER BY bank_name
 
             <a href="../../student_details/add_students.php"
                 class="<?= $activePage == 'add_students' ? 'active' : '' ?>">
-                <i class="fa-solid fa-user-plus"></i>AddStudent
+                <i class="fa-solid fa-user-plus"></i>Add Student
             </a>
 
             <a href="../../student_details/student_list.php"

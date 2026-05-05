@@ -1,4 +1,5 @@
 <?php
+include("../../server/connection.php");
 session_start();
 
 // If already logged in → redirect to dashboard
@@ -12,7 +13,6 @@ header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-include("../../server/connection.php");
 
 // Function to generate captcha
 function generateCaptcha()
@@ -50,10 +50,10 @@ if (isset($_POST['login'])) {
 
     $username = trim($_POST['username']);
     $password = $_POST['password'];
-    $captcha  = $_POST['captcha'];
+    $captcha = $_POST['captcha'];
 
     // CAPTCHA check
-    if ((int)$captcha !== getCaptchaAnswer()) {
+    if ((int) $captcha !== getCaptchaAnswer()) {
         $error = "Wrong CAPTCHA answer";
         generateCaptcha();
     } else {
@@ -94,6 +94,7 @@ if (isset($_POST['login'])) {
 ?>
 
 <html>
+
 <head>
     <title>ERP Login</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
@@ -196,47 +197,48 @@ if (isset($_POST['login'])) {
 
 <body>
 
-<div class="login-box">
+    <div class="login-box">
 
-    <h2>University ERP Login</h2>
+        <h2>University ERP Login</h2>
 
-    <?php if ($error != "") { ?>
-        <div class="error"><?= $error ?></div>
-    <?php } ?>
+        <?php if ($error != "") { ?>
+            <div class="error"><?= $error ?></div>
+        <?php } ?>
 
-    <form method="POST">
+        <form method="POST">
 
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
 
-        <!-- CAPTCHA -->
-        <div class="captcha-container">
-            <div class="captcha-text">
-                What is
-                <span id="num1"><?= $_SESSION['num1'] ?></span>
-                <span id="operator"><?= $_SESSION['operator'] ?></span>
-                <span id="num2"><?= $_SESSION['num2'] ?></span> ?
+            <!-- CAPTCHA -->
+            <div class="captcha-container">
+                <div class="captcha-text">
+                    What is
+                    <span id="num1"><?= $_SESSION['num1'] ?></span>
+                    <span id="operator"><?= $_SESSION['operator'] ?></span>
+                    <span id="num2"><?= $_SESSION['num2'] ?></span> ?
+                </div>
+
+                <button type="button" class="refresh-btn" onclick="refreshCaptcha()">↻ Refresh Code</button>
             </div>
 
-            <button type="button" class="refresh-btn" onclick="refreshCaptcha()">↻</button>
-        </div>
+            <input type="text" name="captcha" placeholder="Enter Answer" required>
 
-        <input type="text" name="captcha" placeholder="Enter Answer" required>
+            <input type="submit" name="login" value="LOGIN">
 
-        <input type="submit" name="login" value="LOGIN">
+        </form>
 
-    </form>
-
-</div>
+    </div>
 
 </body>
+
 </html>
 
 <script>
-if (window.history && window.history.pushState) {
-    window.history.pushState(null, null, window.location.href);
-    window.onpopstate = function () {
-        window.location.href = "../dashboard/index.php";
-    };
-}
+    if (window.history && window.history.pushState) {
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function () {
+            window.location.href = "../dashboard/index.php";
+        };
+    }
 </script>
