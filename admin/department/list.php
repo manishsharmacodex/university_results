@@ -67,6 +67,15 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             background: #111827;
             color: white;
             padding: 20px;
+
+            height: 100vh;
+            /* full screen height */
+            position: sticky;
+            /* stays fixed while page scrolls */
+            top: 0;
+
+            overflow-y: auto;
+            /* enables vertical scroll */
         }
 
         .sidebar h2 {
@@ -91,6 +100,11 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             background: #2563eb;
             color: white;
             transform: translateX(5px);
+        }
+
+        .sidebar a.logout-btn {
+            background: #ef4444;
+            color: white;
         }
 
         .main {
@@ -310,7 +324,7 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
                 <i class="fa-solid fa-users"></i>Student List
             </a>
 
-            <a href="../auth/logout.php" style="background:#ef4444; color:white;">Logout</a>
+            <a href="../auth/logout.php" class="logout-btn">Logout</a>
         </div>
 
         <div class="main">

@@ -77,6 +77,15 @@ $departments = $conn->query("SELECT * FROM departments");
             background: #111827;
             color: white;
             padding: 20px;
+
+            height: 100vh;
+            /* full screen height */
+            position: sticky;
+            /* stays fixed while page scrolls */
+            top: 0;
+
+            overflow-y: auto;
+            /* enables vertical scroll */
         }
 
         .sidebar h2 {
@@ -101,6 +110,11 @@ $departments = $conn->query("SELECT * FROM departments");
             background: #2563eb;
             color: white;
             transform: translateX(5px);
+        }
+
+        .sidebar a.logout-btn {
+            background: #ef4444;
+            color: white;
         }
 
         .main {
@@ -318,7 +332,7 @@ $departments = $conn->query("SELECT * FROM departments");
                 <i class="fa-solid fa-users"></i>Student List
             </a>
 
-            <a href="../auth/logout.php" style="background:#ef4444; color:white;">Logout</a>
+            <a href="../auth/logout.php" class="logout-btn">Logout</a>
         </div>
 
         <div class="main">
