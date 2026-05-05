@@ -82,19 +82,24 @@ $activePage = "dashboard"; // change per page
             transform: translateX(5px);
         }
 
+        .breadcrum-header {
+            width: 100%;
+            display: block;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: #ffffff !important;
+            padding: 18px 25px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            margin-bottom: 15px;
+        }
+
         /* MAIN */
         .main {
             flex: 1;
             padding: 30px;
-        }
-
-        .header {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
 
         /* CARDS */
@@ -236,7 +241,7 @@ $activePage = "dashboard"; // change per page
         <!-- MAIN -->
         <div class="main">
 
-            <div class="header">
+            <div class="breadcrum-header">
                 <h1>Dashboard Overview</h1>
                 <p>Welcome back, Admin</p>
             </div>

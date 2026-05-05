@@ -110,6 +110,20 @@ $result = $conn->query("SELECT * FROM semesters ORDER BY id ASC LIMIT $limit OFF
             color: #2563eb;
         }
 
+        .breadcrum-header {
+            width: 100%;
+            display: block;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: #ffffff !important;
+            padding: 18px 25px;
+            border-radius: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            margin-bottom: 15px;
+        }
+
         .add-btn {
             display: inline-block;
             margin-bottom: 15px;
@@ -294,7 +308,7 @@ $result = $conn->query("SELECT * FROM semesters ORDER BY id ASC LIMIT $limit OFF
         </div>
 
         <div class="main">
-            <h2>Semesters</h2>
+            <h2 class="breadcrum-header">Semesters</h2>
             <div class="breadcrumb"><a href="../dashboard/index.php">Home</a> / Semesters</div>
 
             <?php if ($message != '')

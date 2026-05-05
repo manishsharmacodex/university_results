@@ -94,15 +94,28 @@ $result = $conn->query($sql);
             padding: 25px;
         }
 
-        .header-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
+        .breadcrumb {
+            margin-bottom: 20px;
+            color: #6b7280;
         }
 
-        .breadcrumb {
+        .breadcrumb a {
+            text-decoration: none;
+            color: #2563eb;
+        }
+
+        .breadcrum-header {
+            width: 100%;
+            display: block;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: #ffffff !important;
+            padding: 18px 25px;
+            border-radius: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
             margin-bottom: 15px;
-            color: #6b7280;
         }
 
         .card {
@@ -312,9 +325,10 @@ $result = $conn->query($sql);
 
         <!-- MAIN -->
         <div class="main">
-
-            <div class="header-title">Student List</div>
-            <div class="breadcrumb">Home / Students</div>
+            <h2 class="header-title breadcrum-header">Student Lists</h2>
+            <div class="breadcrumb">
+                <a href="../../../admin/dashboard/index.php">Home</a> / Student Lists
+            </div>
 
             <div class="card">
 

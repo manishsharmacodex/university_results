@@ -103,6 +103,20 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             color: #111827;
         }
 
+        .breadcrum-header {
+            width: 100%;
+            display: block;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: #ffffff !important;
+            padding: 18px 25px;
+            border-radius: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            margin-bottom: 15px;
+        }
+
         .breadcrumb {
             margin-bottom: 20px;
             color: #6b7280;
@@ -286,7 +300,7 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
                 <i class="fa-solid fa-bank"></i>Bank
             </a>
 
-           <a href="../../src/pages/student_details/add_students.php"
+            <a href="../../src/pages/student_details/add_students.php"
                 class="<?= $activePage == 'add_students' ? 'active' : '' ?>" target="_BLANK">
                 <i class="fa-solid fa-user-plus"></i>Add Student
             </a>
@@ -301,7 +315,7 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
 
         <div class="main">
 
-            <h2>Departments</h2>
+            <h2 class="breadcrum-header">Departments</h2>
 
             <div class="breadcrumb">
                 <a href="../dashboard/index.php">Home</a> / Departments
