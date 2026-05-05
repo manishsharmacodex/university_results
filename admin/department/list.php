@@ -3,14 +3,20 @@ include("../../config/auth.php");
 include("../../server/connection.php");
 
 /* ================= ADD DEPARTMENT ================= */
+$message = ''; // Initialize message
+
 if (isset($_POST['add_department'])) {
 
-    $name = $_POST['name'];
+    $name = strtoupper($conn->real_escape_string($_POST['name']));
 
-    $conn->query("INSERT INTO departments (name) VALUES ('$name')");
-
-    header("Location: list.php");
-    exit();
+    // Check if department already exists
+    $check = $conn->query("SELECT * FROM departments WHERE name='$name'");
+    if ($check->num_rows == 0) {
+        $conn->query("INSERT INTO departments (name) VALUES ('$name')");
+        $message = "Department added successfully!";
+    } else {
+        $message = "Department already exists!";
+    }
 }
 
 $result = $conn->query("SELECT * FROM departments");
@@ -209,6 +215,12 @@ $result = $conn->query("SELECT * FROM departments");
             color: white;
             cursor: pointer;
         }
+        
+        .message {
+            margin-bottom: 15px;
+            color: green;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -237,6 +249,10 @@ $result = $conn->query("SELECT * FROM departments");
             <div class="breadcrumb">
                 <a href="../dashboard/index.php">Home</a> / Departments
             </div>
+
+            <?php if ($message != ''): ?>
+                <div class="message"><?= $message ?></div>
+            <?php endif; ?>
 
             <!-- ✅ OPEN MODAL BUTTON -->
             <a class="add-btn" href="#" onclick="document.getElementById('addModal').style.display='flex'">
@@ -332,4 +348,5 @@ $result = $conn->query("SELECT * FROM departments");
     </script>
 
 </body>
+
 </html>

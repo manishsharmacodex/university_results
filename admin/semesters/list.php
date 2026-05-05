@@ -2,51 +2,335 @@
 include("../../config/auth.php");
 include("../../server/connection.php");
 
+/* ================= ADD SEMESTER ON THE SAME PAGE ================= */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['semester_name'])) {
+    $semester_name = strtoupper($conn->real_escape_string($_POST['semester_name']));
+
+    // Check if semester already exists
+    $check = $conn->query("SELECT * FROM semesters WHERE semester_name='$semester_name'");
+    if ($check->num_rows == 0) {
+        $conn->query("INSERT INTO semesters (semester_name) VALUES ('$semester_name')");
+        $message = "Semester added successfully!";
+    } else {
+        $message = "Semester already exists!";
+    }
+}
+
+/* ================= GET SEMESTERS ================= */
 $result = $conn->query("SELECT * FROM semesters");
 ?>
 
+<!DOCTYPE html>
 <html>
 
 <head>
-    <title>List Semester</title>
+    <title>Semesters</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* --- CSS same as before --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f4f6fb;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #111827;
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .sidebar a {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 12px;
+            margin: 6px 0;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background: #2563eb;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .main {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .main h2 {
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        .breadcrumb {
+            margin-bottom: 20px;
+            color: #6b7280;
+        }
+
+        .breadcrumb a {
+            text-decoration: none;
+            color: #2563eb;
+        }
+
+        .add-btn {
+            display: inline-block;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #111827;
+            color: white;
+            padding: 14px;
+            text-align: left;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f3f4f6;
+        }
+
+        .action a {
+            padding: 6px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            margin-right: 5px;
+        }
+
+        .edit {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .modal-box {
+            width: 360px;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+            transform: translateY(-20px) scale(0.95);
+            animation: modalShow 0.25s ease forwards;
+        }
+
+        @keyframes modalShow {
+            to {
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-box h3 {
+            margin-bottom: 15px;
+            text-align: center;
+            color: #111827;
+        }
+
+        .modal-box input,
+        .modal-box select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #ef4444;
+            color: white;
+            cursor: pointer;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            color: green;
+            font-weight: bold;
+        }
+    </style>
 </head>
 
-<body>  
-    <h2>Semester</h2>
+<body>
 
-    <p><a href="../dashboard/index.php">Home</a> / Semester</p>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
+            <a href="../dashboard/index.php"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+            <a href="../department/list.php"><i class="fa-solid fa-building"></i> Departments</a>
+            <a href="../courses/list.php"><i class="fa-solid fa-book"></i> Courses</a>
+            <a href="../semesters/list.php"><i class="fa-solid fa-calendar"></i> Semesters</a>
+            <a href="../bank/list.php"><i class="fa-solid fa-bank"></i> Banks</a>
+            <a href="../../student_details/add_students.php"><i class="fa-solid fa-user-plus"></i> Add Student</a>
+            <a href="../../student_details/student_list.php"><i class="fa-solid fa-users"></i> Student List</a>
+            <a href="../auth/logout.php" style="background:#ef4444; color:white;">Logout</a>
+        </div>
 
-    <a href="add.php">Add New</a>
+        <!-- Main Content -->
+        <div class="main">
+            <h2>Semesters</h2>
+            <div class="breadcrumb">
+                <a href="../dashboard/index.php">Home</a> / Semesters
+            </div>
 
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Edit</th>
-            <th>Delete</th>
-        </tr>
+            <?php if (isset($message)) {
+                echo "<div class='message'>$message</div>";
+            } ?>
 
-        <?php while ($row = $result->fetch_assoc()) { ?>
-            <tr>
-                <td><?= $row['id'] ?></td>
-                <td><?= $row['semester_name'] ?></td>
+            <a class="add-btn" href="#" onclick="document.getElementById('addModal').style.display='flex'">
+                <i class="fa fa-plus"></i> Add New Semester
+            </a>
 
-                <!-- EDIT -->
-                <td>
-                    <a href="edit.php?id=<?= $row['id'] ?>">Edit</a>
-                </td>
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Semester Name</th>
+                    <th>Action</th>
+                </tr>
+                <?php
+                // Refresh table after adding semester
+                $result = $conn->query("SELECT * FROM semesters");
+                while ($row = $result->fetch_assoc()) { ?>
+                    <tr>
+                        <td><?= $row['id'] ?></td>
+                        <td><?= $row['semester_name'] ?></td>
+                        <td class="action">
+                            <a href="#" class="edit" onclick="
+    const semesterValue = '<?= strtoupper(addslashes($row['semester_name'])) ?>';
+    document.getElementById('semester_id').value = '<?= $row['id'] ?>';
+    
+    const select = document.getElementById('semester_name');
+    select.value = semesterValue; // Auto-select the semester for editing
+    
+    document.getElementById('editModal').style.display='flex';
+">Edit</a>
 
-                <!-- DELETE -->
-                <td>
-                    <a href="delete.php?id=<?= $row['id'] ?>"
-                        onclick="return confirm('Are you sure you want to delete this semester?')">
-                        Delete
-                    </a>
-                </td>
-            </tr>
-        <?php } ?>
-    </table>
+                            <a class="delete" href="delete.php?id=<?= $row['id'] ?>"
+                                onclick="return confirm('Delete this semester?')">Delete</a>
+                        </td>
+                    </tr>
+                <?php } ?>
+            </table>
+        </div>
+    </div>
+
+    <!-- ADD SEMESTER MODAL -->
+    <div class="modal" id="addModal">
+        <div class="modal-box">
+            <h3>Add Semester</h3>
+            <form method="POST">
+                <select name="semester_name" required>
+                    <option value="">Select Semester</option>
+                    <?php for ($i = 1; $i <= 8; $i++) { ?>
+                        <option value="Semester <?= $i ?>">SEMESTER <?= $i ?></option>
+                    <?php } ?>
+                </select>
+                <button type="submit" class="save-btn">Add Semester</button>
+                <button type="button" class="close-btn"
+                    onclick="document.getElementById('addModal').style.display='none'">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- EDIT SEMESTER MODAL -->
+    <div class="modal" id="editModal">
+        <div class="modal-box">
+            <h3>Edit Semester</h3>
+            <form method="POST" action="edit.php">
+                <input type="hidden" name="id" id="semester_id">
+                <select name="semester_name" id="semester_name" required>
+                    <option value="" selected>SELECT SEMESTER</option>
+                    <?php for ($i = 1; $i <= 8; $i++) { ?>
+                        <option value="SEMESTER <?= $i ?>">SEMESTER <?= $i ?></option>
+                    <?php } ?>
+                </select>
+                <button type="submit" class="save-btn">Update</button>
+                <button type="button" class="close-btn"
+                    onclick="document.getElementById('editModal').style.display='none'">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // this is uppercase and lowercase filter
+        document.querySelectorAll("input[type='text'], textarea").forEach(field => {
+            field.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
+        });
+    </script>
+
 </body>
 
 </html>

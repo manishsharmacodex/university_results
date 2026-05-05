@@ -3,14 +3,20 @@ include("../../config/auth.php");
 include("../../server/connection.php");
 
 /* ================= ADD COURSE ================= */
+$message = ''; // initialize message
+
 if (isset($_POST['add_course'])) {
-    $course_name = $_POST['course_name'];
+    $course_name = strtoupper($conn->real_escape_string($_POST['course_name']));
     $department_id = $_POST['department_id'];
 
-    $conn->query("INSERT INTO courses (course_name, department_id) VALUES ('$course_name', '$department_id')");
-
-    header("Location: list.php");
-    exit();
+    // Check if course already exists for the same department
+    $check = $conn->query("SELECT * FROM courses WHERE course_name='$course_name' AND department_id='$department_id'");
+    if ($check->num_rows == 0) {
+        $conn->query("INSERT INTO courses (course_name, department_id) VALUES ('$course_name', '$department_id')");
+        $message = "Course added successfully!";
+    } else {
+        $message = "Course already exists in this department!";
+    }
 }
 
 $result = $conn->query("
@@ -215,6 +221,13 @@ $departments = $conn->query("SELECT * FROM departments");
             color: white;
             cursor: pointer;
         }
+
+
+        .message {
+            margin-bottom: 15px;
+            color: green;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -241,6 +254,11 @@ $departments = $conn->query("SELECT * FROM departments");
             <div class="breadcrumb">
                 <a href="../dashboard/index.php">Home</a> / Courses
             </div>
+
+
+            <?php if ($message != ''): ?>
+                <div class="message"><?= $message ?></div>
+            <?php endif; ?>
 
             <a class="add-btn" href="#" onclick="document.getElementById('addModal').style.display='flex'">
                 <i class="fa fa-plus"></i> Add New Course
