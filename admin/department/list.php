@@ -18,6 +18,8 @@ if (isset($_POST['add_department'])) {
     }
 }
 
+$activePage = "department"; // change per page
+
 /* ================= PAGINATION ================= */
 $limit = 6; // number of records per page
 $page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -81,7 +83,8 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             transition: 0.3s;
         }
 
-        .sidebar a:hover {
+        .sidebar a:hover,
+        .sidebar a.active {
             background: #2563eb;
             color: white;
             transform: translateX(5px);
@@ -257,16 +260,38 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
 
     <div class="container">
 
+        <!-- SIDEBAR -->
         <div class="sidebar">
             <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
+            <a href="../dashboard/index.php" class="<?= $activePage == 'dashboard' ? 'active' : '' ?>">
+                <i class="fa-solid fa-gauge"></i>Dashboard
+            </a>
 
-            <a href="../dashboard/index.php"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-            <a href="../department/list.php"><i class="fa-solid fa-building"></i> Departments</a>
-            <a href="../courses/list.php"><i class="fa-solid fa-book"></i> Courses</a>
-            <a href="../semesters/list.php"><i class="fa-solid fa-calendar"></i> Semesters</a>
-            <a href="../bank/list.php"><i class="fa-solid fa-bank"></i> Banks</a>
-            <a href="../../student_details/add_students.php"><i class="fa-solid fa-user-plus"></i> Add Student</a>
-            <a href="../../student_details/student_list.php"><i class="fa-solid fa-users"></i> Student List</a>
+            <a href="./list.php" class="<?= $activePage == 'department' ? 'active' : '' ?>">
+                <i class="fa-solid fa-building"></i>Department
+            </a>
+
+            <a href="../courses/list.php" class="<?= $activePage == 'courses' ? 'active' : '' ?>">
+                <i class="fa-solid fa-book"></i>Courses
+            </a>
+
+            <a href="../semesters/list.php" class="<?= $activePage == 'semester' ? 'active' : '' ?>">
+                <i class="fa-solid fa-calendar"></i>Semester
+            </a>
+
+            <a href="../bank/list.php" class="<?= $activePage == 'bank' ? 'active' : '' ?>">
+                <i class="fa-solid fa-bank"></i>Bank
+            </a>
+
+            <a href="../../student_details/add_students.php"
+                class="<?= $activePage == 'add_students' ? 'active' : '' ?>">
+                <i class="fa-solid fa-user-plus"></i>AddStudent
+            </a>
+
+            <a href="../../student_details/student_list.php"
+                class="<?= $activePage == 'student_list' ? 'active' : '' ?>">
+                <i class="fa-solid fa-users"></i>Student List
+            </a>
 
             <a href="../auth/logout.php" style="background:#ef4444; color:white;">Logout</a>
         </div>

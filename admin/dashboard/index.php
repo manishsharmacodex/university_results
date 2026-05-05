@@ -2,7 +2,8 @@
 include("../../config/auth.php");
 include("../../server/connection.php");
 
-// Prevent caching
+
+// session for login
 header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
@@ -13,17 +14,22 @@ if (!isset($_SESSION['admin'])) {
 }
 
 // DATA
-$total_students = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) AS total FROM student_details"))['total'] ?? 0;
-$total_admissions = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) AS total FROM admission_list"))['total'] ?? 0;
-$total_courses = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) AS total FROM courses"))['total'] ?? 0;
-$total_contact_us = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) AS total FROM contact_us"))['total'] ?? 0;
+$total_students = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM student_details"))['total'] ?? 0;
+$total_admissions = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM admission_list"))['total'] ?? 0;
+$total_courses = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM courses"))['total'] ?? 0;
+$total_contact_us = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM contact_us"))['total'] ?? 0;
+$total_departments = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM departments"))['total'] ?? 0;
+$total_banks = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM banks"))['total'] ?? 0;
+
+$activePage = "dashboard"; // change per page
 ?>
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Admin Dashboard</title>
-
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -31,11 +37,10 @@ $total_contact_us = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) AS to
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Segoe UI", sans-serif;
         }
 
         body {
-            background: #f4f6fb;
+            background: linear-gradient(120deg, #eef2ff, #f8fafc);
         }
 
         .container {
@@ -45,7 +50,7 @@ $total_contact_us = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) AS to
 
         /* SIDEBAR */
         .sidebar {
-            width: 260px;
+            width: 250px;
             background: #111827;
             color: white;
             padding: 20px;
@@ -68,16 +73,11 @@ $total_contact_us = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) AS to
             transition: 0.3s;
         }
 
-        .sidebar a:hover {
+        .sidebar a:hover,
+        .sidebar a.active {
             background: #2563eb;
             color: white;
-        }
-
-        .logout {
-            background: #ef4444 !important;
-            color: white !important;
-            margin-top: 20px;
-            justify-content: center;
+            transform: translateX(5px);
         }
 
         /* MAIN */
@@ -86,8 +86,13 @@ $total_contact_us = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) AS to
             padding: 30px;
         }
 
-        .main h1 {
-            margin-bottom: 20px;
+        .header {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
 
         /* CARDS */
@@ -99,49 +104,74 @@ $total_contact_us = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) AS to
 
         .card {
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 15px;
             color: white;
             position: relative;
             overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         }
 
         .card i {
-            font-size: 35px;
-            opacity: 0.3;
+            font-size: 40px;
             position: absolute;
             right: 15px;
             top: 15px;
+            opacity: 0.2;
         }
 
         .card h3 {
-            font-size: 16px;
+            font-size: 14px;
+            letter-spacing: 1px;
         }
 
         .card p {
-            font-size: 30px;
+            font-size: 32px;
             font-weight: bold;
             margin-top: 10px;
         }
 
-        .blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-        .green { background: linear-gradient(135deg, #10b981, #059669); }
-        .orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        /* COLORS */
+        .blue {
+            background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+        }
 
-        /* ================= SLIDER ================= */
+        .green {
+            background: linear-gradient(135deg, #10b981, #065f46);
+        }
+
+        .orange {
+            background: linear-gradient(135deg, #f59e0b, #7c2d12);
+        }
+
+        .purple {
+            background: linear-gradient(135deg, #8b5cf6, #4c1d95);
+        }
+
+        .pink {
+            background: linear-gradient(135deg, #ec4899, #831843);
+        }
+
+        .teal {
+            background: linear-gradient(135deg, #14b8a6, #134e4a);
+        }
+
+        /* SLIDER */
         .slider {
             margin-top: 30px;
-            width: 100%;
             height: 300px;
             overflow: hidden;
             border-radius: 15px;
             position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
 
         .slides {
             display: flex;
-            width: 200%;
             height: 100%;
             transition: 0.8s;
         }
@@ -150,10 +180,10 @@ $total_contact_us = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) AS to
             width: 100%;
             height: 300px;
             object-fit: cover;
+            flex-shrink: 0;
         }
 
-        /* Responsive */
-        @media(max-width: 768px) {
+        @media(max-width:768px) {
             .sidebar {
                 width: 200px;
             }
@@ -163,78 +193,116 @@ $total_contact_us = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) AS to
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-        <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
+            <a href="./index.php" class="<?= $activePage == 'dashboard' ? 'active' : '' ?>">
+                <i class="fa-solid fa-gauge"></i>Dashboard
+            </a>
 
-        <a href="./index.php"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-        <a href="../department/list.php"><i class="fa-solid fa-building"></i> Departments</a>
-        <a href="../courses/list.php"><i class="fa-solid fa-book"></i> Courses</a>
-        <a href="../semesters/list.php"><i class="fa-solid fa-calendar"></i> Semesters</a>
-        <a href="../bank/list.php"><i class="fa-solid fa-bank"></i> Banks</a>
-        <a href="../../student_details/add_students.php"><i class="fa-solid fa-user-plus"></i> Add Student</a>
-        <a href="../../student_details/student_list.php"><i class="fa-solid fa-users"></i> Student List</a>
+            <a href="../department/list.php" class="<?= $activePage == 'department' ? 'active' : '' ?>">
+                <i class="fa-solid fa-building"></i>Department
+            </a>
 
-        <a class="logout" href="../auth/logout.php">
-            <i class="fa-solid fa-right-from-bracket"></i> Logout
-        </a>
-    </div>
+            <a href="../courses/list.php" class="<?= $activePage == 'courses' ? 'active' : '' ?>">
+                <i class="fa-solid fa-book"></i>Courses
+            </a>
 
-    <!-- MAIN -->
-    <div class="main">
-        <h1>Dashboard Overview</h1>
+            <a href="../semesters/list.php" class="<?= $activePage == 'semester' ? 'active' : '' ?>">
+                <i class="fa-solid fa-calendar"></i>Semester
+            </a>
 
-        <!-- CARDS -->
-        <div class="cards">
+            <a href="../bank/list.php" class="<?= $activePage == 'bank' ? 'active' : '' ?>">
+                <i class="fa-solid fa-bank"></i>Bank
+            </a>
 
-            <div class="card blue">
-                <i class="fa-solid fa-user-graduate"></i>
-                <h3>Total Students</h3>
-                <p><?php echo $total_students; ?></p>
+            <a href="../../student_details/add_students.php"
+                class="<?= $activePage == 'add_students' ? 'active' : '' ?>">
+                <i class="fa-solid fa-user-plus"></i>AddStudent
+            </a>
+
+            <a href="../../student_details/student_list.php"
+                class="<?= $activePage == 'student_list' ? 'active' : '' ?>">
+                <i class="fa-solid fa-users"></i>Student List
+            </a>
+
+            <a href="../auth/logout.php" style="background:#ef4444; color:white;">Logout</a>
+        </div>
+
+        <!-- MAIN -->
+        <div class="main">
+
+            <div class="header">
+                <h1>Dashboard Overview</h1>
+                <p>Welcome back, Admin</p>
             </div>
 
-            <div class="card green">
-                <i class="fa-solid fa-file-signature"></i>
-                <h3>Total Admissions</h3>
-                <p><?php echo $total_admissions; ?></p>
+            <!-- CARDS -->
+            <div class="cards">
+
+                <div class="card blue">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <h3>Total Students</h3>
+                    <p><?= $total_students ?></p>
+                </div>
+
+                <div class="card green">
+                    <i class="fa-solid fa-file-signature"></i>
+                    <h3>Total Admissions</h3>
+                    <p><?= $total_admissions ?></p>
+                </div>
+
+                <div class="card orange">
+                    <i class="fa-solid fa-book"></i>
+                    <h3>Total Courses</h3>
+                    <p><?= $total_courses ?></p>
+                </div>
+
+                <div class="card purple">
+                    <i class="fa-solid fa-envelope"></i>
+                    <h3>Total Queries</h3>
+                    <p><?= $total_contact_us ?></p>
+                </div>
+
+                <div class="card pink">
+                    <i class="fa-solid fa-building"></i>
+                    <h3>Departments</h3>
+                    <p><?= $total_departments ?></p>
+                </div>
+
+                <div class="card teal">
+                    <i class="fa-solid fa-bank"></i>
+                    <h3>Banks</h3>
+                    <p><?= $total_banks ?></p>
+                </div>
+
             </div>
 
-            <div class="card orange">
-                <i class="fa-solid fa-book"></i>
-                <h3>Total Courses</h3>
-                <p><?php echo $total_courses; ?></p>
-            </div>
-
-            <div class="card purple">
-                <i class="fa-solid fa-envelope"></i>
-                <h3>Total Queries</h3>
-                <p><?php echo $total_contact_us; ?></p>
+            <!-- SLIDER -->
+            <div class="slider">
+                <div class="slides" id="slides">
+                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644">
+                    <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d">
+                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b">
+                </div>
             </div>
 
         </div>
-
-        <!-- ================= SLIDER ================= -->
-        <div class="slider">
-            <div class="slides" id="slides">
-                <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644" alt="slide1">
-                <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d" alt="slide2">
-            </div>
-        </div>
     </div>
-</div>
 
-<!-- SLIDER SCRIPT -->
-<script>
-    let index = 0;
-    const slides = document.getElementById("slides");
+    <script>
+        let index = 0;
+        const slides = document.getElementById("slides");
+        const totalSlides = slides.children.length;
 
-    setInterval(() => {
-        index = (index + 1) % 2;
-        slides.style.transform = "translateX(" + (-index * 100) + "%)";
-    }, 10000);
-</script>
+        setInterval(() => {
+            index = (index + 1) % totalSlides;
+            slides.style.transform = "translateX(" + (-index * 100) + "%)";
+        }, 3000);
+    </script>
 
 </body>
+
 </html>
