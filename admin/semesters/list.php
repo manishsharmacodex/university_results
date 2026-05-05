@@ -2,11 +2,11 @@
 include("../../config/auth.php");
 include("../../server/connection.php");
 
-/* ================= ADD SEMESTER ON THE SAME PAGE ================= */
+/* ================= ADD SEMESTER ================= */
+$message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['semester_name'])) {
     $semester_name = strtoupper($conn->real_escape_string($_POST['semester_name']));
 
-    // Check if semester already exists
     $check = $conn->query("SELECT * FROM semesters WHERE semester_name='$semester_name'");
     if ($check->num_rows == 0) {
         $conn->query("INSERT INTO semesters (semester_name) VALUES ('$semester_name')");
@@ -16,8 +16,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['semester_name'])) {
     }
 }
 
-/* ================= GET SEMESTERS ================= */
-$result = $conn->query("SELECT * FROM semesters");
+/* ================= PAGINATION ================= */
+$limit = 6; // number of semesters per page
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+// Count total semesters
+$total_result = $conn->query("SELECT COUNT(*) AS total FROM semesters");
+$total_row = $total_result->fetch_assoc();
+$total_records = $total_row['total'];
+$total_pages = ceil($total_records / $limit);
+
+// Fetch semesters for current page
+$result = $conn->query("SELECT * FROM semesters ORDER BY id ASC LIMIT $limit OFFSET $offset");
 ?>
 
 <!DOCTYPE html>
@@ -28,7 +39,7 @@ $result = $conn->query("SELECT * FROM semesters");
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* --- CSS same as before --- */
+        /* --- CSS same as your previous code --- */
         * {
             margin: 0;
             padding: 0;
@@ -162,7 +173,7 @@ $result = $conn->query("SELECT * FROM semesters");
 
         .modal-box {
             width: 360px;
-            background: #ffffff;
+            background: #fff;
             padding: 25px;
             border-radius: 14px;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
@@ -218,13 +229,29 @@ $result = $conn->query("SELECT * FROM semesters");
             color: green;
             font-weight: bold;
         }
+
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            padding: 6px 12px;
+            margin-right: 4px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #111827;
+            background: #f3f4f6;
+        }
+
+        .pagination a.active {
+            background: #2563eb;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
-
     <div class="container">
-        <!-- Sidebar -->
         <div class="sidebar">
             <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
             <a href="../dashboard/index.php"><i class="fa-solid fa-gauge"></i> Dashboard</a>
@@ -234,19 +261,15 @@ $result = $conn->query("SELECT * FROM semesters");
             <a href="../bank/list.php"><i class="fa-solid fa-bank"></i> Banks</a>
             <a href="../../student_details/add_students.php"><i class="fa-solid fa-user-plus"></i> Add Student</a>
             <a href="../../student_details/student_list.php"><i class="fa-solid fa-users"></i> Student List</a>
-            <a href="../auth/logout.php" style="background:#ef4444; color:white;">Logout</a>
+            <a href="../auth/logout.php" style="background:#ef4444;color:white;">Logout</a>
         </div>
 
-        <!-- Main Content -->
         <div class="main">
             <h2>Semesters</h2>
-            <div class="breadcrumb">
-                <a href="../dashboard/index.php">Home</a> / Semesters
-            </div>
+            <div class="breadcrumb"><a href="../dashboard/index.php">Home</a> / Semesters</div>
 
-            <?php if (isset($message)) {
-                echo "<div class='message'>$message</div>";
-            } ?>
+            <?php if ($message != '')
+                echo "<div class='message'>$message</div>"; ?>
 
             <a class="add-btn" href="#" onclick="document.getElementById('addModal').style.display='flex'">
                 <i class="fa fa-plus"></i> Add New Semester
@@ -258,30 +281,37 @@ $result = $conn->query("SELECT * FROM semesters");
                     <th>Semester Name</th>
                     <th>Action</th>
                 </tr>
-                <?php
-                // Refresh table after adding semester
-                $result = $conn->query("SELECT * FROM semesters");
-                while ($row = $result->fetch_assoc()) { ?>
+                <?php while ($row = $result->fetch_assoc()) { ?>
                     <tr>
                         <td><?= $row['id'] ?></td>
                         <td><?= $row['semester_name'] ?></td>
                         <td class="action">
                             <a href="#" class="edit" onclick="
-    const semesterValue = '<?= strtoupper(addslashes($row['semester_name'])) ?>';
-    document.getElementById('semester_id').value = '<?= $row['id'] ?>';
-    
-    const select = document.getElementById('semester_name');
-    select.value = semesterValue; // Auto-select the semester for editing
-    
-    document.getElementById('editModal').style.display='flex';
-">Edit</a>
-
-                            <a class="delete" href="delete.php?id=<?= $row['id'] ?>"
+                            document.getElementById('semester_id').value='<?= $row['id'] ?>';
+                            document.getElementById('semester_name').value='<?= addslashes($row['semester_name']) ?>';
+                            document.getElementById('editModal').style.display='flex';
+                        ">Edit</a>
+                            <a class="delete" href="delete.php?id=<?= $row['id'] ?>&page=<?= $page ?>"
                                 onclick="return confirm('Delete this semester?')">Delete</a>
                         </td>
                     </tr>
                 <?php } ?>
             </table>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <?php if ($page > 1): ?>
+                    <a href="?page=<?= $page - 1 ?>">Prev</a>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <a href="?page=<?= $i ?>" class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
+                <?php endfor; ?>
+
+                <?php if ($page < $total_pages): ?>
+                    <a href="?page=<?= $page + 1 ?>">Next</a>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 
@@ -292,9 +322,9 @@ $result = $conn->query("SELECT * FROM semesters");
             <form method="POST">
                 <select name="semester_name" required>
                     <option value="">Select Semester</option>
-                    <?php for ($i = 1; $i <= 8; $i++) { ?>
-                        <option value="Semester <?= $i ?>">SEMESTER <?= $i ?></option>
-                    <?php } ?>
+                    <?php for ($i = 1; $i <= 8; $i++): ?>
+                        <option value="SEMESTER <?= $i ?>">SEMESTER <?= $i ?></option>
+                    <?php endfor; ?>
                 </select>
                 <button type="submit" class="save-btn">Add Semester</button>
                 <button type="button" class="close-btn"
@@ -311,9 +341,9 @@ $result = $conn->query("SELECT * FROM semesters");
                 <input type="hidden" name="id" id="semester_id">
                 <select name="semester_name" id="semester_name" required>
                     <option value="" selected>SELECT SEMESTER</option>
-                    <?php for ($i = 1; $i <= 8; $i++) { ?>
+                    <?php for ($i = 1; $i <= 8; $i++): ?>
                         <option value="SEMESTER <?= $i ?>">SEMESTER <?= $i ?></option>
-                    <?php } ?>
+                    <?php endfor; ?>
                 </select>
                 <button type="submit" class="save-btn">Update</button>
                 <button type="button" class="close-btn"
@@ -323,14 +353,10 @@ $result = $conn->query("SELECT * FROM semesters");
     </div>
 
     <script>
-        // this is uppercase and lowercase filter
-        document.querySelectorAll("input[type='text'], textarea").forEach(field => {
-            field.addEventListener("input", function () {
-                this.value = this.value.toUpperCase();
-            });
+        document.querySelectorAll("input[type='text'], textarea").forEach(f => {
+            f.addEventListener("input", function () { this.value = this.value.toUpperCase(); });
         });
     </script>
-
 </body>
 
 </html>

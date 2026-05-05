@@ -19,12 +19,27 @@ if (isset($_POST['add_course'])) {
     }
 }
 
+/* ================= PAGINATION ================= */
+$limit = 6; // number of courses per page
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+// Count total courses
+$total_result = $conn->query("SELECT COUNT(*) as total FROM courses");
+$total_row = $total_result->fetch_assoc();
+$total_records = $total_row['total'];
+$total_pages = ceil($total_records / $limit);
+
+// Fetch courses for current page
 $result = $conn->query("
-    SELECT courses.id, courses.course_name, departments.name AS department_name
+    SELECT courses.id, courses.course_name, courses.department_id, departments.name AS department_name
     FROM courses
     JOIN departments ON courses.department_id = departments.id
+    ORDER BY courses.id ASC
+    LIMIT $limit OFFSET $offset
 ");
 
+// Fetch all departments for dropdown
 $departments = $conn->query("SELECT * FROM departments");
 ?>
 
@@ -154,7 +169,6 @@ $departments = $conn->query("SELECT * FROM departments");
             color: white;
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -171,7 +185,7 @@ $departments = $conn->query("SELECT * FROM departments");
 
         .modal-box {
             width: 360px;
-            background: #ffffff;
+            background: #fff;
             padding: 25px;
             border-radius: 14px;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
@@ -222,22 +236,37 @@ $departments = $conn->query("SELECT * FROM departments");
             cursor: pointer;
         }
 
-
         .message {
             margin-bottom: 15px;
             color: green;
             font-weight: bold;
         }
+
+        /* Pagination */
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            padding: 6px 12px;
+            margin-right: 4px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #111827;
+            background: #f3f4f6;
+        }
+
+        .pagination a.active {
+            background: #2563eb;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
-
     <div class="container">
-
         <div class="sidebar">
             <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
-
             <a href="../dashboard/index.php"><i class="fa-solid fa-gauge"></i> Dashboard</a>
             <a href="../department/list.php"><i class="fa-solid fa-building"></i> Departments</a>
             <a href="../courses/list.php"><i class="fa-solid fa-book"></i> Courses</a>
@@ -245,16 +274,12 @@ $departments = $conn->query("SELECT * FROM departments");
             <a href="../bank/list.php"><i class="fa-solid fa-bank"></i> Banks</a>
             <a href="../../student_details/add_students.php"><i class="fa-solid fa-user-plus"></i> Add Student</a>
             <a href="../../student_details/student_list.php"><i class="fa-solid fa-users"></i> Student List</a>
-            <a href="../auth/logout.php" style="background:#ef4444; color:white;">Logout</a>
+            <a href="../auth/logout.php" style="background:#ef4444;color:white;">Logout</a>
         </div>
 
         <div class="main">
             <h2>Courses</h2>
-
-            <div class="breadcrumb">
-                <a href="../dashboard/index.php">Home</a> / Courses
-            </div>
-
+            <div class="breadcrumb"><a href="../dashboard/index.php">Home</a> / Courses</div>
 
             <?php if ($message != ''): ?>
                 <div class="message"><?= $message ?></div>
@@ -278,19 +303,33 @@ $departments = $conn->query("SELECT * FROM departments");
                         <td><?= $row['department_name'] ?></td>
                         <td class="action">
                             <a href="#" class="edit" onclick="
-    document.getElementById('course_id').value='<?= $row['id'] ?>';
-    document.getElementById('course_name').value='<?= addslashes($row['course_name']) ?>';
-    document.getElementById('department_select').value='<?= $row['department_id'] ?>';
-    document.getElementById('editModal').style.display='flex';
-">Edit</a>
+                            document.getElementById('course_id').value='<?= $row['id'] ?>';
+                            document.getElementById('course_name').value='<?= addslashes($row['course_name']) ?>';
+                            document.getElementById('department_select').value='<?= $row['department_id'] ?>';
+                            document.getElementById('editModal').style.display='flex';
+                        ">Edit</a>
 
-                            <a class="delete" href="delete.php?id=<?= $row['id'] ?>"
+                            <a class="delete" href="delete.php?id=<?= $row['id'] ?>&page=<?= $page ?>"
                                 onclick="return confirm('Delete this course?')">Delete</a>
                         </td>
                     </tr>
                 <?php } ?>
             </table>
 
+            <!-- Pagination -->
+            <div class="pagination">
+                <?php if ($page > 1): ?>
+                    <a href="?page=<?= $page - 1 ?>">Prev</a>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <a href="?page=<?= $i ?>" class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
+                <?php endfor; ?>
+
+                <?php if ($page < $total_pages): ?>
+                    <a href="?page=<?= $page + 1 ?>">Next</a>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 
@@ -306,7 +345,6 @@ $departments = $conn->query("SELECT * FROM departments");
                         <option value="<?= $dept['id'] ?>"><?= $dept['name'] ?></option>
                     <?php } ?>
                 </select>
-
                 <button type="submit" name="add_course" class="save-btn">Add Course</button>
                 <button type="button" class="close-btn"
                     onclick="document.getElementById('addModal').style.display='none'">Cancel</button>
@@ -323,13 +361,11 @@ $departments = $conn->query("SELECT * FROM departments");
                 <input type="text" name="course_name" id="course_name" required>
                 <select name="department_id" id="department_select" required>
                     <option value="">Select Department</option>
-                    <?php
-                    $departments->data_seek(0); // reset pointer
+                    <?php $departments->data_seek(0);
                     while ($dept = $departments->fetch_assoc()) { ?>
                         <option value="<?= $dept['id'] ?>"><?= $dept['name'] ?></option>
                     <?php } ?>
                 </select>
-
                 <button type="submit" class="save-btn">Update</button>
                 <button type="button" class="close-btn"
                     onclick="document.getElementById('editModal').style.display='none'">Cancel</button>
@@ -338,14 +374,10 @@ $departments = $conn->query("SELECT * FROM departments");
     </div>
 
     <script>
-        // Uppercase input
         document.querySelectorAll("input[type='text'], textarea").forEach(field => {
-            field.addEventListener("input", function () {
-                this.value = this.value.toUpperCase();
-            });
+            field.addEventListener("input", function () { this.value = this.value.toUpperCase(); });
         });
     </script>
-
 </body>
 
 </html>

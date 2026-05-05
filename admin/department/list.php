@@ -6,7 +6,6 @@ include("../../server/connection.php");
 $message = ''; // Initialize message
 
 if (isset($_POST['add_department'])) {
-
     $name = strtoupper($conn->real_escape_string($_POST['name']));
 
     // Check if department already exists
@@ -19,7 +18,19 @@ if (isset($_POST['add_department'])) {
     }
 }
 
-$result = $conn->query("SELECT * FROM departments");
+/* ================= PAGINATION ================= */
+$limit = 6; // number of records per page
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+// Count total departments
+$total_result = $conn->query("SELECT COUNT(*) as total FROM departments");
+$total_row = $total_result->fetch_assoc();
+$total_records = $total_row['total'];
+$total_pages = ceil($total_records / $limit);
+
+// Fetch departments for current page
+$result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit OFFSET $offset");
 ?>
 
 <!DOCTYPE html>
@@ -148,8 +159,7 @@ $result = $conn->query("SELECT * FROM departments");
             color: white;
         }
 
-        /* ================= MODAL ================= */
-
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -166,7 +176,7 @@ $result = $conn->query("SELECT * FROM departments");
 
         .modal-box {
             width: 360px;
-            background: #ffffff;
+            background: #fff;
             padding: 25px;
             border-radius: 14px;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
@@ -215,11 +225,30 @@ $result = $conn->query("SELECT * FROM departments");
             color: white;
             cursor: pointer;
         }
-        
+
         .message {
             margin-bottom: 15px;
             color: green;
             font-weight: bold;
+        }
+
+        /* Pagination */
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            padding: 6px 12px;
+            margin-right: 4px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #111827;
+            background: #f3f4f6;
+        }
+
+        .pagination a.active {
+            background: #2563eb;
+            color: white;
         }
     </style>
 </head>
@@ -254,7 +283,7 @@ $result = $conn->query("SELECT * FROM departments");
                 <div class="message"><?= $message ?></div>
             <?php endif; ?>
 
-            <!-- ✅ OPEN MODAL BUTTON -->
+            <!-- Add Department Button -->
             <a class="add-btn" href="#" onclick="document.getElementById('addModal').style.display='flex'">
                 <i class="fa fa-plus"></i> Add New Department
             </a>
@@ -265,81 +294,71 @@ $result = $conn->query("SELECT * FROM departments");
                     <th>Department Name</th>
                     <th>Action</th>
                 </tr>
-
                 <?php while ($row = $result->fetch_assoc()) { ?>
                     <tr>
                         <td><?= $row['id'] ?></td>
                         <td><?= $row['name'] ?></td>
                         <td class="action">
-
-                            <a href="#" class="edit" onclick="document.getElementById('dept_id').value='<?= $row['id'] ?>';
-                                    document.getElementById('dept_name').value='<?= addslashes($row['name']) ?>';
-                                    document.getElementById('editModal').style.display='flex'">
-                                Edit
-                            </a>
+                            <a href="#" class="edit" onclick="
+                                document.getElementById('dept_id').value='<?= $row['id'] ?>';
+                                document.getElementById('dept_name').value='<?= addslashes($row['name']) ?>';
+                                document.getElementById('editModal').style.display='flex';
+                            ">Edit</a>
 
                             <a class="delete" href="delete.php?id=<?= $row['id'] ?>"
-                                onclick="return confirm('Delete this department?')">
-                                Delete
-                            </a>
-
+                                onclick="return confirm('Delete this department?')">Delete</a>
                         </td>
                     </tr>
                 <?php } ?>
-
             </table>
 
+            <!-- Pagination Links -->
+            <div class="pagination">
+                <?php if ($page > 1): ?>
+                    <a href="?page=<?= $page - 1 ?>">Prev</a>
+                <?php endif; ?>
+
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <a href="?page=<?= $i ?>" class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
+                <?php endfor; ?>
+
+                <?php if ($page < $total_pages): ?>
+                    <a href="?page=<?= $page + 1 ?>">Next</a>
+                <?php endif; ?>
+            </div>
+
         </div>
     </div>
 
-    <!-- ================= ADD MODAL ================= -->
+    <!-- ADD MODAL -->
     <div class="modal" id="addModal">
         <div class="modal-box">
-
             <h3>Add Department</h3>
-
             <form method="POST">
-
                 <input type="text" name="name" placeholder="Department Name" required>
-
                 <button type="submit" name="add_department" class="save-btn">Add Department</button>
-
                 <button type="button" class="close-btn"
-                    onclick="document.getElementById('addModal').style.display='none'">
-                    Cancel
-                </button>
-
+                    onclick="document.getElementById('addModal').style.display='none'">Cancel</button>
             </form>
-
         </div>
     </div>
 
-    <!-- ================= EDIT MODAL ================= -->
+    <!-- EDIT MODAL -->
     <div class="modal" id="editModal">
         <div class="modal-box">
-
             <h3>Edit Department</h3>
-
             <form method="POST" action="edit.php">
-
                 <input type="hidden" name="id" id="dept_id">
                 <input type="text" name="name" id="dept_name" required>
-
                 <button type="submit" class="save-btn">Update</button>
-
                 <button type="button" class="close-btn"
-                    onclick="document.getElementById('editModal').style.display='none'">
-                    Cancel
-                </button>
-
+                    onclick="document.getElementById('editModal').style.display='none'">Cancel</button>
             </form>
-
         </div>
     </div>
 
-
     <script>
-        // this is uppercase and lowercase filter
+        // Uppercase input
         document.querySelectorAll("input[type='text'], textarea").forEach(field => {
             field.addEventListener("input", function () {
                 this.value = this.value.toUpperCase();
