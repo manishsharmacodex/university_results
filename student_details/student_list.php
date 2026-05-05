@@ -1,433 +1,371 @@
 <?php
 include("../server/connection.php");
 
-/* =========================
-   DELETE STUDENT
-========================= */
-if (isset($_GET['delete'])) {
+$sql = "
+SELECT s.*,
+       c.course_name,
+       d.name AS department_name,
+       bm.bank_name
+FROM student_details s
+LEFT JOIN courses c ON s.course = c.id
+LEFT JOIN departments d ON s.department = d.id
+LEFT JOIN banks b ON s.bank_name = b.id
+LEFT JOIN bank_master bm ON b.bank_master_id = bm.id
+ORDER BY s.id DESC
+";
 
-    $id = $_GET['delete'];
-
-    $stmt = $conn->prepare("DELETE FROM student_details WHERE id=?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-
-    header("Location: student_list.php");
-    exit;
-}
-
-/* =========================
-   UPDATE STUDENT (WITH PHOTO)
-========================= */
-if (isset($_POST['update'])) {
-
-    $id = $_POST['id'];
-
-    $old = $conn->prepare("SELECT photo FROM student_details WHERE id=?");
-    $old->bind_param("i", $id);
-    $old->execute();
-    $oldPhoto = $old->get_result()->fetch_assoc()['photo'];
-
-    $photoName = $oldPhoto;
-
-    if (!empty($_FILES['photo']['name'])) {
-
-        $targetDir = "uploads/";
-        if (!is_dir($targetDir))
-            mkdir($targetDir, 0777, true);
-
-        $fileName = time() . "_" . basename($_FILES["photo"]["name"]);
-        move_uploaded_file($_FILES["photo"]["tmp_name"], $targetDir . $fileName);
-
-        $photoName = $fileName;
-    }
-
-    $stmt = $conn->prepare("UPDATE student_details SET 
-        full_name=?,
-        father_name=?,
-        email=?,
-        phone=?,
-        course=?,
-        semester=?,
-        photo=?
-        WHERE id=?");
-
-    $stmt->bind_param(
-        "sssssssi",
-        $_POST['full_name'],
-        $_POST['father_name'],
-        $_POST['email'],
-        $_POST['phone'],
-        $_POST['course'],
-        $_POST['semester'],
-        $photoName,
-        $id
-    );
-
-    $stmt->execute();
-
-    header("Location: student_list.php");
-    exit;
-}
-
-/* =========================
-   SEARCH
-========================= */
-$search = $_GET['search'] ?? '';
-
-if (!empty($search)) {
-
-    $stmt = $conn->prepare("SELECT * FROM student_details WHERE student_id LIKE ? ORDER BY id DESC");
-    $like = "%$search%";
-    $stmt->bind_param("s", $like);
-
-} else {
-
-    $stmt = $conn->prepare("SELECT * FROM student_details ORDER BY id DESC");
-}
-
-$stmt->execute();
-$result = $stmt->get_result();
+$result = $conn->query($sql);
 ?>
 
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Student List</title>
+<title>Student ERP</title>
+<link rel="stylesheet" type="text/css" href="../css/font.css">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+body{
+    margin:0;
+    padding: 0;
+    box-sizing: border-box;
+    background:#f4f6fb;
+}
 
-    <style>
-        body {
-            font-family: Poppins;
-            margin: 0;
-            background: #f1f5f9;
-        }
+/* HEADER */
+.header{
+    background:#111827;
+    color:#fff;
+    padding:16px 25px;
+    font-size:18px;
+    font-weight:600;
+}
 
-        .container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 20px;
-        }
+/* TABLE WRAPPER */
+.wrapper{
+    padding:20px;
+}
 
-        .header {
-            background: #2563eb;
-            color: #fff;
-            padding: 18px;
-            border-radius: 12px;
-            text-align: center;
-        }
+.card{
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+    overflow:hidden;
+}
 
-        .card {
-            background: #fff;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
-        }
+/* TABLE */
+table{
+    width:100%;
+    border-collapse:collapse;
+}
 
-        .search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
+th{
+    text-align:left;
+    padding:14px;
+    font-size:12px;
+    color:#6b7280;
+    background:#f9fafb;
+    text-transform:uppercase;
+}
 
-        .search-box input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            outline: none;
-        }
+td{
+    padding:14px;
+    border-top:1px solid #eee;
+    font-size:14px;
+}
 
-        .search-box button {
-            padding: 12px 18px;
-            border: none;
-            background: #2563eb;
-            color: #fff;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+tr:hover{
+    background:#f3f6ff;
+    cursor:pointer;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+/* AVATAR */
+.avatar{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid #e5e7eb;
+}
 
-        th {
-            background: #f8fafc;
-            padding: 12px;
-            font-size: 14px;
-            text-align: center;
-        }
+/* BUTTON */
+.btn{
+    background:#2563eb;
+    color:#fff;
+    border:none;
+    padding:6px 12px;
+    border-radius:6px;
+    font-size:12px;
+    cursor:pointer;
+}
 
-        td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #eee;
-            font-size: 13px;
-        }
+/* ================= MODAL ================= */
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
 
-        tr:hover {
-            background: #f9fafb;
-        }
+/* MAIN PANEL */
+.panel{
+    width:100%;
+    max-width:950px;
+    background:#fff;
+    border-radius:14px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    max-height:90vh;
+    overflow-y: scroll;
+}
 
-        .btn {
-            padding: 6px 10px;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-        }
+/* HERO HEADER */
+.hero{
+    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+    color:#fff;
+    padding:22px;
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
 
-        .edit {
-            background: #3b82f6;
-            color: #fff;
-        }
+.hero img{
+    width:75px;
+    height:75px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #fff;
+}
 
-        .delete {
-            background: #ef4444;
-            color: #fff;
-        }
+.hero h2{
+    margin:0;
+    font-size:18px;
+}
 
-        .photo {
-            width: 45px;
-            height: 45px;
-            border-radius: 8px;
-            object-fit: cover;
-            border: 1px solid #ddd;
-        }
+.hero small{
+    opacity:0.8;
+}
 
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            justify-content: center;
-            align-items: center;
-        }
+/* CONTENT */
+.content{
+    padding:18px;
+    overflow-y:auto;
+}
 
-        .modal-content {
-            background: #fff;
-            width: 600px;
-            padding: 20px;
-            border-radius: 12px;
-            position: relative;
-        }
+/* SECTION CARD */
+.section{
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:12px;
+}
 
-        .close {
-            position: absolute;
-            right: 15px;
-            top: 10px;
-            font-size: 22px;
-            cursor: pointer;
-        }
+.section-title{
+    font-size:12px;
+    font-weight:600;
+    color:#2563eb;
+    margin-bottom:10px;
+    text-transform:uppercase;
+}
 
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+/* ROW */
+.row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 20px;
+}
 
-        .field {
-            display: flex;
-            flex-direction: column;
-            font-size: 13px;
-        }
+.item{
+    font-size:13px;
+}
 
-        input {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
+.label{
+    font-size:11px;
+    color:#6b7280;
+}
 
-        .update-btn {
-            width: 100%;
-            margin-top: 15px;
-            padding: 12px;
-            background: #16a34a;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+.value{
+    font-weight:600;
+    color:#111827;
+}
 
-        .photo-box {
-            text-align: center;
-            margin-top: 15px;
-        }
+/* FOOTER */
+.footer{
+    padding:12px;
+    border-top:1px solid #eee;
+    text-align:right;
+}
 
-        .photo-box img {
-            width: 80px;
-            height: 80px;
-            border-radius: 10px;
-            object-fit: cover;
-            border: 2px solid #2563eb;
-        }
-    </style>
+.close-btn{
+    background:#ef4444;
+    color:#fff;
+    border:none;
+    padding:7px 14px;
+    border-radius:6px;
+    cursor:pointer;
+}
 
+/* MOBILE */
+@media(max-width:768px){
+    .row{
+        grid-template-columns:1fr;
+    }
+}
+</style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="header">🎓 Student Management ERP</div>
 
-    <div class="header">
-        <h2>🎓 Student ERP Dashboard</h2>
-    </div>
+<div class="wrapper">
+<div class="card">
 
-    <div class="card">
+<table>
+<tr>
+    <th>ID</th>
+    <th>Photo</th>
+    <th>Name</th>
+    <th>Phone</th>
+    <th>Course</th>
+    <th>Action</th>
+</tr>
 
-        <form method="GET" class="search-box">
-            <input type="text" name="search" placeholder="Search Student ID" value="<?= $search ?>">
-            <button>Search</button>
-        </form>
+<?php while($row = $result->fetch_assoc()): ?>
+<tr onclick="openModal(<?= $row['id'] ?>)">
 
-        <table>
+    <td><?= $row['student_id'] ?></td>
 
-            <tr>
-                <th>ID</th>
-                <th>Photo</th>
-                <th>Roll No</th>
-                <th>Name</th>
-                <th>Dept</th>
-                <th>Course</th>
-                <th>Phone</th>
-                <th>Action</th>
-            </tr>
+    <td>
+        <?php if($row['photo']) { ?>
+            <img src="uploads/<?= $row['photo'] ?>" class="avatar">
+        <?php } ?>
+    </td>
 
-            <?php while ($row = $result->fetch_assoc()) { ?>
+    <td><?= $row['full_name'] ?></td>
+    <td><?= $row['phone'] ?></td>
+    <td><?= $row['course_name'] ?></td>
 
-                <tr>
+    <td>
+        <button class="btn" onclick="event.stopPropagation(); openModal(<?= $row['id'] ?>)">
+            View
+        </button>
+    </td>
 
-                    <td><?= $row['id'] ?></td>
+</tr>
+<?php endwhile; ?>
 
-                    <td>
-                        <?php if ($row['photo']) { ?>
-                            <img class="photo" src="uploads/<?= $row['photo'] ?>">
-                        <?php } ?>
-                    </td>
+</table>
 
-                    <td><?= $row['student_id'] ?></td>
-                    <td><?= $row['full_name'] ?></td>
-                    <td><?= $row['department'] ?></td>
-                    <td><?= $row['course'] ?></td>
-                    <td><?= $row['phone'] ?></td>
-
-                    <td>
-
-                        <button class="btn edit" onclick='openModal(
-"<?= $row['id'] ?>",
-"<?= htmlspecialchars($row['full_name']) ?>",
-"<?= htmlspecialchars($row['father_name']) ?>",
-"<?= htmlspecialchars($row['email']) ?>",
-"<?= htmlspecialchars($row['phone']) ?>",
-"<?= htmlspecialchars($row['course']) ?>",
-"<?= htmlspecialchars($row['semester']) ?>",
-"<?= $row['photo'] ?>"
-)'>Edit</button>
-
-                        <a class="btn delete" href="?delete=<?= $row['id'] ?>"
-                           onclick="return confirm('Delete this student?')">Delete</a>
-
-                    </td>
-
-                </tr>
-
-            <?php } ?>
-
-        </table>
-
-    </div>
+</div>
 </div>
 
-<div class="modal" id="editModal">
+<!-- MODAL -->
+<div class="modal" id="modal">
+    <div class="panel">
 
-    <div class="modal-content">
+        <div id="modalContent"></div>
 
-        <span class="close" onclick="closeModal()">&times;</span>
-
-        <h3>Edit Student</h3>
-
-        <form method="POST" enctype="multipart/form-data">
-
-            <input type="hidden" name="id" id="id">
-
-            <div class="grid">
-
-                <div class="field">
-                    <label>Name</label>
-                    <input type="text" name="full_name" id="full_name">
-                </div>
-
-                <div class="field">
-                    <label>Father</label>
-                    <input type="text" name="father_name" id="father_name">
-                </div>
-
-                <div class="field">
-                    <label>Email</label>
-                    <input type="email" name="email" id="email">
-                </div>
-
-                <div class="field">
-                    <label>Phone</label>
-                    <input type="text" name="phone" id="phone">
-                </div>
-
-                <div class="field">
-                    <label>Course</label>
-                    <input type="text" name="course" id="course">
-                </div>
-
-                <div class="field">
-                    <label>Semester</label>
-                    <input type="text" name="semester" id="semester">
-                </div>
-
-            </div>
-
-            <div class="photo-box">
-                <img id="photoPreview">
-                <input type="file" name="photo">
-            </div>
-
-            <button class="update-btn" type="submit" name="update">Update</button>
-
-        </form>
+        <div class="footer">
+            <button class="close-btn" onclick="closeModal()">Close</button>
+        </div>
 
     </div>
 </div>
 
 <script>
+function openModal(id){
 
-function openModal(id, name, father, email, phone, course, semester, photo) {
+fetch("get_student.php?id=" + id)
+.then(res => res.json())
+.then(data => {
 
-    document.getElementById('editModal').style.display = 'flex';
+let photo = data.photo
+? `uploads/${data.photo}`
+: `https://via.placeholder.com/80`;
 
-    document.getElementById('id').value = id;
-    document.getElementById('full_name').value = name;
-    document.getElementById('father_name').value = father;
-    document.getElementById('email').value = email;
-    document.getElementById('phone').value = phone;
-    document.getElementById('course').value = course;
-    document.getElementById('semester').value = semester;
+let html = `
 
-    document.getElementById('photoPreview').src = 'uploads/' + photo;
+<div class="hero">
+    <img src="${photo}">
+    <div>
+        <h2>${data.full_name}</h2>
+        <small>${data.student_id}</small>
+    </div>
+</div>
+
+<div class="content">
+
+    <div class="section">
+        <div class="section-title">Academic Information</div>
+        <div class="row">
+            <div class="item"><div class="label">Department</div><div class="value">${data.department_name}</div></div>
+            <div class="item"><div class="label">Course</div><div class="value">${data.course_name}</div></div>
+            <div class="item"><div class="label">Semester</div><div class="value">${data.semester}</div></div>
+            <div class="item"><div class="label">Section</div><div class="value">${data.section}</div></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Personal Information</div>
+        <div class="row">
+            <div class="item"><div class="label">Father</div><div class="value">${data.father_name}</div></div>
+            <div class="item"><div class="label">Mother</div><div class="value">${data.mother_name}</div></div>
+            <div class="item"><div class="label">DOB</div><div class="value">${data.dob}</div></div>
+            <div class="item"><div class="label">Gender</div><div class="value">${data.gender}</div></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Contact Information</div>
+        <div class="row">
+            <div class="item"><div class="label">Email</div><div class="value">${data.email}</div></div>
+            <div class="item"><div class="label">Phone</div><div class="value">${data.phone}</div></div>
+            <div class="item"><div class="label">Address</div><div class="value">${data.address}</div></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Other Details</div>
+        <div class="row">
+            <div class="item"><div class="label">Bank</div><div class="value">${data.bank_name}</div></div>
+            <div class="item"><div class="label">Aadhaar</div><div class="value">${data.aadhaar_number}</div></div>
+            <div class="item"><div class="label">University</div><div class="value">${data.university}</div></div>
+            <div class="item"><div class="label">Admission</div><div class="value">${data.admission_date}</div></div>
+        </div>
+    </div>
+
+</div>
+
+`;
+
+document.getElementById("modalContent").innerHTML = html;
+document.getElementById("modal").style.display = "flex";
+
+});
 }
 
-function closeModal() {
-    document.getElementById('editModal').style.display = 'none';
+function closeModal(){
+document.getElementById("modal").style.display = "none";
 }
 
-/* ✅ ADDED ONLY THIS (AUTO SEARCH ON TYPE + CLEAR INPUT) */
-document.querySelector('input[name="search"]').addEventListener('input', function () {
-    this.form.submit();
+/* outside click close */
+document.getElementById("modal").addEventListener("click", function(e){
+    if(e.target === this){
+        closeModal();
+    }
 });
 
+/* ESC close */
+document.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){
+        closeModal();
+    }
+});
 </script>
 
 </body>

@@ -31,6 +31,7 @@ if (!isset($_SESSION['admin'])) {
         <li><a href="../semesters/list.php">Semesters</a></li>
         <li><a href="../bank/list.php">Banks</a></li>
         <li><a href="../../student_details/add_students.php" target="_BLANK">Add New Student</a></li>
+        <li><a href="../../student_details/student_list.php">Student List</a></li>
 
     </ul>
 
