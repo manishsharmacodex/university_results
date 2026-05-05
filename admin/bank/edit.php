@@ -32,7 +32,13 @@ if (isset($_POST['update'])) {
 }
 ?>
 
-<h3>Edit Bank</h3>
+<html>
+    <head>
+        <title>Edit Bank</title>
+        <link rel="stylesheet" type="text/css" href="../../css/font.css">
+    </head>
+    <body>
+        <h3>Edit Bank</h3>
 
 <p><a href="./list.php">Go Back</a>/Update Bank</p>
 
@@ -49,3 +55,5 @@ if (isset($_POST['update'])) {
     <br><br>
     <button name="update">Update</button>
 </form>
+    </body>
+</html>

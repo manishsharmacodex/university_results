@@ -9,39 +9,50 @@ $result = $conn->query("
 ");
 ?>
 
-<h2>Courses</h2>
+<html>
 
-<p><a href="../dashboard/index.php">Home</a> / Courses</p>
+<head>
+    <title>List Bank</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
+</head>
 
-<a href="add.php">Add New</a>
+<body>
+    <h2>Courses</h2>
 
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Course Name</th>
-        <th>Department</th>
-        <th>Edit</th>
-        <th>Delete</th>
-    </tr>
+    <p><a href="../dashboard/index.php">Home</a> / Courses</p>
 
-    <?php while ($row = $result->fetch_assoc()) { ?>
+    <a href="add.php">Add New</a>
+
+    <table border="1">
         <tr>
-            <td><?= $row['id'] ?></td>
-            <td><?= $row['course_name'] ?></td>
-            <td><?= $row['department_name'] ?></td>
-
-            <!-- EDIT -->
-            <td>
-                <a href="edit.php?id=<?= $row['id'] ?>">Edit</a>
-            </td>
-
-            <!-- DELETE -->
-            <td>
-                <a href="delete.php?id=<?= $row['id'] ?>"
-                   onclick="return confirm('Are you sure you want to delete this course?')">
-                   Delete
-                </a>
-            </td>
+            <th>ID</th>
+            <th>Course Name</th>
+            <th>Department</th>
+            <th>Edit</th>
+            <th>Delete</th>
         </tr>
-    <?php } ?>
-</table>
+
+        <?php while ($row = $result->fetch_assoc()) { ?>
+            <tr>
+                <td><?= $row['id'] ?></td>
+                <td><?= $row['course_name'] ?></td>
+                <td><?= $row['department_name'] ?></td>
+
+                <!-- EDIT -->
+                <td>
+                    <a href="edit.php?id=<?= $row['id'] ?>">Edit</a>
+                </td>
+
+                <!-- DELETE -->
+                <td>
+                    <a href="delete.php?id=<?= $row['id'] ?>"
+                        onclick="return confirm('Are you sure you want to delete this course?')">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        <?php } ?>
+    </table>
+</body>
+
+</html>

@@ -23,19 +23,30 @@ if (isset($_POST['save'])) {
 }
 ?>
 
-<p><a href="./list.php">Go Back</a> / Add Department</p>
+<html>
 
-<form method="POST">
-    <input type="text" name="name" placeholder="Department Name" required>
-    <button name="save">Add</button>
-</form>
+<head>
+    <title>Add Department</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
+</head>
+
+<body>
+    <p><a href="./list.php">Go Back</a> / Add Department</p>
+
+    <form method="POST">
+        <input type="text" name="name" placeholder="Department Name" required>
+        <button name="save">Add</button>
+    </form>
 
 
 
-<script>
-    document.querySelectorAll("input[type='text'], textarea").forEach(field => {
-        field.addEventListener("input", function () {
-            this.value = this.value.toUpperCase();
+    <script>
+        document.querySelectorAll("input[type='text'], textarea").forEach(field => {
+            field.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
         });
-    });
-</script>
+    </script>
+</body>
+
+</html>

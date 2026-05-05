@@ -40,27 +40,38 @@ if (isset($_POST['update'])) {
 }
 ?>
 
-<h3>Edit Course</h3>
+<html>
 
-<form method="POST">
-    <select name="department_id">
-        <?php while ($d = $dept->fetch_assoc()) { ?>
-            <option value="<?= $d['id'] ?>" <?= $d['id'] == $data['department_id'] ? 'selected' : '' ?>>
-                <?= $d['name'] ?>
-            </option>
-        <?php } ?>
-    </select>
+<head>
+    <title>Edit Courses</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
+</head>
 
-    <input type="text" name="course_name" value="<?= $data['course_name'] ?>" required>
+<body>
+    <h3>Edit Course</h3>
 
-    <button type="submit" name="update">Update</button>
-</form>
+    <form method="POST">
+        <select name="department_id">
+            <?php while ($d = $dept->fetch_assoc()) { ?>
+                <option value="<?= $d['id'] ?>" <?= $d['id'] == $data['department_id'] ? 'selected' : '' ?>>
+                    <?= $d['name'] ?>
+                </option>
+            <?php } ?>
+        </select>
+
+        <input type="text" name="course_name" value="<?= $data['course_name'] ?>" required>
+
+        <button type="submit" name="update">Update</button>
+    </form>
 
 
-<script>
-    document.querySelectorAll("input[type='text'], textarea").forEach(field => {
-        field.addEventListener("input", function () {
-            this.value = this.value.toUpperCase();
+    <script>
+        document.querySelectorAll("input[type='text'], textarea").forEach(field => {
+            field.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
         });
-    });
-</script>
+    </script>
+</body>
+
+</html>

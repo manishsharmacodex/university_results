@@ -18,26 +18,38 @@ if (isset($_POST['save'])) {
     }
 }
 ?>
-<p><a href="./list.php">Go Back</a>/Courses</p>
 
-<form method="POST">
-    <select name="department_id">
-        <?php while ($d = $dept->fetch_assoc()) { ?>
-            <option value="<?= $d['id'] ?>">
-                <?= $d['name'] ?>
-            </option>
-        <?php } ?>
-    </select>
+<html>
 
-    <input type="text" name="course_name" placeholder="Course Name">
-    <button name="save">Add Course</button>
-</form>
+<head>
+    <title>add Courses</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
+</head>
+
+<body>
+    <p><a href="./list.php">Go Back</a>/Courses</p>
+
+    <form method="POST">
+        <select name="department_id">
+            <?php while ($d = $dept->fetch_assoc()) { ?>
+                <option value="<?= $d['id'] ?>">
+                    <?= $d['name'] ?>
+                </option>
+            <?php } ?>
+        </select>
+
+        <input type="text" name="course_name" placeholder="Course Name">
+        <button name="save">Add Course</button>
+    </form>
 
 
-<script>
-    document.querySelectorAll("input[type='text'], textarea").forEach(field => {
-        field.addEventListener("input", function () {
-            this.value = this.value.toUpperCase();
+    <script>
+        document.querySelectorAll("input[type='text'], textarea").forEach(field => {
+            field.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
         });
-    });
-</script>
+    </script>
+</body>
+
+</html>

@@ -10,32 +10,43 @@ $result = $conn->query("
 ");
 ?>
 
-<h2>Banks</h2>
+<html>
 
-<p><a href="../dashboard/index.php">Home</a>/Banks List</p>
+<head>
+    <title>List Bank</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
+</head>
 
-<a href="add.php">Add New</a>
+<body>
+    <h2>Banks</h2>
 
-<table border="1">
-    <tr>
-        <th>ID</th>
-        <th>Bank Name</th>
-        <th>Edit</th>
-        <th>Delete</th>
-    </tr>
+    <p><a href="../dashboard/index.php">Home</a>/Banks List</p>
 
-    <?php while ($row = $result->fetch_assoc()) { ?>
+    <a href="add.php">Add New</a>
+
+    <table border="1">
         <tr>
-            <td><?= $row['id'] ?></td>
-            <td><?= $row['bank_name'] ?></td>
-
-            <td><a href="edit.php?id=<?= $row['id'] ?>">Edit</a></td>
-            <td>
-                <a href="delete.php?id=<?= $row['id'] ?>"
-                    onclick="return confirm('Are you sure you want to delete this bank?');">
-                    Delete
-                </a>
-            </td>
+            <th>ID</th>
+            <th>Bank Name</th>
+            <th>Edit</th>
+            <th>Delete</th>
         </tr>
-    <?php } ?>
-</table>
+
+        <?php while ($row = $result->fetch_assoc()) { ?>
+            <tr>
+                <td><?= $row['id'] ?></td>
+                <td><?= $row['bank_name'] ?></td>
+
+                <td><a href="edit.php?id=<?= $row['id'] ?>">Edit</a></td>
+                <td>
+                    <a href="delete.php?id=<?= $row['id'] ?>"
+                        onclick="return confirm('Are you sure you want to delete this bank?');">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        <?php } ?>
+    </table>
+</body>
+
+</html>

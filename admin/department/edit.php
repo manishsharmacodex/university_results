@@ -36,19 +36,30 @@ if (isset($_POST['update'])) {
 }
 ?>
 
-<p>
-    <a href="./list.php">Go Back</a> / Edit Department
-</p>
+<html>
 
-<form method="POST">
-    <input type="text" name="name" value="<?= $data['name'] ?>" required>
-    <button type="submit" name="update">Update</button>
-</form>
+<head>
+    <title>Edit Department</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
+</head>
 
-<script>
-    document.querySelectorAll("input[type='text'], textarea").forEach(field => {
-        field.addEventListener("input", function () {
-            this.value = this.value.toUpperCase();
+<body>
+    <p>
+        <a href="./list.php">Go Back</a> / Edit Department
+    </p>
+
+    <form method="POST">
+        <input type="text" name="name" value="<?= $data['name'] ?>" required>
+        <button type="submit" name="update">Update</button>
+    </form>
+
+    <script>
+        document.querySelectorAll("input[type='text'], textarea").forEach(field => {
+            field.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
         });
-    });
-</script>
+    </script>
+</body>
+
+</html>

@@ -25,25 +25,36 @@ if (isset($_POST['save'])) {
 }
 ?>
 
-<h3>Add Bank</h3>
+<html>
 
-<p><a href="./list.php">Go Back</a></p>
+<head>
+    <title>Add Bank</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
+</head>
 
-<form method="POST">
+<body>
+    <h3>Add Bank</h3>
 
-    <select name="bank_master_id" required>
-        <option value="">Select Bank</option>
+    <p><a href="./list.php">Go Back</a></p>
 
-        <?php while ($row = $master->fetch_assoc()) { ?>
-            <option value="<?= $row['id'] ?>">
-                <?= $row['bank_name'] ?>
-            </option>
-        <?php } ?>
+    <form method="POST">
 
-    </select>
+        <select name="bank_master_id" required>
+            <option value="">Select Bank</option>
 
-    <br><br>
+            <?php while ($row = $master->fetch_assoc()) { ?>
+                <option value="<?= $row['id'] ?>">
+                    <?= $row['bank_name'] ?>
+                </option>
+            <?php } ?>
 
-    <button type="submit" name="save">Add Bank</button>
+        </select>
 
-</form>
+        <br><br>
+
+        <button type="submit" name="save">Add Bank</button>
+
+    </form>
+</body>
+
+</html>
