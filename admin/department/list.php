@@ -2,6 +2,17 @@
 include("../../config/auth.php");
 include("../../server/connection.php");
 
+/* ================= ADD DEPARTMENT ================= */
+if (isset($_POST['add_department'])) {
+
+    $name = $_POST['name'];
+
+    $conn->query("INSERT INTO departments (name) VALUES ('$name')");
+
+    header("Location: list.php");
+    exit();
+}
+
 $result = $conn->query("SELECT * FROM departments");
 ?>
 
@@ -10,7 +21,7 @@ $result = $conn->query("SELECT * FROM departments");
 
 <head>
     <title>Departments</title>
-
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -18,7 +29,6 @@ $result = $conn->query("SELECT * FROM departments");
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Segoe UI", sans-serif;
         }
 
         body {
@@ -30,7 +40,6 @@ $result = $conn->query("SELECT * FROM departments");
             min-height: 100vh;
         }
 
-        /* ================= SIDEBAR (UNCHANGED) ================= */
         .sidebar {
             width: 260px;
             background: #111827;
@@ -61,7 +70,6 @@ $result = $conn->query("SELECT * FROM departments");
             transform: translateX(5px);
         }
 
-        /* ================= MAIN (UNCHANGED) ================= */
         .main {
             flex: 1;
             padding: 30px;
@@ -134,7 +142,8 @@ $result = $conn->query("SELECT * FROM departments");
             color: white;
         }
 
-        /* ================= MODAL (NEW ONLY) ================= */
+        /* ================= MODAL ================= */
+
         .modal {
             display: none;
             position: fixed;
@@ -142,155 +151,185 @@ $result = $conn->query("SELECT * FROM departments");
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
             justify-content: center;
             align-items: center;
             z-index: 999;
         }
 
         .modal-box {
-            background: white;
-            width: 380px;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 360px;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+            transform: translateY(-20px) scale(0.95);
+            animation: modalShow 0.25s ease forwards;
+        }
+
+        @keyframes modalShow {
+            to {
+                transform: translateY(0) scale(1);
+            }
         }
 
         .modal-box h3 {
             margin-bottom: 15px;
+            text-align: center;
+            color: #111827;
         }
 
         .modal-box input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-
-        .modal-box button {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 5px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
         }
 
         .save-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
             background: #2563eb;
             color: white;
+            font-weight: bold;
+            cursor: pointer;
         }
 
         .close-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 8px;
             background: #ef4444;
             color: white;
+            cursor: pointer;
         }
-
     </style>
 </head>
 
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <!-- SIDEBAR (UNCHANGED) -->
-    <div class="sidebar">
-        <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
+        <div class="sidebar">
+            <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
 
-        <a href="../dashboard/index.php"><i class="fa-solid fa-gauge"></i> Dashboard</a>
-        <a href="../department/list.php"><i class="fa-solid fa-building"></i> Departments</a>
-        <a href="../courses/list.php"><i class="fa-solid fa-book"></i> Courses</a>
-        <a href="../semesters/list.php"><i class="fa-solid fa-calendar"></i> Semesters</a>
-        <a href="../bank/list.php"><i class="fa-solid fa-bank"></i> Banks</a>
-        <a href="../../student_details/add_students.php"><i class="fa-solid fa-user-plus"></i> Add Student</a>
-        <a href="../../student_details/student_list.php"><i class="fa-solid fa-users"></i> Student List</a>
+            <a href="../dashboard/index.php"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+            <a href="../department/list.php"><i class="fa-solid fa-building"></i> Departments</a>
+            <a href="../courses/list.php"><i class="fa-solid fa-book"></i> Courses</a>
+            <a href="../semesters/list.php"><i class="fa-solid fa-calendar"></i> Semesters</a>
+            <a href="../bank/list.php"><i class="fa-solid fa-bank"></i> Banks</a>
+            <a href="../../student_details/add_students.php"><i class="fa-solid fa-user-plus"></i> Add Student</a>
+            <a href="../../student_details/student_list.php"><i class="fa-solid fa-users"></i> Student List</a>
 
-        <a href="../auth/logout.php" style="background:#ef4444; color:white;">
-            Logout
-        </a>
-    </div>
-
-    <!-- MAIN -->
-    <div class="main">
-
-        <h2>Departments</h2>
-
-        <div class="breadcrumb">
-            <a href="../dashboard/index.php">Home</a> / Departments
+            <a href="../auth/logout.php" style="background:#ef4444; color:white;">Logout</a>
         </div>
 
-        <a class="add-btn" href="add.php">
-            <i class="fa fa-plus"></i> Add New Department
-        </a>
+        <div class="main">
 
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>Department Name</th>
-                <th>Action</th>
-            </tr>
+            <h2>Departments</h2>
 
-            <?php while ($row = $result->fetch_assoc()) { ?>
+            <div class="breadcrumb">
+                <a href="../dashboard/index.php">Home</a> / Departments
+            </div>
+
+            <!-- ✅ OPEN MODAL BUTTON -->
+            <a class="add-btn" href="#" onclick="document.getElementById('addModal').style.display='flex'">
+                <i class="fa fa-plus"></i> Add New Department
+            </a>
+
+            <table>
                 <tr>
-                    <td><?= $row['id'] ?></td>
-                    <td><?= $row['name'] ?></td>
-                    <td class="action">
-
-                        <!-- EDIT BUTTON OPENS MODAL -->
-                        <a href="#"
-                           class="edit"
-                           onclick="openModal(<?= $row['id'] ?>, '<?= addslashes($row['name']) ?>')">
-                            Edit
-                        </a>
-
-                        <a class="delete"
-                           href="delete.php?id=<?= $row['id'] ?>"
-                           onclick="return confirm('Delete this department?')">
-                            Delete
-                        </a>
-
-                    </td>
+                    <th>ID</th>
+                    <th>Department Name</th>
+                    <th>Action</th>
                 </tr>
-            <?php } ?>
 
-        </table>
+                <?php while ($row = $result->fetch_assoc()) { ?>
+                    <tr>
+                        <td><?= $row['id'] ?></td>
+                        <td><?= $row['name'] ?></td>
+                        <td class="action">
 
+                            <a href="#" class="edit" onclick="document.getElementById('dept_id').value='<?= $row['id'] ?>';
+                                    document.getElementById('dept_name').value='<?= addslashes($row['name']) ?>';
+                                    document.getElementById('editModal').style.display='flex'">
+                                Edit
+                            </a>
+
+                            <a class="delete" href="delete.php?id=<?= $row['id'] ?>"
+                                onclick="return confirm('Delete this department?')">
+                                Delete
+                            </a>
+
+                        </td>
+                    </tr>
+                <?php } ?>
+
+            </table>
+
+        </div>
     </div>
-</div>
 
-<!-- ================= POPUP MODAL ================= -->
-<div class="modal" id="editModal">
-    <div class="modal-box">
+    <!-- ================= ADD MODAL ================= -->
+    <div class="modal" id="addModal">
+        <div class="modal-box">
 
-        <h3>Edit Department</h3>
+            <h3>Add Department</h3>
 
-        <form method="POST" action="edit.php">
+            <form method="POST">
 
-            <input type="hidden" name="id" id="dept_id">
+                <input type="text" name="name" placeholder="Department Name" required>
 
-            <input type="text" name="name" id="dept_name" required>
+                <button type="submit" name="add_department" class="save-btn">Add Department</button>
 
-            <button type="submit" class="save-btn">Save Changes</button>
-            <button type="button" class="close-btn" onclick="closeModal()">Cancel</button>
+                <button type="button" class="close-btn"
+                    onclick="document.getElementById('addModal').style.display='none'">
+                    Cancel
+                </button>
 
-        </form>
+            </form>
 
+        </div>
     </div>
-</div>
 
-<!-- ================= JS ================= -->
-<script>
-function openModal(id, name) {
-    document.getElementById('dept_id').value = id;
-    document.getElementById('dept_name').value = name;
-    document.getElementById('editModal').style.display = "flex";
-}
+    <!-- ================= EDIT MODAL ================= -->
+    <div class="modal" id="editModal">
+        <div class="modal-box">
 
-function closeModal() {
-    document.getElementById('editModal').style.display = "none";
-}
-</script>
+            <h3>Edit Department</h3>
+
+            <form method="POST" action="edit.php">
+
+                <input type="hidden" name="id" id="dept_id">
+                <input type="text" name="name" id="dept_name" required>
+
+                <button type="submit" class="save-btn">Update</button>
+
+                <button type="button" class="close-btn"
+                    onclick="document.getElementById('editModal').style.display='none'">
+                    Cancel
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <script>
+        // this is uppercase and lowercase filter
+        document.querySelectorAll("input[type='text'], textarea").forEach(field => {
+            field.addEventListener("input", function () {
+                this.value = this.value.toUpperCase();
+            });
+        });
+    </script>
 
 </body>
 </html>

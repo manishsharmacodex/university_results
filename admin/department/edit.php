@@ -12,7 +12,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($stmt->execute()) {
         echo "<script>
-            alert('Department updated successfully');
+            // alert('Department updated successfully');
             window.location.href='list.php';
         </script>";
     }
