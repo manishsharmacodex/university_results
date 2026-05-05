@@ -1,6 +1,18 @@
 <?php
 include("../server/connection.php");
 
+/* ================= PAGINATION ================= */
+$limit = 6; // students per page
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+/* COUNT TOTAL RECORDS */
+$total_result = $conn->query("SELECT COUNT(*) as total FROM student_details");
+$total_row = $total_result->fetch_assoc();
+$total_records = $total_row['total'];
+$total_pages = ceil($total_records / $limit);
+
+/* MAIN QUERY WITH LIMIT */
 $sql = "
 SELECT s.*,
        c.course_name,
@@ -12,288 +24,383 @@ LEFT JOIN departments d ON s.department = d.id
 LEFT JOIN banks b ON s.bank_name = b.id
 LEFT JOIN bank_master bm ON b.bank_master_id = bm.id
 ORDER BY s.id DESC
+LIMIT $limit OFFSET $offset
 ";
 
 $result = $conn->query($sql);
 ?>
-
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Student ERP</title>
-<link rel="stylesheet" type="text/css" href="../css/font.css">
+    <title>Student List</title>
+    <link rel="stylesheet" type="text/css" href="../css/font.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<style>
-body{
-    margin:0;
-    padding: 0;
-    box-sizing: border-box;
-    background:#f4f6fb;
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-/* HEADER */
-.header{
-    background:#111827;
-    color:#fff;
-    padding:16px 25px;
-    font-size:18px;
-    font-weight:600;
-}
+        body {
+            background: #f4f6fb;
+            font-family: Arial;
+        }
 
-/* TABLE WRAPPER */
-.wrapper{
-    padding:20px;
-}
+        /* ================= LAYOUT ================= */
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
 
-.card{
-    background:#fff;
-    border-radius:12px;
-    box-shadow:0 10px 25px rgba(0,0,0,0.08);
-    overflow:hidden;
-}
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            background: #111827;
+            color: white;
+            padding: 20px;
+        }
 
-/* TABLE */
-table{
-    width:100%;
-    border-collapse:collapse;
-}
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
 
-th{
-    text-align:left;
-    padding:14px;
-    font-size:12px;
-    color:#6b7280;
-    background:#f9fafb;
-    text-transform:uppercase;
-}
+        .sidebar a {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 12px;
+            margin: 6px 0;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
 
-td{
-    padding:14px;
-    border-top:1px solid #eee;
-    font-size:14px;
-}
+        .sidebar a:hover {
+            background: #2563eb;
+            color: white;
+            transform: translateX(5px);
+        }
 
-tr:hover{
-    background:#f3f6ff;
-    cursor:pointer;
-}
+        /* MAIN */
+        .main {
+            flex: 1;
+            padding: 25px;
+        }
 
-/* AVATAR */
-.avatar{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    object-fit:cover;
-    border:2px solid #e5e7eb;
-}
+        .header-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #111827;
+        }
 
-/* BUTTON */
-.btn{
-    background:#2563eb;
-    color:#fff;
-    border:none;
-    padding:6px 12px;
-    border-radius:6px;
-    font-size:12px;
-    cursor:pointer;
-}
+        .breadcrumb {
+            margin-bottom: 15px;
+            color: #6b7280;
+        }
 
-/* ================= MODAL ================= */
-.modal{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.55);
-    display:none;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-}
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        }
 
-/* MAIN PANEL */
-.panel{
-    width:100%;
-    max-width:950px;
-    background:#fff;
-    border-radius:14px;
-    overflow:hidden;
-    display:flex;
-    flex-direction:column;
-    max-height:90vh;
-    overflow-y: scroll;
-}
+        /* TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-/* HERO HEADER */
-.hero{
-    background:linear-gradient(135deg,#1e3a8a,#2563eb);
-    color:#fff;
-    padding:22px;
-    display:flex;
-    align-items:center;
-    gap:15px;
-}
+        th {
+            background: #111827;
+            color: white;
+            text-align: left;
+            padding: 14px;
+            font-size: 13px;
+        }
 
-.hero img{
-    width:75px;
-    height:75px;
-    border-radius:50%;
-    object-fit:cover;
-    border:3px solid #fff;
-}
+        td {
+            padding: 14px;
+            border-top: 1px solid #eee;
+            font-size: 14px;
+        }
 
-.hero h2{
-    margin:0;
-    font-size:18px;
-}
+        tr:hover {
+            background: #f3f6ff;
+            cursor: pointer;
+        }
 
-.hero small{
-    opacity:0.8;
-}
+        /* AVATAR */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
 
-/* CONTENT */
-.content{
-    padding:18px;
-    overflow-y:auto;
-}
+        /* BUTTON */
+        .btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
 
-/* SECTION CARD */
-.section{
-    background:#f9fafb;
-    border:1px solid #e5e7eb;
-    border-radius:10px;
-    padding:12px 14px;
-    margin-bottom:12px;
-}
+        /* MODAL */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
 
-.section-title{
-    font-size:12px;
-    font-weight:600;
-    color:#2563eb;
-    margin-bottom:10px;
-    text-transform:uppercase;
-}
+        .panel {
+            width: 90%;
+            max-width: 900px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
 
-/* ROW */
-.row{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px 20px;
-}
+        .hero {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white;
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
 
-.item{
-    font-size:13px;
-}
+        .hero img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
 
-.label{
-    font-size:11px;
-    color:#6b7280;
-}
+        .content {
+            padding: 15px;
+        }
 
-.value{
-    font-weight:600;
-    color:#111827;
-}
+        .section {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #eee;
+        }
 
-/* FOOTER */
-.footer{
-    padding:12px;
-    border-top:1px solid #eee;
-    text-align:right;
-}
+        .section-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 8px;
+        }
 
-.close-btn{
-    background:#ef4444;
-    color:#fff;
-    border:none;
-    padding:7px 14px;
-    border-radius:6px;
-    cursor:pointer;
-}
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
 
-/* MOBILE */
-@media(max-width:768px){
-    .row{
-        grid-template-columns:1fr;
-    }
-}
-</style>
+        .item {
+            font-size: 13px;
+        }
+
+        .label {
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .value {
+            font-weight: bold;
+        }
+
+        .footer {
+            padding: 12px;
+            text-align: right;
+            border-top: 1px solid #eee;
+        }
+
+        .close-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .breadcrumb {
+            margin-bottom: 20px;
+            color: #6b7280;
+        }
+
+        .breadcrumb a {
+            text-decoration: none;
+            color: #2563eb;
+        }
+
+        .pagination {
+            margin-top: 15px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .pagination a {
+            padding: 6px 10px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #111827;
+            font-size: 13px;
+        }
+
+        .pagination a.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width:768px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="header">🎓 Student Management ERP</div>
+    <div class="container">
 
-<div class="wrapper">
-<div class="card">
+        <!-- ================= SIDEBAR ================= -->
+        <div class="sidebar">
+            <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
 
-<table>
-<tr>
-    <th>ID</th>
-    <th>Photo</th>
-    <th>Name</th>
-    <th>Phone</th>
-    <th>Course</th>
-    <th>Action</th>
-</tr>
+            <a href="../admin/dashboard/index.php"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+            <a href="../admin/department/list.php"><i class="fa-solid fa-building"></i> Departments</a>
+            <a href="../admin/courses/list.php"><i class="fa-solid fa-book"></i> Courses</a>
+            <a href="../admin/semesters/list.php"><i class="fa-solid fa-calendar"></i> Semesters</a>
+            <a href="../admin/bank/list.php"><i class="fa-solid fa-bank"></i> Banks</a>
 
-<?php while($row = $result->fetch_assoc()): ?>
-<tr onclick="openModal(<?= $row['id'] ?>)">
+            <a href="add_students.php"><i class="fa-solid fa-user-plus"></i> Add Student</a>
+            <a href="student_list.php"><i class="fa-solid fa-users"></i> Student List</a>
 
-    <td><?= $row['student_id'] ?></td>
+            <a href="../admin/auth/logout.php" style="background:#ef4444;color:white;">Logout</a>
+        </div>  
 
-    <td>
-        <?php if($row['photo']) { ?>
-            <img src="uploads/<?= $row['photo'] ?>" class="avatar">
-        <?php } ?>
-    </td>
+        <!-- ================= MAIN ================= -->
+        <div class="main">
 
-    <td><?= $row['full_name'] ?></td>
-    <td><?= $row['phone'] ?></td>
-    <td><?= $row['course_name'] ?></td>
+            <div class="header-title">Student List</div>
 
-    <td>
-        <button class="btn" onclick="event.stopPropagation(); openModal(<?= $row['id'] ?>)">
-            View
-        </button>
-    </td>
+            <div class="breadcrumb"><a href="../admin/dashboard/index.php">Home</a> / Student List</div>
 
-</tr>
-<?php endwhile; ?>
+            <div class="card">
 
-</table>
+                <table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Photo</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Course</th>
+                        <th>Action</th>
+                    </tr>
 
-</div>
-</div>
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                        <tr onclick="openModal(<?= $row['id'] ?>)">
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-    <div class="panel">
+                            <td><?= $row['student_id'] ?></td>
 
-        <div id="modalContent"></div>
+                            <td>
+                                <?php if ($row['photo']) { ?>
+                                    <img src="uploads/<?= $row['photo'] ?>" class="avatar">
+                                <?php } ?>
+                            </td>
 
-        <div class="footer">
-            <button class="close-btn" onclick="closeModal()">Close</button>
+                            <td><?= $row['full_name'] ?></td>
+                            <td><?= $row['phone'] ?></td>
+                            <td><?= $row['course_name'] ?></td>
+
+                            <td>
+                                <button class="btn" onclick="event.stopPropagation(); openModal(<?= $row['id'] ?>)">
+                                    View
+                                </button>
+                            </td>
+
+                        </tr>
+                    <?php endwhile; ?>
+
+                </table>
+
+                <!-- ================= PAGINATION ================= -->
+                <div class="pagination">
+
+                    <?php if ($page > 1): ?>
+                        <a href="?page=<?= $page - 1 ?>">Prev</a>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <a href="?page=<?= $i ?>" class="<?= ($i == $page) ? 'active' : '' ?>">
+                            <?= $i ?>
+                        </a>
+                    <?php endfor; ?>
+
+                    <?php if ($page < $total_pages): ?>
+                        <a href="?page=<?= $page + 1 ?>">Next</a>
+                    <?php endif; ?>
+
+                </div>
+
+            </div>
         </div>
-
     </div>
-</div>
 
-<script>
-function openModal(id){
+    <!-- ================= MODAL ================= -->
+    <div class="modal" id="modal">
+        <div class="panel">
 
-fetch("get_student.php?id=" + id)
-.then(res => res.json())
-.then(data => {
+            <div id="modalContent"></div>
 
-let photo = data.photo
-? `uploads/${data.photo}`
-: `https://via.placeholder.com/80`;
+            <div class="footer">
+                <button class="close-btn" onclick="closeModal()">Close</button>
+            </div>
 
-let html = `
+        </div>
+    </div>
 
+    <script>
+        function openModal(id) {
+
+            fetch("get_student.php?id=" + id)
+                .then(res => res.json())
+                .then(data => {
+
+                    let photo = data.photo
+                        ? `uploads/${data.photo}`
+                        : `https://via.placeholder.com/80`;
+
+                    document.getElementById("modalContent").innerHTML = `
 <div class="hero">
     <img src="${photo}">
     <div>
-        <h2>${data.full_name}</h2>
+        <h3>${data.full_name}</h3>
         <small>${data.student_id}</small>
     </div>
 </div>
@@ -301,72 +408,34 @@ let html = `
 <div class="content">
 
     <div class="section">
-        <div class="section-title">Academic Information</div>
+        <div class="section-title">Academic</div>
         <div class="row">
             <div class="item"><div class="label">Department</div><div class="value">${data.department_name}</div></div>
             <div class="item"><div class="label">Course</div><div class="value">${data.course_name}</div></div>
-            <div class="item"><div class="label">Semester</div><div class="value">${data.semester}</div></div>
-            <div class="item"><div class="label">Section</div><div class="value">${data.section}</div></div>
         </div>
     </div>
 
     <div class="section">
-        <div class="section-title">Personal Information</div>
-        <div class="row">
-            <div class="item"><div class="label">Father</div><div class="value">${data.father_name}</div></div>
-            <div class="item"><div class="label">Mother</div><div class="value">${data.mother_name}</div></div>
-            <div class="item"><div class="label">DOB</div><div class="value">${data.dob}</div></div>
-            <div class="item"><div class="label">Gender</div><div class="value">${data.gender}</div></div>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Contact Information</div>
+        <div class="section-title">Contact</div>
         <div class="row">
             <div class="item"><div class="label">Email</div><div class="value">${data.email}</div></div>
             <div class="item"><div class="label">Phone</div><div class="value">${data.phone}</div></div>
-            <div class="item"><div class="label">Address</div><div class="value">${data.address}</div></div>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Other Details</div>
-        <div class="row">
-            <div class="item"><div class="label">Bank</div><div class="value">${data.bank_name}</div></div>
-            <div class="item"><div class="label">Aadhaar</div><div class="value">${data.aadhaar_number}</div></div>
-            <div class="item"><div class="label">University</div><div class="value">${data.university}</div></div>
-            <div class="item"><div class="label">Admission</div><div class="value">${data.admission_date}</div></div>
         </div>
     </div>
 
 </div>
-
 `;
 
-document.getElementById("modalContent").innerHTML = html;
-document.getElementById("modal").style.display = "flex";
+                    document.getElementById("modal").style.display = "flex";
 
-});
-}
+                });
+        }
 
-function closeModal(){
-document.getElementById("modal").style.display = "none";
-}
-
-/* outside click close */
-document.getElementById("modal").addEventListener("click", function(e){
-    if(e.target === this){
-        closeModal();
-    }
-});
-
-/* ESC close */
-document.addEventListener("keydown", function(e){
-    if(e.key === "Escape"){
-        closeModal();
-    }
-});
-</script>
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+    </script>
 
 </body>
+
 </html>
