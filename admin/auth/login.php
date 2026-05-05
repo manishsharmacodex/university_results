@@ -96,6 +96,8 @@ if (isset($_POST['login'])) {
 <html>
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ERP Login</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
 

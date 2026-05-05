@@ -4,21 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School Information - Sushant University</title>
-    <link rel="stylesheet" type="text/css" href="../css/font.css">
+    <title>School Information - Alpha University</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
 
     <style>
         :root {
             --bg: #0b1220;
             --primary: #00d9ff;
             --muted: #b8c1d1;
-            --radius: 16px;
+            --radius: 14px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
         }
 
         body {
@@ -37,47 +42,62 @@
             backdrop-filter: blur(14px);
             position: sticky;
             top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 100;
         }
 
         .logo {
-            font-size: 22px;
             font-weight: 700;
+            font-size: 20px;
             color: var(--primary);
         }
 
-        .nav-links {
+        .navbar ul {
             display: flex;
+            gap: 22px;
             list-style: none;
-            gap: 25px;
-            cursor: pointer;
         }
 
-        .nav-links a {
+        .navbar ul li {
             color: var(--muted);
-            text-decoration: none;
+            cursor: pointer;
             font-size: 14px;
             transition: 0.3s;
         }
 
-        .nav-links a:hover {
+        .navbar ul li:hover {
             color: var(--primary);
         }
 
-        .btn-primary {
-            padding: 9px 18px;
-            border: none;
-            background: linear-gradient(135deg, var(--primary), #00ffa3);
-            color: #000;
+        /* ================= NAV BUTTONS (NEW) ================= */
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            padding: 8px 14px;
             border-radius: 25px;
+            border: 1px solid transparent;
             cursor: pointer;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 500;
             transition: 0.3s;
         }
 
-        .btn-primary:hover {
+        .student-btn {
+            background: var(--primary);
+            color: #000;
+        }
+
+        .admin-btn {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .nav-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 217, 255, 0.2);
         }
 
         /* ================= PAGE HEADER ================= */
@@ -180,25 +200,36 @@
 
         /* ================= FOOTER ================= */
         .footer {
+            padding: 50px 60px;
             background: #050a14;
-            padding: 30px;
-            text-align: center;
-            margin-top: 50px;
         }
 
-        .footer-links {
-            margin-top: 10px;
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
         }
 
-        .footer-links a {
-            margin: 0 10px;
-            color: var(--muted);
-            text-decoration: none;
-            font-size: 13px;
-        }
-
-        .footer-links a:hover {
+        .footer h3 {
             color: var(--primary);
+        }
+
+        .footer p,
+        .footer a {
+            color: var(--muted);
+            font-size: 13px;
+            display: block;
+            margin-bottom: 5px;
+            text-decoration: none;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+            font-size: 12px;
+            color: #777;
         }
 
         /* ================= RESPONSIVE ================= */
@@ -218,27 +249,35 @@
 <body>
 
     <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="logo">🎓 SU</div>
-
-        <ul class="nav-links">
-            <a href="../index.php"><li>Home</li></a>
+    <div class="navbar">
+        <div class="logo">Alpha University</div>
+        <ul>
+            <a href="../../index.php">
+                <li>Home</li>
+            </a>
             <li>Programs</li>
             <li>Admissions</li>
-            <a href="../results_check/results.php"><li>Exam & Results</li></a>
-            <a href="./school_information.php">
-                <li>Campus</li>
+            <a href="./results.php" target="_BLANK">
+                <li>Exam & Results</li>
             </a>
-            <a href="../src/pages/contact.php"><li>Contact</li></a>
+            <a href="./school_information.php">
+                <li>School Informations</li>
+            </a>
+            <a href="./contact.php">
+                <li>Contact</li>
+            </a>
         </ul>
-
-        <a href="../admin/auth/login.php"><button class="btn-primary">Admin Login</button></a>
-    </nav>
+        <!-- ✅ NEW BUTTONS -->
+        <div class="nav-buttons">
+            <button class="nav-btn student-btn">Student Login</button>
+            <a href="../../admin/auth/login.php" target="_BLANK"><button class="nav-btn admin-btn">Admin Login</button></a>
+        </div>
+    </div>
 
     <!-- PAGE -->
     <section class="container">
 
-        <h1 class="title">Schools at Sushant University</h1>
+        <h1 class="title">Schools at Alpha University</h1>
         <p class="subtitle">Explore different schools offering world-class education and industry exposure</p>
 
         <div class="grid">
@@ -321,14 +360,39 @@
     </section>
 
     <!-- FOOTER -->
-    <footer class="footer">
-        <p>© 2026 Sushant University</p>
-        <div class="footer-links">
-            <a href="#">Home</a>
-            <a href="#">About</a>
-            <a href="#">Contact</a>
+    <div class="footer">
+        <div class="footer-grid">
+
+            <div>
+                <h3>About</h3>
+                <p>Top private university in India focused on innovation.</p>
+            </div>
+
+            <div>
+                <h3>Links</h3>
+                <a href="#">Admissions</a>
+                <a href="#">Programs</a>
+                <a href="#">Results</a>
+            </div>
+
+            <div>
+                <h3>Support</h3>
+                <a href="#">Help Center</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+
+            <div>
+                <h3>Contact</h3>
+                <p>Email: contact@alphauniversity.com</p>
+                <p>Phone: +91 99999 99999</p>
+            </div>
+
         </div>
-    </footer>
+
+        <div class="footer-bottom">
+            © 2026 Alpha University | All Rights Reserved
+        </div>
+</div>
 
 </body>
 </html>

@@ -31,8 +31,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Contact Us - Sushant University</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Us - Alpha University</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
 
     <style>
         :root {
@@ -42,11 +44,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             --radius: 14px;
         }
 
-        body {
+        * {
             margin: 0;
-            font-family: sans-serif;
-            background: radial-gradient(circle at top, #14213d, var(--bg));
-            color: #fff;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         a {
@@ -54,7 +55,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: inherit;
         }
 
-        /* NAVBAR */
+        body {
+            background: radial-gradient(circle at top, #14213d, var(--bg));
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* ================= NAVBAR ================= */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -62,39 +69,64 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             padding: 15px 60px;
             background: rgba(255, 255, 255, 0.06);
             backdrop-filter: blur(14px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .logo {
+            font-weight: 700;
+            font-size: 20px;
             color: var(--primary);
-            font-weight: bold;
         }
 
         .navbar ul {
             display: flex;
-            gap: 20px;
+            gap: 22px;
             list-style: none;
         }
 
-        .navbar li {
+        .navbar ul li {
             color: var(--muted);
             cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
         }
 
-        .nav-buttons button {
+        .navbar ul li:hover {
+            color: var(--primary);
+        }
+
+        /* ================= NAV BUTTONS (NEW) ================= */
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
             padding: 8px 14px;
-            border-radius: 20px;
+            border-radius: 25px;
+            border: 1px solid transparent;
             cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: 0.3s;
         }
 
         .student-btn {
             background: var(--primary);
-            border: none;
+            color: #000;
         }
 
         .admin-btn {
-            border: 1px solid var(--primary);
             background: transparent;
+            border: 1px solid var(--primary);
             color: var(--primary);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 217, 255, 0.2);
         }
 
         /* HERO */
@@ -205,11 +237,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin-bottom: 15px;
         }
 
-        /* FOOTER */
+        /* ================= FOOTER ================= */
         .footer {
-            padding: 50px;
+            padding: 50px 60px;
             background: #050a14;
-            margin-top: 40px;
         }
 
         .footer-grid {
@@ -226,6 +257,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .footer a {
             color: var(--muted);
             font-size: 13px;
+            display: block;
+            margin-bottom: 5px;
+            text-decoration: none;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+            font-size: 12px;
+            color: #777;
         }
 
         /* RESPONSIVE */
@@ -249,25 +292,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- NAVBAR -->
     <div class="navbar">
-        <div class="logo">🎓 Sushant University</div>
-
+        <div class="logo">Alpha University</div>
         <ul>
             <a href="../../index.php">
                 <li>Home</li>
             </a>
             <li>Programs</li>
             <li>Admissions</li>
-            <a href="../../results_check/results.php">
+            <a href="./results.php" target="_BLANK">
                 <li>Exam & Results</li>
             </a>
-            <a href="./contact.php">
+            <a href="./school_information.php">
+                <li>School Informations</li>
+            </a>
+            <a href="./pages/contact.php">
                 <li>Contact</li>
             </a>
         </ul>
-
+        <!-- ✅ NEW BUTTONS -->
         <div class="nav-buttons">
-            <button class="student-btn">Student Login</button>
-            <a href="../../admin/auth/login.php"><button class="admin-btn">Admin Login</button></a>
+            <button class="nav-btn student-btn">Student Login</button>
+            <a href="../../admin/auth/login.php" target="_BLANK"><button class="nav-btn admin-btn">Admin Login</button></a>
         </div>
     </div>
 
@@ -285,7 +330,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <h2>Contact Information</h2>
             <p class="info-item">📍 Gurugram, Haryana, India</p>
             <p class="info-item">📞 +91 9876543210</p>
-            <p class="info-item">✉️ support@sushantuniversity.com</p>
+            <p class="info-item">✉️ support@alphauniversity.com</p>
             <p class="info-item">🕒 Mon - Sat (9AM - 5PM)</p>
         </div>
 
@@ -346,28 +391,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div>
                 <h3>About</h3>
-                <p>Top private university focused on innovation.</p>
+                <p>Top private university in India focused on innovation.</p>
             </div>
 
             <div>
                 <h3>Links</h3>
                 <a href="#">Admissions</a>
                 <a href="#">Programs</a>
+                <a href="#">Results</a>
             </div>
 
             <div>
                 <h3>Support</h3>
                 <a href="#">Help Center</a>
+                <a href="#">Privacy Policy</a>
             </div>
 
             <div>
                 <h3>Contact</h3>
-                <p>Email: info@university.com</p>
+                <p>Email: contact@alphauniversity.com</p>
                 <p>Phone: +91 99999 99999</p>
             </div>
 
         </div>
-    </div>
+
+        <div class="footer-bottom">
+            © 2026 Alpha University | All Rights Reserved
+        </div>
+</div>
 
 </body>
 

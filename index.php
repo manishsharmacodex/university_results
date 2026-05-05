@@ -1,13 +1,14 @@
 <?php
-    include("./server/connection.php");
+include("./server/connection.php");
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sushant University - Homepage</title>
+    <title>Alpha University - Homepage</title>
     <link rel="stylesheet" type="text/css" href="./css/font.css">
     <style>
         :root {
@@ -293,21 +294,22 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- NAVBAR -->
     <div class="navbar">
-        <div class="logo">🎓 Sushant University</div>
+        <div class="logo">Alpha University</div>
         <ul>
             <a href="./index.php">
                 <li>Home</li>
             </a>
             <li>Programs</li>
             <li>Admissions</li>
-            <a href="./results_check/results.php">
+            <a href="./src/pages/results.php" target="_BLANK">
                 <li>Exam & Results</li>
             </a>
-            <a href="./school/school_information.php">
+            <a href="./src/pages/school_information.php">
                 <li>School Informations</li>
             </a>
             <a href="./src/pages/contact.php">
@@ -325,7 +327,7 @@
     <div class="hero">
 
         <div class="hero-text">
-            <h1>Shape Your Future at <span>Sushant University</span></h1>
+            <h1>Shape Your Future at <span>Alpha University</span></h1>
             <p>Industry-focused education, expert faculty, modern campus, and 95% placement record.</p>
 
             <div class="hero-buttons">
@@ -426,14 +428,14 @@
 
             <div>
                 <h3>Contact</h3>
-                <p>Email: info@university.com</p>
+                <p>Email: contact@alphauniversity.com</p>
                 <p>Phone: +91 99999 99999</p>
             </div>
 
         </div>
 
         <div class="footer-bottom">
-            © 2026 Sushant University | All Rights Reserved
+            © 2026 Alpha University | All Rights Reserved
         </div>
     </div>
 

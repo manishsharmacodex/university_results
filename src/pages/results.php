@@ -1,5 +1,5 @@
 <?php
-include("../server/connection.php");
+include("../../server/connection.php");
 
 $student = null;
 $results = [];
@@ -62,13 +62,17 @@ function gradePoint($marks)
 <html>
 
 <head>
-    <title>University Result Portal</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>University Result 2026</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
 
     <style>
         body {
-            font-family: Arial;
             background: linear-gradient(120deg, #eef2f3, #d9e4f5);
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         .container {
@@ -161,7 +165,7 @@ function gradePoint($marks)
 
         <div class="card">
 
-            <h2>University Result System</h2>
+            <h2>University Result 2026</h2>
 
             <form method="POST">
 

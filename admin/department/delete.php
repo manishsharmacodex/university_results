@@ -18,6 +18,6 @@ if ($stmt->execute()) {
     header("Location: list.php");
     exit;
 } else {
-    echo "Error deleting record: " . $stmt->error;
+    echo "Error deleting department: " . $stmt->error;
 }
 ?>
