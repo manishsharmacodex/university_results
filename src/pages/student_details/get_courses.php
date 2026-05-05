@@ -1,5 +1,5 @@
 <?php
-include("../server/connection.php");
+include("../../../server/connection.php");
 
 $dept_id = $_GET['dept_id'];
 

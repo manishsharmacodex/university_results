@@ -1,5 +1,5 @@
 <?php
-include("../server/connection.php");
+include("../../../server/connection.php");
 
 if(isset($_GET['id'])){
 

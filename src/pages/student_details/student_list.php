@@ -1,5 +1,5 @@
 <?php
-include("../server/connection.php");
+include("../../../server/connection.php");
 
 $activePage = "student_list"; // change per page
 
@@ -35,8 +35,10 @@ $result = $conn->query($sql);
 <html>
 
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student List</title>
-    <link rel="stylesheet" type="text/css" href="../css/font.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -277,23 +279,23 @@ $result = $conn->query($sql);
         <!-- SIDEBAR -->
         <div class="sidebar">
             <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
-            <a href="../admin/dashboard/index.php" class="<?= $activePage == 'dashboard' ? 'active' : '' ?>">
+            <a href="../../../admin/dashboard/index.php" class="<?= $activePage == 'dashboard' ? 'active' : '' ?>">
                 <i class="fa-solid fa-gauge"></i>Dashboard
             </a>
 
-            <a href="../admin/department/list.php" class="<?= $activePage == 'department' ? 'active' : '' ?>">
+            <a href="../../../admin/department/list.php" class="<?= $activePage == 'department' ? 'active' : '' ?>">
                 <i class="fa-solid fa-building"></i>Department
             </a>
 
-            <a href="../admin/courses/list.php" class="<?= $activePage == 'courses' ? 'active' : '' ?>">
+            <a href="../../../admin/courses/list.php" class="<?= $activePage == 'courses' ? 'active' : '' ?>">
                 <i class="fa-solid fa-book"></i>Courses
             </a>
 
-            <a href="../admin/semesters/list.php" class="<?= $activePage == 'semester' ? 'active' : '' ?>">
+            <a href="../../../admin/semesters/list.php" class="<?= $activePage == 'semester' ? 'active' : '' ?>">
                 <i class="fa-solid fa-calendar"></i>Semester
             </a>
 
-            <a href="../admin/bank/list.php" class="<?= $activePage == 'bank' ? 'active' : '' ?>">
+            <a href="../../../admin/bank/list.php" class="<?= $activePage == 'bank' ? 'active' : '' ?>">
                 <i class="fa-solid fa-bank"></i>Bank
             </a>
 

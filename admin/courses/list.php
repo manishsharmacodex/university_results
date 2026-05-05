@@ -294,12 +294,12 @@ $departments = $conn->query("SELECT * FROM departments");
                 <i class="fa-solid fa-bank"></i>Bank
             </a>
 
-            <a href="../../student_details/add_students.php"
-                class="<?= $activePage == 'add_students' ? 'active' : '' ?>">
+            <a href="../../src/pages/student_details/add_students.php"
+                class="<?= $activePage == 'add_students' ? 'active' : '' ?>" target="_BLANK">
                 <i class="fa-solid fa-user-plus"></i>Add Student
             </a>
 
-            <a href="../../student_details/student_list.php"
+            <a href="../../src/pages/student_details/student_list.php"
                 class="<?= $activePage == 'student_list' ? 'active' : '' ?>">
                 <i class="fa-solid fa-users"></i>Student List
             </a>
