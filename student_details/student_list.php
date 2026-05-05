@@ -142,16 +142,22 @@ $result = $conn->query($sql);
             font-size: 12px;
         }
 
-        /* ================= MODAL UPGRADED (ERP STYLE) ================= */
+        .btn-edit {
+            background: #f59e0b;
+        }
+
+        .btn-save {
+            background: #22c55e;
+        }
+
         .modal {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.65);
+            background: rgba(0, 0, 0, 0.6);
             display: none;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            backdrop-filter: blur(6px);
         }
 
         .panel {
@@ -163,10 +169,8 @@ $result = $conn->query($sql);
             max-height: 92vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
         }
 
-        /* sticky header */
         .hero {
             background: linear-gradient(135deg, #1e3a8a, #2563eb);
             color: white;
@@ -174,9 +178,6 @@ $result = $conn->query($sql);
             display: flex;
             align-items: center;
             gap: 15px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
         }
 
         .hero img {
@@ -187,33 +188,21 @@ $result = $conn->query($sql);
             border: 2px solid white;
         }
 
-        .hero h3 {
-            font-size: 18px;
-        }
-
-        .hero small {
-            opacity: 0.85;
-        }
-
-        /* scroll body */
         .content {
             padding: 20px;
             overflow-y: auto;
         }
 
-        /* GRID CARD STYLE */
         .section {
-            background: linear-gradient(180deg, #ffffff, #f8fafc);
-            border: 1px solid #e5e7eb;
+            background: #f8fafc;
             border-radius: 14px;
             padding: 16px;
             margin-bottom: 14px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e5e7eb;
         }
 
         .section-title {
             font-size: 11px;
-            letter-spacing: 1px;
             font-weight: 700;
             color: #2563eb;
             margin-bottom: 12px;
@@ -227,29 +216,23 @@ $result = $conn->query($sql);
         }
 
         .item {
-            background: #f9fafb;
+            background: white;
             padding: 10px;
             border-radius: 10px;
             border: 1px solid #eee;
         }
 
-        .label {
-            font-size: 11px;
-            color: #6b7280;
-        }
-
-        .value {
-            font-size: 14px;
-            font-weight: 600;
-            color: #111827;
-            margin-top: 3px;
+        .input {
+            width: 100%;
+            border: 1px solid #ddd;
+            padding: 6px;
+            border-radius: 6px;
         }
 
         .footer {
             padding: 12px;
             text-align: right;
             border-top: 1px solid #eee;
-            background: #fff;
         }
 
         .close-btn {
@@ -279,12 +262,6 @@ $result = $conn->query($sql);
             background: #2563eb;
             color: white;
         }
-
-        @media(max-width:768px) {
-            .row {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 
@@ -292,7 +269,7 @@ $result = $conn->query($sql);
 
     <div class="container">
 
-        <!-- SIDEBAR (UNCHANGED) -->
+        <!-- SIDEBAR -->
         <div class="sidebar">
             <h2>Admin</h2>
 
@@ -348,22 +325,8 @@ $result = $conn->query($sql);
 
                 </table>
 
-                <!-- PAGINATION -->
-                <div class="pagination">
-                    <?php if ($page > 1) { ?>
-                        <a href="?page=<?= $page - 1 ?>">Prev</a>
-                    <?php } ?>
-
-                    <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
-                        <a class="<?= $i == $page ? 'active' : '' ?>" href="?page=<?= $i ?>"><?= $i ?></a>
-                    <?php } ?>
-
-                    <?php if ($page < $total_pages) { ?>
-                        <a href="?page=<?= $page + 1 ?>">Next</a>
-                    <?php } ?>
-                </div>
-
             </div>
+
         </div>
     </div>
 
@@ -382,6 +345,8 @@ $result = $conn->query($sql);
             <div class="content" id="modalContent"></div>
 
             <div class="footer">
+                <button class="btn btn-edit" onclick="enableEdit()">Edit</button>
+                <button class="btn btn-save" onclick="saveData()">Save</button>
                 <button class="close-btn" onclick="closeModal()">Close</button>
             </div>
 
@@ -390,7 +355,11 @@ $result = $conn->query($sql);
 
     <script>
 
+        let currentId = 0;
+
         function openModal(id) {
+
+            currentId = id;
 
             fetch("get_student.php?id=" + id)
                 .then(res => res.json())
@@ -403,41 +372,41 @@ $result = $conn->query($sql);
                     document.getElementById("modalContent").innerHTML = `
 
 <div class="section">
-<div class="section-title">Academic Information</div>
+<div class="section-title">Academic</div>
 <div class="row">
-<div class="item"><div class="label">Department</div><div class="value">${data.department_name}</div></div>
-<div class="item"><div class="label">Course</div><div class="value">${data.course_name}</div></div>
-<div class="item"><div class="label">Semester</div><div class="value">${data.semester}</div></div>
-<div class="item"><div class="label">Section</div><div class="value">${data.section}</div></div>
+<div class="item">Department<br><input class="input" name="department_name" value="${data.department_name}" disabled></div>
+<div class="item">Course<br><input class="input" name="course_name" value="${data.course_name}" disabled></div>
+<div class="item">Semester<br><input class="input" name="semester" value="${data.semester}" disabled></div>
+<div class="item">Section<br><input class="input" name="section" value="${data.section}" disabled></div>
 </div>
 </div>
 
 <div class="section">
-<div class="section-title">Personal Details</div>
+<div class="section-title">Personal</div>
 <div class="row">
-<div class="item"><div class="label">Father</div><div class="value">${data.father_name}</div></div>
-<div class="item"><div class="label">Mother</div><div class="value">${data.mother_name}</div></div>
-<div class="item"><div class="label">DOB</div><div class="value">${data.dob}</div></div>
-<div class="item"><div class="label">Gender</div><div class="value">${data.gender}</div></div>
+<div class="item">Father<br><input class="input" value="${data.father_name}" disabled></div>
+<div class="item">Mother<br><input class="input" value="${data.mother_name}" disabled></div>
+<div class="item">DOB<br><input class="input" value="${data.dob}" disabled></div>
+<div class="item">Gender<br><input class="input" value="${data.gender}" disabled></div>
 </div>
 </div>
 
 <div class="section">
 <div class="section-title">Contact</div>
 <div class="row">
-<div class="item"><div class="label">Email</div><div class="value">${data.email}</div></div>
-<div class="item"><div class="label">Phone</div><div class="value">${data.phone}</div></div>
-<div class="item"><div class="label">Address</div><div class="value">${data.address}</div></div>
+<div class="item">Email<br><input class="input" name="email" value="${data.email}" disabled></div>
+<div class="item">Phone<br><input class="input" name="phone" value="${data.phone}" disabled></div>
+<div class="item">Address<br><input class="input" value="${data.address}" disabled></div>
 </div>
 </div>
 
 <div class="section">
 <div class="section-title">Other</div>
 <div class="row">
-<div class="item"><div class="label">Bank</div><div class="value">${data.bank_name}</div></div>
-<div class="item"><div class="label">Aadhaar</div><div class="value">${data.aadhaar_number}</div></div>
-<div class="item"><div class="label">University</div><div class="value">${data.university}</div></div>
-<div class="item"><div class="label">Admission Date</div><div class="value">${data.admission_date}</div></div>
+<div class="item">Bank<br><input class="input" value="${data.bank_name}" disabled></div>
+<div class="item">Aadhaar<br><input class="input" value="${data.aadhaar_number}" disabled></div>
+<div class="item">University<br><input class="input" value="${data.university}" disabled></div>
+<div class="item">Admission<br><input class="input" value="${data.admission_date}" disabled></div>
 </div>
 </div>
 
@@ -446,6 +415,32 @@ $result = $conn->query($sql);
                     document.getElementById("modal").style.display = "flex";
 
                 });
+        }
+
+        function enableEdit() {
+            document.querySelectorAll(".input").forEach(el => el.disabled = false);
+        }
+
+        function saveData() {
+
+            let data = {
+                id: currentId,
+                email: document.querySelector('[name="email"]').value,
+                phone: document.querySelector('[name="phone"]').value
+            };
+
+            fetch("update_student.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+                .then(res => res.text())
+                .then(res => {
+                    alert("Updated");
+                    closeModal();
+                    location.reload();
+                });
+
         }
 
         function closeModal() {
