@@ -12,7 +12,7 @@ $result = $conn->query("SELECT * FROM semesters");
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
 </head>
 
-<body>
+<body>  
     <h2>Semester</h2>
 
     <p><a href="../dashboard/index.php">Home</a> / Semester</p>
