@@ -2,36 +2,63 @@
 include("../../config/auth.php");
 include("../../server/connection.php");
 
-$id = $_POST['id'] ?? null; // Read from POST
-
-if (!$id) {
-    die("Invalid ID");
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-$semester_name = strtoupper($_POST['semester_name'] ?? ''); // Always store uppercase
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: list.php");
+    exit;
+}
 
-if ($semester_name) {
-    // Check if semester already exists (excluding current one)
-    $check_stmt = $conn->prepare("SELECT id FROM semesters WHERE semester_name=? AND id != ?");
-    $check_stmt->bind_param("si", $semester_name, $id);
-    $check_stmt->execute();
-    $check_result = $check_stmt->get_result();
+$id = (int)($_POST['id'] ?? 0);
+$semester_name = trim($_POST['semester_name'] ?? '');
 
-    if ($check_result->num_rows == 0) {
-        // Update semester using prepared statement
-        $stmt = $conn->prepare("UPDATE semesters SET semester_name=? WHERE id=?");
-        $stmt->bind_param("si", $semester_name, $id);
+// Validation
+if (
+    $id <= 0 ||
+    $semester_name === ''
+) {
+    $_SESSION['message'] = "Invalid data submitted!";
+    header("Location: list.php");
+    exit;
+}
 
-        if ($stmt->execute()) {
-            echo "<script>window.location.href='list.php';</script>";
-            exit;
-        } else {
-            echo "Error: " . $stmt->error;
-        }
-    } else {
-        echo "Semester already exists!";
-    }
+// Convert to uppercase (your original logic)
+$semester_name = strtoupper($semester_name);
+
+// Duplicate check (excluding current record)
+$check_stmt = $conn->prepare("SELECT id FROM semesters WHERE semester_name = ? AND id != ?");
+$check_stmt->bind_param("si", $semester_name, $id);
+$check_stmt->execute();
+$check_result = $check_stmt->get_result();
+
+if ($check_result->num_rows > 0) {
+    $_SESSION['message'] = "Semester already exists!";
+    header("Location: list.php");
+    exit;
+}
+
+$stmt = $conn->prepare("UPDATE semesters SET semester_name = ? WHERE id = ?");
+
+if (!$stmt) {
+    $_SESSION['message'] = "Database error!";
+    header("Location: list.php");
+    exit;
+}
+
+$stmt->bind_param("si", $semester_name, $id);
+
+if ($stmt->execute()) {
+    $_SESSION['message'] = ($stmt->affected_rows > 0)
+        ? "Semester updated successfully!"
+        : "No changes made!";
 } else {
-    die("Invalid data submitted");
+    $_SESSION['message'] = "Error updating semester!";
 }
+
+$stmt->close();
+
+header("Location: list.php");
+exit;
 ?>

@@ -2,24 +2,49 @@
 include("../../config/auth.php");
 include("../../server/connection.php");
 
-// Read ID and new bank_master_id from POST
-$id = $_POST['id'] ?? null;
-$bank_master_id = $_POST['bank_master_id'] ?? null;
-
-if (!$id || !$bank_master_id) {
-    die("Invalid data submitted");
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-// Prepare and execute update query
-$stmt = $conn->prepare("UPDATE banks SET bank_master_id=? WHERE id=?");
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: list.php");
+    exit;
+}
+
+$id = (int)($_POST['id'] ?? 0);
+$bank_master_id = (int)($_POST['bank_master_id'] ?? 0);
+$page = (int)($_POST['page'] ?? 1);
+
+// Validation
+if (
+    $id <= 0 ||
+    $bank_master_id <= 0
+) {
+    $_SESSION['message'] = "Invalid data submitted!";
+    header("Location: list.php?page=" . $page);
+    exit;
+}
+
+$stmt = $conn->prepare("UPDATE banks SET bank_master_id = ? WHERE id = ?");
+
+if (!$stmt) {
+    $_SESSION['message'] = "Database error!";
+    header("Location: list.php?page=" . $page);
+    exit;
+}
+
 $stmt->bind_param("ii", $bank_master_id, $id);
 
 if ($stmt->execute()) {
-    // Redirect back to list page (preserve page if sent)
-    $page = $_GET['page'] ?? 1;
-    echo "<script>window.location.href='list.php?page=$page';</script>";
-    exit;
+    $_SESSION['message'] = ($stmt->affected_rows > 0)
+        ? "Bank updated successfully!"
+        : "No changes made!";
 } else {
-    echo "Error: " . $stmt->error;
+    $_SESSION['message'] = "Error updating bank!";
 }
+
+$stmt->close();
+
+header("Location: list.php?page=" . $page);
+exit;
 ?>

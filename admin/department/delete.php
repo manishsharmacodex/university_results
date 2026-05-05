@@ -2,22 +2,44 @@
 include("../../config/auth.php");
 include("../../server/connection.php");
 
-// Get ID from URL
-$id = $_GET['id'] ?? null;
-
-if (!$id) {
-    die("Invalid ID");
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-// Prepare delete query
-$stmt = $conn->prepare("DELETE FROM university_results.departments WHERE id = ?");
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: list.php");
+    exit;
+}
+
+$id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+
+if ($id <= 0) {
+    $_SESSION['message'] = "Invalid ID!";
+    header("Location: list.php");
+    exit;
+}
+
+$stmt = $conn->prepare("DELETE FROM departments WHERE id = ?");
+if (!$stmt) {
+    $_SESSION['message'] = "Database error!";
+    header("Location: list.php");
+    exit;
+}
+
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {
-    // Redirect back to list after delete
-    header("Location: list.php");
-    exit;
+    if ($stmt->affected_rows > 0) {
+        $_SESSION['message'] = "Department deleted successfully!";
+    } else {
+        $_SESSION['message'] = "No record found!";
+    }
 } else {
-    echo "Error deleting department: " . $stmt->error;
+    $_SESSION['message'] = "Delete failed!";
 }
+
+$stmt->close();
+
+header("Location: list.php");
+exit;
 ?>

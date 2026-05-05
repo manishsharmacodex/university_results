@@ -2,9 +2,19 @@
 include("../../config/auth.php");
 include("../../server/connection.php");
 
-/* ================= ADD DEPARTMENT ================= */
-$message = ''; // Initialize message
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$message = '';
+
+if (isset($_SESSION['message'])) {
+    $message = $_SESSION['message'];
+    unset($_SESSION['message']);
+}
+
+/* ================= ADD DEPARTMENT ================= */
 if (isset($_POST['add_department'])) {
     $name = strtoupper($conn->real_escape_string($_POST['name']));
 
@@ -284,6 +294,37 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             background: #2563eb;
             color: white;
         }
+
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #111827;
+            color: white;
+            padding: 14px 18px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            font-size: 14px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: 0.4s ease;
+            z-index: 9999;
+            min-width: 220px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast.success {
+            background: #16a34a;
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
     </style>
 </head>
 
@@ -327,6 +368,9 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             <a href="../auth/logout.php" class="logout-btn">Logout</a>
         </div>
 
+
+
+        <!-- this code is main -->
         <div class="main">
 
             <h2 class="breadcrum-header">Departments</h2>
@@ -336,7 +380,11 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             </div>
 
             <?php if ($message != ''): ?>
-                <div class="message"><?= $message ?></div>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        showToast("<?= $message ?>", "success");
+                    });
+                </script>
             <?php endif; ?>
 
             <!-- Add Department Button -->
@@ -361,8 +409,9 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
                                 document.getElementById('editModal').style.display='flex';
                             ">Edit</a>
 
-                            <a class="delete" href="delete.php?id=<?= $row['id'] ?>"
-                                onclick="return confirm('Delete this department?')">Delete</a>
+                            <a href="#" class="delete" onclick="openDeleteModal(<?= $row['id'] ?>)">
+                                Delete
+                            </a>
                         </td>
                     </tr>
                 <?php } ?>
@@ -413,6 +462,28 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
         </div>
     </div>
 
+
+    <!-- delete model -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-box" style="text-align:center;">
+            <h3>Delete Department?</h3>
+
+            <form method="POST" action="delete.php">
+                <input type="hidden" name="id" id="delete_id">
+
+                <button type="submit" class="save-btn" style="background:#ef4444;">
+                    Yes, Delete
+                </button>
+
+                <button type="button" class="close-btn" onclick="closeDeleteModal()">
+                    Cancel
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
     <script>
         // Uppercase input
         document.querySelectorAll("input[type='text'], textarea").forEach(field => {
@@ -420,6 +491,29 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
                 this.value = this.value.toUpperCase();
             });
         });
+
+
+        // funtion for delete model
+        function openDeleteModal(id) {
+            document.getElementById('delete_id').value = id;
+            document.getElementById('deleteModal').style.display = "flex";
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = "none";
+        }
+
+        // toast notification
+        function showToast(message, type = "success") {
+            const toast = document.getElementById("toast");
+
+            toast.className = "toast show " + type;
+            toast.innerText = message;
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
     </script>
 
 </body>

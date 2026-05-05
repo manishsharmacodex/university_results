@@ -2,26 +2,55 @@
 include("../../config/auth.php");
 include("../../server/connection.php");
 
-$id = $_POST['id'] ?? null; // <-- read from POST
-
-if (!$id) {
-    die("Invalid ID");
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 
-$course_name = $_POST['course_name'] ?? '';
-$department_id = $_POST['department_id'] ?? '';
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: list.php");
+    exit;
+}
 
-if ($course_name && $department_id) {
-    $stmt = $conn->prepare("UPDATE courses SET course_name=?, department_id=? WHERE id=?");
-    $stmt->bind_param("sii", $course_name, $department_id, $id);
+$id = (int)($_POST['id'] ?? 0);
+$course_name = trim($_POST['course_name'] ?? '');
+$department_id = (int)($_POST['department_id'] ?? 0);
 
-    if ($stmt->execute()) {
-        echo "<script>window.location.href='list.php';</script>";
-        exit;
-    } else {
-        echo "Error: " . $stmt->error;
-    }
+// Validation
+if (
+    $id <= 0 ||
+    $department_id <= 0 ||
+    $course_name === '' ||
+    strlen($course_name) < 2 ||
+    strlen($course_name) > 100
+) {
+    $_SESSION['message'] = "Invalid data submitted!";
+    header("Location: list.php");
+    exit;
+}
+
+// Convert to uppercase (same as your original logic)
+$course_name = strtoupper($course_name);
+
+$stmt = $conn->prepare("UPDATE courses SET course_name = ?, department_id = ? WHERE id = ?");
+
+if (!$stmt) {
+    $_SESSION['message'] = "Database error!";
+    header("Location: list.php");
+    exit;
+}
+
+$stmt->bind_param("sii", $course_name, $department_id, $id);
+
+if ($stmt->execute()) {
+    $_SESSION['message'] = ($stmt->affected_rows > 0)
+        ? "Course updated successfully!"
+        : "No changes made!";
 } else {
-    die("Invalid data submitted");
+    $_SESSION['message'] = "Error updating course!";
 }
+
+$stmt->close();
+
+header("Location: list.php");
+exit;
 ?>
