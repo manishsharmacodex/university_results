@@ -292,6 +292,83 @@ include("./server/connection.php");
                 gap: 10px;
             }
         }
+
+        /* ================= SLIDER ================= */
+        .slider {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+        }
+
+        .slides {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            display: none;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Caption */
+        .caption {
+            position: absolute;
+            bottom: 50px;
+            left: 60px;
+            color: #fff;
+        }
+
+        .caption h2 {
+            font-size: 36px;
+        }
+
+        .caption p {
+            margin-top: 10px;
+            color: #ddd;
+        }
+
+        /* Buttons */
+        .prev,
+        .next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .prev {
+            left: 20px;
+        }
+
+        .next {
+            right: 20px;
+        }
+
+        .prev:hover,
+        .next:hover {
+            background: var(--primary);
+            color: #000;
+        }
     </style>
 </head>
 
@@ -322,6 +399,45 @@ include("./server/connection.php");
             <a href="./admin/auth/login.php" target="_BLANK"><button class="nav-btn admin-btn">Admin Login</button></a>
         </div>
     </div>
+
+
+
+    <!-- slider banner -->
+    <!-- ================= SLIDER ================= -->
+    <div class="slider">
+        <div class="slides">
+
+            <div class="slide active">
+                <img src="./src/images/banner-1.jpg" alt="">
+                <div class="caption">
+                    <h2>Welcome to Alpha University</h2>
+                    <p>Empowering students with future-ready skills</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <img src="./src/images/banner-2.jpg" alt="">
+                <div class="caption">
+                    <h2>World Class Campus</h2>
+                    <p>Modern labs, smart classrooms & innovation hubs</p>
+                </div>
+            </div>
+
+            <div class="slide">
+                <img src="./images/slide3.jpg" alt="">
+                <div class="caption">
+                    <h2>95% Placement Record</h2>
+                    <p>Top recruiters from across the globe</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Buttons -->
+        <button class="prev">&#10094;</button>
+        <button class="next">&#10095;</button>
+    </div>
+
 
     <!-- HERO -->
     <div class="hero">
@@ -438,6 +554,35 @@ include("./server/connection.php");
             © 2026 Alpha University | All Rights Reserved
         </div>
     </div>
+
+
+
+    <script>
+        let slides = document.querySelectorAll(".slide");
+        let index = 0;
+
+        function showSlide(i) {
+            slides.forEach(slide => slide.classList.remove("active"));
+            slides[i].classList.add("active");
+        }
+
+        function nextSlide() {
+            index = (index + 1) % slides.length;
+            showSlide(index);
+        }
+
+        function prevSlide() {
+            index = (index - 1 + slides.length) % slides.length;
+            showSlide(index);
+        }
+
+        // Auto Slide
+        setInterval(nextSlide, 4000);
+
+        // Buttons
+        document.querySelector(".next").onclick = nextSlide;
+        document.querySelector(".prev").onclick = prevSlide;
+    </script>
 
 </body>
 
