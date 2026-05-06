@@ -407,33 +407,28 @@ include("./server/connection.php");
     <div class="slider">
         <div class="slides">
 
-            <div class="slide active">
-                <img src="./src/images/banner-3.jpg" alt="University Banner">
-                <div class="caption">
-                    <h2>Welcome to Alpha University</h2>
-                    <p>Empowering students with future-ready skills</p>
-                </div>
-            </div>
+            <?php
+            $banners = mysqli_query($conn, "SELECT * FROM banners ORDER BY id DESC");
 
-            <div class="slide">
-                <img src="./src/images/banner-2.jpg" alt="University Banner">
-                <div class="caption">
-                    <h2>World Class Campus</h2>
-                    <p>Modern labs, smart classrooms & innovation hubs</p>
-                </div>
-            </div>
+            $first = true;
+            while ($row = mysqli_fetch_assoc($banners)) {
+                ?>
 
-            <div class="slide">
-                <img src="./src/images/banner-3.jpg" alt="University Banner">
-                <div class="caption">
-                    <h2>95% Placement Record</h2>
-                    <p>Top recruiters from across the globe</p>
+                <div class="slide <?= $first ? 'active' : '' ?>">
+                    <img src="./admin/uploads/banners/<?= $row['image'] ?>" alt="Banner">
+                    <div class="caption">
+                        <h2>Welcome to Alpha University</h2>
+                        <p>Empowering students with future-ready skills</p>
+                    </div>
                 </div>
-            </div>
+
+                <?php
+                $first = false;
+            }
+            ?>
 
         </div>
 
-        <!-- Buttons -->
         <button class="prev">&#10094;</button>
         <button class="next">&#10095;</button>
     </div>
