@@ -362,7 +362,7 @@ $result = $conn->query($sql);
 
                             <td>
                                 <?php if ($row['photo']) { ?>
-                                    <img src="uploads/<?= $row['photo'] ?>" class="avatar">
+                                    <img src="../../../admin/uploads/student_profile/<?= $row['photo'] ?>" class="avatar">
                                 <?php } ?>
                             </td>
 

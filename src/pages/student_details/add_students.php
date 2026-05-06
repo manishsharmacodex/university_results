@@ -133,7 +133,7 @@ if (isset($_POST['submit'])) {
 
     if (!empty($_FILES["photo"]["name"])) {
 
-        $folder = "uploads/";
+        $folder = "../../../admin/uploads/student_profile/";
         if (!is_dir($folder)) {
             mkdir($folder, 0777, true);
         }
@@ -805,23 +805,6 @@ if (isset($_POST['submit'])) {
             });
         });
 
-        // this is filter data from department to courses
-        // document.getElementById("department").addEventListener("change", function () {
-        //     let dept = this.value;
-        //     let courseSelect = document.getElementById("course");
-
-        //     courseSelect.innerHTML = '<option value="">Select Course</option>';
-
-        //     if (coursesByDept[dept]) {
-        //         coursesByDept[dept].forEach(course => {
-        //             let option = document.createElement("option");
-        //             option.value = course;
-        //             option.textContent = course;
-        //             courseSelect.appendChild(option);
-        //         });
-        //     }
-        // });
-
 
         // ajax with backend logic filters
         document.getElementById("department").addEventListener("change", function () {
@@ -860,38 +843,7 @@ if (isset($_POST['submit'])) {
         <?php } ?>
 
 
-
-
-        // script code for auto generate section if not condition check from php just random section generate
-        // function generateSection() {
-        //     const sections = ["A", "B", "C", "D", "E"];
-
-        //     // shuffle array
-        //     for (let i = sections.length - 1; i > 0; i--) {
-        //         const j = Math.floor(Math.random() * (i + 1));
-        //         [sections[i], sections[j]] = [sections[j], sections[i]];
-        //     }
-
-        //     // pick first section after shuffle
-        //     return sections[0];
-        // }
-
-        // // trigger on department OR course change
-        // function updateSection() {
-        //     let dept = document.getElementById("department").value;
-        //     let course = document.getElementById("course").value;
-
-        //     if (dept !== "" && course !== "") {
-        //         document.getElementById("section").value = generateSection();
-        //     } else {
-        //         document.getElementById("section").value = "";
-        //     }
-        // }
-
-        // // attach events
-        // document.getElementById("department").addEventListener("change", updateSection);
-        // document.getElementById("course").addEventListener("change", updateSection);
-
+        let selectedPhotoDataURL = "";
 
 
         // script code for image photoPreview
@@ -900,77 +852,79 @@ if (isset($_POST['submit'])) {
         let removeBtn = document.getElementById("removePhoto");
 
         photoInput.addEventListener("change", function (event) {
+
             let file = event.target.files[0];
 
             if (file) {
+
                 let reader = new FileReader();
 
                 reader.onload = function (e) {
-                    selectedPhotoDataURL = e.target.result; // ✅ store for modal
 
-                    preview.src = e.target.result;
+                    selectedPhotoDataURL = e.target.result; // ✅ STORE IMAGE
+
+                    preview.src = selectedPhotoDataURL;
                     preview.style.display = "block";
                     removeBtn.style.display = "inline-block";
                 };
 
                 reader.readAsDataURL(file);
+
+            } else {
+                selectedPhotoDataURL = "";
             }
         });
 
         removeBtn.addEventListener("click", function () {
+
             photoInput.value = "";
             preview.src = "";
             preview.style.display = "none";
             removeBtn.style.display = "none";
+
+            selectedPhotoDataURL = ""; // ✅ CLEAR VALUE
         });
 
-        let selectedPhotoDataURL = "";
 
         function openPreview() {
 
             let form = document.getElementById("studentForm");
 
-            if (!form) {
-                alert("Form not found");
-                return;
-            }
+            let photoHTML = selectedPhotoDataURL
+                ? `<img class="preview-img" src="${selectedPhotoDataURL}">`
+                : `<p style="color:#999;font-size:12px;">No Photo Selected</p>`;
 
             let html = `
     <div class="preview-grid">
 
         <div class="preview-item"><span>STUDENT NAME</span><b>${form.full_name.value}</b></div>
-
         <div class="preview-item"><span>FATHER NAME</span><b>${form.father_name.value}</b></div>
-
         <div class="preview-item"><span>MOTHER NAME</span><b>${form.mother_name.value}</b></div>
 
-        <div class="preview-item"><span>DATE OF BIRTH</span><b>${form.dob.value}</b></div>
-
+        <div class="preview-item"><span>DOB</span><b>${form.dob.value}</b></div>
         <div class="preview-item"><span>GENDER</span><b>${form.gender.value}</b></div>
 
-        <div class="preview-item"><span>EMAIL ADDRESS</span><b>${form.email.value}</b></div>
+        <div class="preview-item"><span>EMAIL</span><b>${form.email.value}</b></div>
+        <div class="preview-item"><span>PHONE</span><b>${form.phone.value}</b></div>
 
-        <div class="preview-item"><span>PHONE NUMBER</span><b>${form.phone.value}</b></div>
-
-        <div class="preview-item"><span>SCHOOL</span><b>${form.department.value}</b></div>
-
+        <div class="preview-item"><span>DEPARTMENT</span><b>${form.department.value}</b></div>
         <div class="preview-item"><span>COURSE</span><b>${form.course.value}</b></div>
 
         <div class="preview-item"><span>SEMESTER</span><b>${form.semester.value}</b></div>
-
         <div class="preview-item"><span>ADMISSION DATE</span><b>${form.admission_date.value}</b></div>
 
         <div class="preview-item"><span>UNIVERSITY</span><b>${form.university.value}</b></div>
-        <div class="preview-item"><span>AADHAAR NUMBER</span><b>${form.aadhaar_number.value}</b></div>
+        <div class="preview-item"><span>AADHAAR</span><b>${form.aadhaar_number.value}</b></div>
 
-        <div class="preview-item full"><span>PERMANENT ADDRESS</span><b>${form.address.value}</b></div>
+        <div class="preview-item full"><span>ADDRESS</span><b>${form.address.value}</b></div>
 
         <div class="preview-item photo-container">
             <span>Photo</span>
-                <img class="preview-img" src="${selectedPhotoDataURL}">
+            ${photoHTML}
         </div>
+
     </div>
-`;
+    `;
 
             document.getElementById("previewContent").innerHTML = html;
             document.getElementById("previewPopup").style.display = "flex";
