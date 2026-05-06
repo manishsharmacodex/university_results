@@ -408,7 +408,7 @@ include("./server/connection.php");
         <div class="slides">
 
             <div class="slide active">
-                <img src="./src/images/banner-1.jpg" alt="">
+                <img src="./src/images/banner-3.jpg" alt="University Banner">
                 <div class="caption">
                     <h2>Welcome to Alpha University</h2>
                     <p>Empowering students with future-ready skills</p>
@@ -416,7 +416,7 @@ include("./server/connection.php");
             </div>
 
             <div class="slide">
-                <img src="./src/images/banner-2.jpg" alt="">
+                <img src="./src/images/banner-2.jpg" alt="University Banner">
                 <div class="caption">
                     <h2>World Class Campus</h2>
                     <p>Modern labs, smart classrooms & innovation hubs</p>
@@ -424,7 +424,7 @@ include("./server/connection.php");
             </div>
 
             <div class="slide">
-                <img src="./images/slide3.jpg" alt="">
+                <img src="./src/images/banner-3.jpg" alt="University Banner">
                 <div class="caption">
                     <h2>95% Placement Record</h2>
                     <p>Top recruiters from across the globe</p>
