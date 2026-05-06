@@ -5,6 +5,8 @@ include("../../server/connection.php");
 if (isset($_POST['upload_banner'])) {
 
     $file = $_FILES['banner_image'];
+    $title = $_POST['title'];
+    $description = $_POST['description'];
 
     $file_name = time() . "_" . $file['name'];
     $tmp_name = $file['tmp_name'];
@@ -13,7 +15,7 @@ if (isset($_POST['upload_banner'])) {
 
     if (move_uploaded_file($tmp_name, $upload_path)) {
 
-        $query = "INSERT INTO banners (image) VALUES ('$file_name')";
+        $query = "INSERT INTO banners (image,title, description) VALUES ('$file_name','$title', '$description')";
         mysqli_query($conn, $query);
 
         echo "<script>alert('Banner Uploaded Successfully');</script>";
@@ -42,6 +44,8 @@ if (isset($_GET['delete'])) {
 <body>
     <form method="POST" enctype="multipart/form-data">
         <h3>Upload Banner</h3>
+        <input type="text" name="title" placeholder="Banner Title" required>
+        <input type="text" name="description" placeholder="Banner Description" required>
         <input type="file" name="banner_image" required>
         <button type="submit" name="upload_banner">Upload</button>
     </form>

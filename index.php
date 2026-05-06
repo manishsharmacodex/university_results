@@ -401,8 +401,6 @@ include("./server/connection.php");
     </div>
 
 
-
-    <!-- slider banner -->
     <!-- ================= SLIDER ================= -->
     <div class="slider">
         <div class="slides">
@@ -416,9 +414,10 @@ include("./server/connection.php");
 
                 <div class="slide <?= $first ? 'active' : '' ?>">
                     <img src="./admin/uploads/banners/<?= $row['image'] ?>" alt="Banner">
+
                     <div class="caption">
-                        <h2>Welcome to Alpha University</h2>
-                        <p>Empowering students with future-ready skills</p>
+                        <h2><?= htmlspecialchars($row['title']) ?></h2>
+                        <p><?= htmlspecialchars($row['description']) ?></p>
                     </div>
                 </div>
 
