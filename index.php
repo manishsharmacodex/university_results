@@ -1,5 +1,15 @@
 <?php
 include("./server/connection.php");
+
+/* =========================================
+   FETCH ADMISSION FORM SETTINGS
+========================================= */
+$form_settings = mysqli_fetch_assoc(
+    mysqli_query(
+        $conn,
+        "SELECT * FROM admission_form_settings WHERE id='1'"
+    )
+);
 ?>
 
 <!DOCTYPE html>
@@ -10,6 +20,7 @@ include("./server/connection.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Alpha University - Homepage</title>
     <link rel="stylesheet" type="text/css" href="./css/font.css">
+
     <style>
         :root {
             --bg: #0b1220;
@@ -24,18 +35,21 @@ include("./server/connection.php");
             box-sizing: border-box;
         }
 
+        body {
+            background: radial-gradient(circle at top, #14213d, var(--bg));
+            color: #fff;
+            overflow-x: hidden;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
         a {
             text-decoration: none;
             color: inherit;
         }
 
-        body {
-            background: radial-gradient(circle at top, #14213d, var(--bg));
-            color: #fff;
-            overflow-x: hidden;
-        }
-
-        /* ================= NAVBAR ================= */
+        /* =========================================
+           NAVBAR
+        ========================================= */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -45,46 +59,43 @@ include("./server/connection.php");
             backdrop-filter: blur(14px);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 999;
         }
 
         .logo {
+            font-size: 22px;
             font-weight: 700;
-            font-size: 20px;
             color: var(--primary);
         }
 
         .navbar ul {
             display: flex;
-            gap: 22px;
+            gap: 20px;
             list-style: none;
         }
 
         .navbar ul li {
             color: var(--muted);
-            cursor: pointer;
-            font-size: 14px;
             transition: 0.3s;
+            cursor: pointer;
         }
 
         .navbar ul li:hover {
             color: var(--primary);
         }
 
-        /* ================= NAV BUTTONS (NEW) ================= */
         .nav-buttons {
             display: flex;
             gap: 10px;
         }
 
         .nav-btn {
-            padding: 8px 14px;
-            border-radius: 25px;
-            border: 1px solid transparent;
+            padding: 10px 16px;
+            border-radius: 30px;
+            border: none;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
             transition: 0.3s;
+            font-weight: 600;
         }
 
         .student-btn {
@@ -100,15 +111,95 @@ include("./server/connection.php");
 
         .nav-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 217, 255, 0.2);
         }
 
-        /* ================= HERO ================= */
+        /* =========================================
+           SLIDER
+        ========================================= */
+        .slider {
+            width: 100%;
+            height: 450px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slides {
+            width: 100%;
+            height: 100%;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            position: relative;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .caption {
+            position: absolute;
+            left: 60px;
+            bottom: 60px;
+        }
+
+        .caption h2 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .caption p {
+            color: #ddd;
+            font-size: 16px;
+        }
+
+        .prev,
+        .next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 22px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .prev:hover,
+        .next:hover {
+            background: var(--primary);
+            color: #000;
+        }
+
+        .prev {
+            left: 20px;
+        }
+
+        .next {
+            right: 20px;
+        }
+
+        /* =========================================
+           HERO SECTION
+        ========================================= */
         .hero {
             display: flex;
             justify-content: space-between;
-            padding: 80px 60px;
             gap: 40px;
+            padding: 80px 60px;
+            align-items: flex-start;
         }
 
         .hero-text {
@@ -116,7 +207,8 @@ include("./server/connection.php");
         }
 
         .hero-text h1 {
-            font-size: 52px;
+            font-size: 55px;
+            line-height: 1.2;
         }
 
         .hero-text span {
@@ -126,14 +218,18 @@ include("./server/connection.php");
         .hero-text p {
             margin-top: 15px;
             color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .hero-buttons {
+            margin-top: 20px;
         }
 
         .hero-buttons button {
-            margin-top: 20px;
-            margin-right: 10px;
-            padding: 10px 18px;
+            padding: 12px 18px;
             border-radius: 10px;
             border: none;
+            margin-right: 10px;
             cursor: pointer;
         }
 
@@ -148,43 +244,68 @@ include("./server/connection.php");
             color: var(--primary);
         }
 
-        /* ================= FORM ================= */
+        /* =========================================
+           FORM
+        ========================================= */
         .form-box {
+            width: 400px;
             background: #ffffff;
-            color: #000;
             padding: 30px;
             border-radius: var(--radius);
-            width: 380px;
+            color: #000;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
         .form-box h3 {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .form-box p {
+            margin-bottom: 20px;
+            color: #555;
         }
 
         .form-box input,
         .form-box select {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
+            padding: 13px;
+            margin-bottom: 14px;
             border-radius: 10px;
             border: 1px solid #ddd;
-            background: #fff;
-            color: #000;
             font-size: 14px;
+            outline: none;
         }
 
-        .form-box .button {
+        .form-box input:focus,
+        .form-box select:focus {
+            border-color: var(--primary);
+        }
+
+        .button {
             width: 100%;
-            padding: 12px;
-            background: var(--primary);
+            padding: 13px;
             border: none;
+            background: var(--primary);
             border-radius: 10px;
-            font-weight: 600;
             cursor: pointer;
+            font-weight: 700;
+            font-size: 15px;
         }
 
-        /* ================= STATS ================= */
+        .closed-message {
+            background: red;
+            color: white;
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* =========================================
+           STATS
+        ========================================= */
         .stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -194,20 +315,23 @@ include("./server/connection.php");
 
         .stat {
             background: rgba(255, 255, 255, 0.06);
-            padding: 20px;
+            padding: 25px;
             border-radius: var(--radius);
             text-align: center;
         }
 
         .stat h2 {
             color: var(--primary);
+            margin-bottom: 8px;
         }
 
         .stat p {
             color: var(--muted);
         }
 
-        /* ================= SECTIONS ================= */
+        /* =========================================
+           PROGRAMS
+        ========================================= */
         .section {
             padding: 60px;
             text-align: center;
@@ -217,27 +341,30 @@ include("./server/connection.php");
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
         .card {
             background: rgba(255, 255, 255, 0.06);
-            padding: 20px;
+            padding: 25px;
             border-radius: var(--radius);
         }
 
         .card h3 {
             color: var(--primary);
+            margin-bottom: 10px;
         }
 
         .card p {
             color: var(--muted);
         }
 
-        /* ================= FOOTER ================= */
+        /* =========================================
+           FOOTER
+        ========================================= */
         .footer {
-            padding: 50px 60px;
             background: #050a14;
+            padding: 50px 60px;
         }
 
         .footer-grid {
@@ -248,179 +375,112 @@ include("./server/connection.php");
 
         .footer h3 {
             color: var(--primary);
+            margin-bottom: 10px;
         }
 
         .footer p,
         .footer a {
             color: var(--muted);
-            font-size: 13px;
+            font-size: 14px;
+            margin-bottom: 6px;
             display: block;
-            margin-bottom: 5px;
-            text-decoration: none;
         }
 
         .footer-bottom {
             text-align: center;
-            margin-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 15px;
-            font-size: 12px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             color: #777;
-        }
-
-        /* ================= RESPONSIVE ================= */
-        @media (max-width: 900px) {
-
-            .hero,
-            .stats,
-            .cards,
-            .footer-grid {
-                grid-template-columns: 1fr;
-                flex-direction: column;
-            }
-
-            .hero {
-                flex-direction: column;
-            }
-
-            .hero-text h1 {
-                font-size: 36px;
-            }
-
-            .navbar {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-
-        /* ================= SLIDER ================= */
-        .slider {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            overflow: hidden;
-        }
-
-        .slides {
-            display: flex;
-            width: 100%;
-            height: 100%;
-        }
-
-        .slide {
-            min-width: 100%;
-            height: 100%;
-            position: relative;
-            display: none;
-        }
-
-        .slide.active {
-            display: block;
-        }
-
-        .slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Caption */
-        .caption {
-            position: absolute;
-            bottom: 50px;
-            left: 60px;
-            color: #fff;
-        }
-
-        .caption h2 {
-            font-size: 36px;
-        }
-
-        .caption p {
-            margin-top: 10px;
-            color: #ddd;
-        }
-
-        /* Buttons */
-        .prev,
-        .next {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.5);
-            border: none;
-            color: #fff;
-            font-size: 24px;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 50%;
-        }
-
-        .prev {
-            left: 20px;
-        }
-
-        .next {
-            right: 20px;
-        }
-
-        .prev:hover,
-        .next:hover {
-            background: var(--primary);
-            color: #000;
+            font-size: 13px;
         }
     </style>
+
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
+    <!-- =========================================
+         NAVBAR
+    ========================================= -->
     <div class="navbar">
+
         <a href="./index.php">
             <div class="logo">Alpha University</div>
         </a>
+
         <ul>
             <a href="./index.php">
                 <li>Home</li>
             </a>
+
             <li>Programs</li>
+
             <li>Admissions</li>
-            <a href="./src/pages/results/results.php" target="_BLANK">
+
+            <a href="./src/pages/results/results.php" target="_blank">
                 <li>Exam & Results</li>
             </a>
+
             <a href="./src/pages/school/school_information.php">
                 <li>School Informations</li>
             </a>
+
             <a href="./src/pages/contact_us/contact.php">
                 <li>Contact</li>
             </a>
         </ul>
-        <!-- ✅ NEW BUTTONS -->
+
         <div class="nav-buttons">
-            <button class="nav-btn student-btn">Student Login</button>
-            <a href="./admin/auth/login.php" target="_BLANK"><button class="nav-btn admin-btn">Admin Login</button></a>
+
+            <button class="nav-btn student-btn">
+                Student Login
+            </button>
+
+            <a href="./admin/auth/login.php" target="_blank">
+                <button class="nav-btn admin-btn">
+                    Admin Login
+                </button>
+            </a>
+
         </div>
+
     </div>
 
-
-    <!-- ================= SLIDER ================= -->
+    <!-- =========================================
+         SLIDER
+    ========================================= -->
     <div class="slider">
+
         <div class="slides">
 
             <?php
-            $banners = mysqli_query($conn, "SELECT * FROM banners ORDER BY id DESC");
+            $banners = mysqli_query(
+                $conn,
+                "SELECT * FROM banners ORDER BY id DESC"
+            );
 
             $first = true;
+
             while ($row = mysqli_fetch_assoc($banners)) {
                 ?>
 
                 <div class="slide <?= $first ? 'active' : '' ?>">
-                    <img src="./admin/uploads/banners/<?= $row['image'] ?>" alt="Banner">
+
+                    <img src="./admin/uploads/banners/<?= htmlspecialchars($row['image']) ?>" alt="Banner">
 
                     <div class="caption">
-                        <h2><?= htmlspecialchars($row['title']) ?></h2>
-                        <p><?= htmlspecialchars($row['description']) ?></p>
+
+                        <h2>
+                            <?= htmlspecialchars($row['title']) ?>
+                        </h2>
+
+                        <p>
+                            <?= htmlspecialchars($row['description']) ?>
+                        </p>
+
                     </div>
+
                 </div>
 
                 <?php
@@ -432,97 +492,188 @@ include("./server/connection.php");
 
         <button class="prev">&#10094;</button>
         <button class="next">&#10095;</button>
+
     </div>
 
-
-    <!-- HERO -->
+    <!-- =========================================
+         HERO SECTION
+    ========================================= -->
     <div class="hero">
 
+        <!-- LEFT CONTENT -->
         <div class="hero-text">
-            <h1>Shape Your Future at <span>Alpha University</span></h1>
-            <p>Industry-focused education, expert faculty, modern campus, and 95% placement record.</p>
+
+            <h1>
+                Shape Your Future at
+                <span>Alpha University</span>
+            </h1>
+
+            <p>
+                Industry-focused education, expert faculty,
+                modern campus, and 95% placement record.
+            </p>
 
             <div class="hero-buttons">
-                <button class="primary">Apply Now</button>
-                <a href="./src/pages/school_information.php"><button class="secondary">Explore Programs</button></a>
+
+                <button class="primary">
+                    Apply Now
+                </button>
+
+                <a href="./src/pages/school/school_information.php">
+                    <button class="secondary">
+                        Explore Programs
+                    </button>
+                </a>
+
             </div>
+
         </div>
 
-        <!-- FORM -->
-        <form action="#" method="post">
+        <!-- RIGHT FORM -->
+        <div>
 
-            <div class="form-box">
-                <h3>Admission Form 2026</h3>
+            <?php if ($form_settings['form_status'] == 'Closed') { ?>
 
-                <input type="text" name="full_name" placeholder="Full Name" required>
-                <input type="email" name="email_address" placeholder="Email Address" required>
-                <input type="text" name="phone_number" placeholder="Phone Number" maxlength="10" required>
+                <div class="closed-message">
+                    Admissions Are Currently Closed
+                </div>
 
-                <select name="course">
-                    <option value="Select Course">Select Course</option>
-                    <option value="BCA">BCA</option>
-                    <option value="MCA">MCA</option>
-                    <option value="B.TECH">B.TECH</option>
-                    <option value="M.TECH">M.TECH</option>
-                    <option value="LLB">LLB</option>
-                    <option value="B.ARCH">B.ARCH</option>
-                </select>
+            <?php } ?>
 
-                <!-- <button>Submit Application</button> -->
-                <input type="submit" value="Submit Application" class="button" name="addmission_button">
-            </div>
+            <form action="" method="POST" <?= $form_settings['form_status'] == 'Closed'
+                ? 'style="pointer-events:none;opacity:0.6;"'
+                : ''
+                ?>>
+
+                <div class="form-box" style="background: <?= htmlspecialchars($form_settings['background_color']) ?>;">
+
+                    <h3>
+                        <?= htmlspecialchars($form_settings['form_title']) ?>
+                    </h3>
+
+                    <p>
+                        <?= htmlspecialchars($form_settings['form_description']) ?>
+                    </p>
+
+                    <input type="text" name="full_name" placeholder="Full Name" required>
+
+                    <input type="email" name="email_address" placeholder="Email Address" required>
+
+                    <input type="text" name="phone_number" placeholder="Phone Number" maxlength="10" required>
+
+                    <!-- DEPARTMENT -->
+                    <select name="department" id="department" required>
+
+                        <option value="">
+                            Select Department
+                        </option>
+
+                        <?php
+                        $department_query = mysqli_query(
+                            $conn,
+                            "SELECT * FROM departments ORDER BY id DESC"
+                        );
+
+                        while ($department = mysqli_fetch_assoc($department_query)) {
+                            ?>
+
+                            <option value="<?= $department['id'] ?>">
+
+                                <?= htmlspecialchars($department['name']) ?>
+
+                            </option>
+
+                        <?php } ?>
+
+                    </select>
+
+                    <!-- COURSE -->
+                    <select name="course" id="course" required>
+
+                        <option value="">
+                            Select Course
+                        </option>
+
+                    </select>
+
+                    <input type="submit" value="<?= htmlspecialchars($form_settings['button_text']) ?>" class="button"
+                        name="addmission_button">
+
+                </div>
+
+            </form>
+
+        </div>
 
     </div>
 
-    </form>
-
-    <!-- STATS -->
+    <!-- =========================================
+         STATS
+    ========================================= -->
     <div class="stats">
+
         <div class="stat">
             <h2>10K+</h2>
             <p>Students</p>
         </div>
+
         <div class="stat">
             <h2>200+</h2>
             <p>Faculty</p>
         </div>
+
         <div class="stat">
             <h2>95%</h2>
             <p>Placements</p>
         </div>
+
         <div class="stat">
             <h2>50+</h2>
             <p>Courses</p>
         </div>
+
     </div>
 
-    <!-- PROGRAMS -->
+    <!-- =========================================
+         PROGRAMS
+    ========================================= -->
     <div class="section">
+
         <h2>Our Popular Programs</h2>
 
         <div class="cards">
+
             <div class="card">
                 <h3>B.Tech</h3>
                 <p>Engineering & AI/ML programs</p>
             </div>
+
             <div class="card">
                 <h3>MBA</h3>
                 <p>Leadership & business skills</p>
             </div>
+
             <div class="card">
                 <h3>Law</h3>
                 <p>Modern legal education</p>
             </div>
+
         </div>
+
     </div>
 
-    <!-- FOOTER -->
+    <!-- =========================================
+         FOOTER
+    ========================================= -->
     <div class="footer">
+
         <div class="footer-grid">
 
             <div>
                 <h3>About</h3>
-                <p>Top private university in India focused on innovation.</p>
+                <p>
+                    Top private university in India focused on innovation.
+                </p>
             </div>
 
             <div>
@@ -549,65 +700,163 @@ include("./server/connection.php");
         <div class="footer-bottom">
             © 2026 Alpha University | All Rights Reserved
         </div>
+
     </div>
 
 
-
     <script>
+
+        /* =========================================
+           SLIDER
+        ========================================= */
         let slides = document.querySelectorAll(".slide");
         let index = 0;
 
         function showSlide(i) {
-            slides.forEach(slide => slide.classList.remove("active"));
+
+            slides.forEach(slide => {
+                slide.classList.remove("active");
+            });
+
             slides[i].classList.add("active");
         }
 
         function nextSlide() {
+
             index = (index + 1) % slides.length;
+
             showSlide(index);
         }
 
         function prevSlide() {
+
             index = (index - 1 + slides.length) % slides.length;
+
             showSlide(index);
         }
 
-        // Auto Slide
         setInterval(nextSlide, 4000);
 
-        // Buttons
         document.querySelector(".next").onclick = nextSlide;
         document.querySelector(".prev").onclick = prevSlide;
+
+
+        
+        /* =========================================
+           FETCH COURSE ACCORDING DEPARTMENT
+        ========================================= */
+        document.getElementById("department").addEventListener("change", function () {
+
+            let department_id = this.value;
+
+            let xhr = new XMLHttpRequest();
+
+            xhr.open(
+                "POST",
+                "./ajax/get_courses.php",
+                true
+            );
+
+            xhr.setRequestHeader(
+                "Content-type",
+                "application/x-www-form-urlencoded"
+            );
+
+            xhr.onload = function () {
+
+                document.getElementById("course").innerHTML = this.responseText;
+
+            };
+
+            xhr.send(
+                "department_id=" + department_id
+            );
+
+        });
+
     </script>
 
 </body>
 
 </html>
 
-
-<!-- insert admission data into database -->
 <?php
 
+/* =========================================
+   INSERT ADMISSION DATA
+========================================= */
 if (isset($_POST['addmission_button'])) {
 
-    $full_name = $_POST['full_name'];
-    $email_address = $_POST['email_address'];
-    $phone_number = $_POST['phone_number'];
-    $course = $_POST['course'];
+    $full_name = mysqli_real_escape_string(
+        $conn,
+        $_POST['full_name']
+    );
 
+    $email_address = mysqli_real_escape_string(
+        $conn,
+        $_POST['email_address']
+    );
 
-    $query = "INSERT INTO university_results.admission_list (full_name,email_address,phone_number,course) VALUES('$full_name','$email_address','$phone_number','$course')";
+    $phone_number = mysqli_real_escape_string(
+        $conn,
+        $_POST['phone_number']
+    );
+
+    $department = mysqli_real_escape_string(
+        $conn,
+        $_POST['department']
+    );
+
+    $course = mysqli_real_escape_string(
+        $conn,
+        $_POST['course']
+    );
+
+    $query = "
+        INSERT INTO admission_list
+        (
+            full_name,
+            email_address,
+            phone_number,
+            department,
+            course
+        )
+
+        VALUES
+        (
+            '$full_name',
+            '$email_address',
+            '$phone_number',
+            '$department',
+            '$course'
+        )
+    ";
 
     $data = mysqli_query($conn, $query);
 
     if ($data) {
-        echo "<script>
-                alert('Your Form have been Submited Our Team will call back within 24 hours  - Thank You');
-            </script>";
+
+        echo "
+        <script>
+
+            alert(
+                'Your form has been submitted successfully. Our team will contact you within 24 hours.'
+            );
+
+            window.location.href='index.php';
+
+        </script>
+        ";
+
     } else {
-        echo "<script>
-                alert('sorry please try again');
-            </script>";
+
+        echo "
+        <script>
+
+            alert('Sorry! Please try again.');
+
+        </script>
+        ";
     }
 }
 ?>
