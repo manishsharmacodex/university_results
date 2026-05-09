@@ -326,7 +326,7 @@ $result = $conn->query($sql);
                 <i class="fa-solid fa-bank"></i>Bank
             </a>
 
-            <a href="./add_students.php" class="<?= $activePage == 'add_students' ? 'active' : '' ?>">
+            <a href="../add_student/add_students.php" class="<?= $activePage == 'add_students' ? 'active' : '' ?>" target="_BLANK">
                 <i class="fa-solid fa-user-plus"></i>Add Student
             </a>
 

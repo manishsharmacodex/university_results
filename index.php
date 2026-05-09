@@ -376,20 +376,22 @@ include("./server/connection.php");
 
     <!-- NAVBAR -->
     <div class="navbar">
-        <div class="logo">Alpha University</div>
+        <a href="./index.php">
+            <div class="logo">Alpha University</div>
+        </a>
         <ul>
             <a href="./index.php">
                 <li>Home</li>
             </a>
             <li>Programs</li>
             <li>Admissions</li>
-            <a href="./src/pages/results.php" target="_BLANK">
+            <a href="./src/pages/results/results.php" target="_BLANK">
                 <li>Exam & Results</li>
             </a>
-            <a href="./src/pages/school_information.php">
+            <a href="./src/pages/school/school_information.php">
                 <li>School Informations</li>
             </a>
-            <a href="./src/pages/contact.php">
+            <a href="./src/pages/contact_us/contact.php">
                 <li>Contact</li>
             </a>
         </ul>
@@ -442,7 +444,7 @@ include("./server/connection.php");
 
             <div class="hero-buttons">
                 <button class="primary">Apply Now</button>
-                <a href="./school/school_information.php"><button class="secondary">Explore Programs</button></a>
+                <a href="./src/pages/school_information.php"><button class="secondary">Explore Programs</button></a>
             </div>
         </div>
 
@@ -452,9 +454,9 @@ include("./server/connection.php");
             <div class="form-box">
                 <h3>Admission Form 2026</h3>
 
-                <input type="text" name="full_name" placeholder="Full Name">
-                <input type="email" name="email_address" placeholder="Email Address">
-                <input type="text" name="phone_number" placeholder="Phone Number">
+                <input type="text" name="full_name" placeholder="Full Name" required>
+                <input type="email" name="email_address" placeholder="Email Address" required>
+                <input type="text" name="phone_number" placeholder="Phone Number" maxlength="10" required>
 
                 <select name="course">
                     <option value="Select Course">Select Course</option>

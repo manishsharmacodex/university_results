@@ -12,6 +12,7 @@ if (isset($_SESSION['admin'])) {
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
+// If already logged in → redirect to dashboard
 
 
 // Function to generate captcha
@@ -37,6 +38,7 @@ function getCaptchaAnswer()
     }
 }
 
+// error message display on login form
 $error = "";
 
 // AJAX request for refreshing captcha
@@ -98,28 +100,8 @@ if (isset($_POST['login'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ERP Login</title>
+    <title>ERP Admin Login</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
-
-    <script>
-        function refreshCaptcha() {
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "", true);
-            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-            xhr.onload = function () {
-                if (this.status === 200) {
-                    let data = this.responseText.split("|");
-                    document.getElementById("num1").innerText = data[0];
-                    document.getElementById("operator").innerText = data[1];
-                    document.getElementById("num2").innerText = data[2];
-                }
-            };
-
-            xhr.send("refresh_captcha=1");
-        }
-    </script>
-
     <style>
         body {
             margin: 0;
@@ -143,6 +125,8 @@ if (isset($_POST['login'])) {
         .login-box h2 {
             margin-bottom: 20px;
             color: #2a5298;
+            /* text-transform: uppercase; */
+            font-weight: 600;
         }
 
         .login-box input[type="text"],
@@ -152,6 +136,7 @@ if (isset($_POST['login'])) {
             margin: 8px 0;
             border: 1px solid #ccc;
             border-radius: 6px;
+            outline: none;
         }
 
         .login-box input[type="submit"] {
@@ -201,7 +186,7 @@ if (isset($_POST['login'])) {
 
     <div class="login-box">
 
-        <h2>University ERP Login</h2>
+        <h2>ERP Admin Login</h2>
 
         <?php if ($error != "") { ?>
             <div class="error"><?= $error ?></div>
@@ -209,8 +194,8 @@ if (isset($_POST['login'])) {
 
         <form method="POST">
 
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
+            <input type="text" name="username" placeholder="Username" autocomplete="off" required>
+            <input type="password" name="password" placeholder="Password" autocomplete="off" required>
 
             <!-- CAPTCHA -->
             <div class="captcha-container">
@@ -221,10 +206,10 @@ if (isset($_POST['login'])) {
                     <span id="num2"><?= $_SESSION['num2'] ?></span> ?
                 </div>
 
-                <button type="button" class="refresh-btn" onclick="refreshCaptcha()">↻ Refresh Code</button>
+                <button type="button" class="refresh-btn" onclick="refreshCaptcha()">↻ Refresh Captcha</button>
             </div>
 
-            <input type="text" name="captcha" placeholder="Enter Answer" required>
+            <input type="text" name="captcha" placeholder="Enter Answer" autocomplete="off" required>
 
             <input type="submit" name="login" value="LOGIN">
 
@@ -237,10 +222,29 @@ if (isset($_POST['login'])) {
 </html>
 
 <script>
+    // session history
     if (window.history && window.history.pushState) {
         window.history.pushState(null, null, window.location.href);
         window.onpopstate = function () {
             window.location.href = "../dashboard/index.php";
         };
+    }
+
+    // function for refresh captcha code
+    function refreshCaptcha() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "", true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onload = function () {
+            if (this.status === 200) {
+                let data = this.responseText.split("|");
+                document.getElementById("num1").innerText = data[0];
+                document.getElementById("operator").innerText = data[1];
+                document.getElementById("num2").innerText = data[2];
+            }
+        };
+
+        xhr.send("refresh_captcha=1");
     }
 </script>

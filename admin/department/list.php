@@ -1,8 +1,8 @@
 <?php
-include("../../config/auth.php");
 include("../../server/connection.php");
+include("../../config/auth.php");
 
-
+// session history check
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -13,6 +13,7 @@ if (isset($_SESSION['message'])) {
     $message = $_SESSION['message'];
     unset($_SESSION['message']);
 }
+// session history check
 
 /* ================= ADD DEPARTMENT ================= */
 if (isset($_POST['add_department'])) {
@@ -203,6 +204,10 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             color: white;
         }
 
+        .save-btn.delete-btn {
+            background: #ef4444;
+        }
+
         /* Modal */
         .modal {
             display: none;
@@ -226,6 +231,7 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
             transform: translateY(-20px) scale(0.95);
             animation: modalShow 0.25s ease forwards;
+            text-align: center;
         }
 
         @keyframes modalShow {
@@ -268,12 +274,6 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             background: #ef4444;
             color: white;
             cursor: pointer;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            color: green;
-            font-weight: bold;
         }
 
         /* Pagination */
@@ -355,19 +355,18 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
                 <i class="fa-solid fa-bank"></i>Bank
             </a>
 
-            <a href="../../src/pages/student_details/add_students.php"
+            <a href="../../src/pages/add_student/add_students.php"
                 class="<?= $activePage == 'add_students' ? 'active' : '' ?>" target="_BLANK">
                 <i class="fa-solid fa-user-plus"></i>Add Student
             </a>
 
-            <a href="../../src/pages/student_details/student_list.php"
+            <a href="../../src/pages/student_list/student_list.php"
                 class="<?= $activePage == 'student_list' ? 'active' : '' ?>">
                 <i class="fa-solid fa-users"></i>Student List
             </a>
 
             <a href="../auth/logout.php" class="logout-btn">Logout</a>
         </div>
-
 
 
         <!-- this code is main -->
@@ -463,15 +462,15 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
     </div>
 
 
-    <!-- delete model -->
+    <!-- DELETE DEPARTMENT MODEL -->
     <div id="deleteModal" class="modal">
-        <div class="modal-box" style="text-align:center;">
-            <h3>Delete Department?</h3>
+        <div class="modal-box">
+            <h3>Delete Department ?</h3>
 
             <form method="POST" action="delete.php">
                 <input type="hidden" name="id" id="delete_id">
 
-                <button type="submit" class="save-btn" style="background:#ef4444;">
+                <button type="submit" class="save-btn delete-btn">
                     Yes, Delete
                 </button>
 
@@ -482,6 +481,7 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
         </div>
     </div>
 
+    <!-- Toast Notification Message -->
     <div id="toast" class="toast"></div>
 
     <script>

@@ -167,19 +167,21 @@ if (isset($_POST['submit'])) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add Student</title>
+    <title>Add Student - Alpha University</title>
     <link rel="stylesheet" type="text/css" href="../../../css/font.css">
     <style>
         /* =========================
    PREMIUM UI SYSTEM (FINAL CLEAN)
 ========================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             background: linear-gradient(135deg, #eef2ff, #f8fafc);
             color: #0f172a;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
             text-transform: capitalize;
         }
 
@@ -214,6 +216,7 @@ if (isset($_POST['submit'])) {
             background: linear-gradient(90deg, #2563eb, #7c3aed);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
         }
 
         /* =========================
@@ -543,34 +546,13 @@ if (isset($_POST['submit'])) {
             color: #0f172a;
             border: 1px solid #e2e8f0;
         }
-
-        /* =========================
-   RESPONSIVE
-========================= */
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            button {
-                width: 100%;
-            }
-
-            .preview-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .preview-item.full {
-                grid-column: span 1;
-            }
-        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="card">
-            <h2 class="form-title">Register New Student</h2>
+            <h2 class="form-title">Register New Student - Alpha University (2026)</h2>
             <?php if ($message != "") { ?>
                 <div class="msg"><?php echo $message; ?></div>
             <?php } ?>
@@ -681,7 +663,7 @@ if (isset($_POST['submit'])) {
                         <label>University</label>
                         <select name="university">
                             <option value="">SELECT UNIVERSITY</option>
-                            <option value="SUSHANT UNIVERSITY">SUSHANT UNIVERSITY</option>
+                            <option value="SUSHANT UNIVERSITY">ALPHA UNIVERSITY</option>
                         </select>
                     </div>
 

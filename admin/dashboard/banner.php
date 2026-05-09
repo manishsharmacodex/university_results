@@ -38,7 +38,10 @@ if (isset($_GET['delete'])) {
 <html>
 
 <head>
-    <title>Banner Add</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>University Banner Add</title>
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
 </head>
 
 <body>

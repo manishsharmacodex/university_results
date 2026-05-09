@@ -1,6 +1,6 @@
 <?php
-include("../../config/auth.php");
 include("../../server/connection.php");
+include("../../config/auth.php");
 
 
 // session for login
@@ -130,6 +130,7 @@ $activePage = "dashboard"; // change per page
             position: relative;
             overflow: hidden;
             transition: 0.3s;
+            cursor: pointer;
         }
 
         .card:hover {
@@ -181,8 +182,11 @@ $activePage = "dashboard"; // change per page
             background: linear-gradient(135deg, #14b8a6, #134e4a);
         }
 
+
+
+
         /* SLIDER */
-        .slider {
+        /* .slider {
             margin-top: 30px;
             height: 300px;
             overflow: hidden;
@@ -202,13 +206,7 @@ $activePage = "dashboard"; // change per page
             height: 300px;
             object-fit: cover;
             flex-shrink: 0;
-        }
-
-        @media(max-width:768px) {
-            .sidebar {
-                width: 200px;
-            }
-        }
+        } */
     </style>
 </head>
 
@@ -239,12 +237,12 @@ $activePage = "dashboard"; // change per page
                 <i class="fa-solid fa-bank"></i>Bank
             </a>
 
-            <a href="../../src/pages/student_details/add_students.php"
+            <a href="../../src/pages/add_student/add_students.php"
                 class="<?= $activePage == 'add_students' ? 'active' : '' ?>" target="_BLANK">
                 <i class="fa-solid fa-user-plus"></i>Add Student
             </a>
 
-            <a href="../../src/pages/student_details/student_list.php"
+            <a href="../../src/pages/student_list/student_list.php"
                 class="<?= $activePage == 'student_list' ? 'active' : '' ?>">
                 <i class="fa-solid fa-users"></i>Student List
             </a>
@@ -265,31 +263,31 @@ $activePage = "dashboard"; // change per page
 
                 <div class="card blue">
                     <i class="fa-solid fa-user-graduate"></i>
-                    <h3>Total Students</h3>
+                    <h3>Active Students</h3>
                     <p><?= $total_students ?></p>
                 </div>
 
                 <div class="card green">
                     <i class="fa-solid fa-file-signature"></i>
-                    <h3>Total Admissions</h3>
+                    <h3>Admissions</h3>
                     <p><?= $total_admissions ?></p>
                 </div>
 
                 <div class="card orange">
                     <i class="fa-solid fa-book"></i>
-                    <h3>Total Courses</h3>
+                    <h3>Courses</h3>
                     <p><?= $total_courses ?></p>
                 </div>
 
                 <div class="card purple">
                     <i class="fa-solid fa-envelope"></i>
-                    <h3>Total Queries</h3>
+                    <h3>Queries</h3>
                     <p><?= $total_contact_us ?></p>
                 </div>
 
                 <div class="card pink">
                     <i class="fa-solid fa-building"></i>
-                    <h3>Departments</h3>
+                    <h3>Schools</h3>
                     <p><?= $total_departments ?></p>
                 </div>
 
@@ -301,27 +299,30 @@ $activePage = "dashboard"; // change per page
 
             </div>
 
+
+
             <!-- SLIDER -->
-            <div class="slider">
+            <!-- <div class="slider">
                 <div class="slides" id="slides">
                     <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644">
                     <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d">
                     <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b">
                 </div>
-            </div>
+            </div> -->
 
         </div>
     </div>
 
     <script>
-        let index = 0;
-        const slides = document.getElementById("slides");
-        const totalSlides = slides.children.length;
+        // Script for the Slider
+        // let index = 0;
+        // const slides = document.getElementById("slides");
+        // const totalSlides = slides.children.length;
 
-        setInterval(() => {
-            index = (index + 1) % totalSlides;
-            slides.style.transform = "translateX(" + (-index * 100) + "%)";
-        }, 3000);
+        // setInterval(() => {
+        //     index = (index + 1) % totalSlides;
+        //     slides.style.transform = "translateX(" + (-index * 100) + "%)";
+        // }, 3000);
     </script>
 
 </body>

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Information - Alpha University</title>
-    <link rel="stylesheet" type="text/css" href="../../css/font.css">
+    <link rel="stylesheet" type="text/css" href="../../../css/font.css">
 
     <style>
         :root {
@@ -250,27 +250,30 @@
 
     <!-- NAVBAR -->
     <div class="navbar">
-        <div class="logo">Alpha University</div>
+        <a href="../../../index.php">
+            <div class="logo">Alpha University</div>
+        </a>
         <ul>
-            <a href="../../index.php">
+            <a href="../../../index.php">
                 <li>Home</li>
             </a>
             <li>Programs</li>
             <li>Admissions</li>
-            <a href="./results.php" target="_BLANK">
+            <a href="../results/results.php" target="_BLANK">
                 <li>Exam & Results</li>
             </a>
             <a href="./school_information.php">
                 <li>School Informations</li>
             </a>
-            <a href="./contact.php">
+            <a href="../contact_us/contact.php">
                 <li>Contact</li>
             </a>
         </ul>
         <!-- ✅ NEW BUTTONS -->
         <div class="nav-buttons">
             <button class="nav-btn student-btn">Student Login</button>
-            <a href="../../admin/auth/login.php" target="_BLANK"><button class="nav-btn admin-btn">Admin Login</button></a>
+            <a href="../../../admin/auth/login.php" target="_BLANK"><button class="nav-btn admin-btn">Admin
+                    Login</button></a>
         </div>
     </div>
 
@@ -392,7 +395,8 @@
         <div class="footer-bottom">
             © 2026 Alpha University | All Rights Reserved
         </div>
-</div>
+    </div>
 
 </body>
+
 </html>
