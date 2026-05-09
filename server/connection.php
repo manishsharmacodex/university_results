@@ -1,20 +1,42 @@
 <?php
 
-error_reporting(0);
+// Enable strict mysqli error reporting
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-$server_name = "localhost";
-$user_name = "root";
-$password = "admin@23bca";
-$db_name = "university_results";
+// Load Composer autoload
+require_once __DIR__ . '/../vendor/autoload.php';
 
-$conn = mysqli_connect($server_name, $user_name, $password, $db_name);
+use Dotenv\Dotenv;
 
-if ($conn) {
-    // echo "<script>
-    //     alert('Connection Successully');
-    // </script>";
-} else {
-    echo "Failed Connection" . mysqli_connect_error();
+try {
+
+    // FIX: point to project root (NOT /server folder)
+    $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+    $dotenv->load();
+
+    // Database configuration from ENV
+    $server_name = $_ENV['DB_HOST'];
+    $user_name   = $_ENV['DB_USER'];
+    $password    = $_ENV['DB_PASSWORD'];
+    $db_name     = $_ENV['DB_NAME'];
+
+    // Create connection
+    $conn = new mysqli(
+        $server_name,
+        $user_name,
+        $password,
+        $db_name
+    );
+
+    // Set charset
+    $conn->set_charset("utf8mb4");
+
+} catch (Exception $e) {
+
+    // Log actual error (never expose details to users)
+    error_log($e->getMessage());
+
+    die("Database connection failed. Please try again later.");
 }
 
 ?>
