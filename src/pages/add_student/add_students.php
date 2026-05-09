@@ -117,7 +117,7 @@ if (isset($_POST['submit'])) {
     $aadhaar_number = $_POST['aadhaar_number'];
 
     $bank_name = $_POST['bank_id'];
-    
+
     $section = generateSection($conn, $department, $course, $semester);
 
     $semester = $_POST['semester'];
@@ -733,7 +733,7 @@ if (isset($_POST['submit'])) {
         <div class="popup-box">
 
             <div class="success-icon">
-                <img src="../src/images/success_icon.png" alt="Success OK" class="success_icon">
+                <img src="../../assets/success_icon.png" alt="Success OK" class="success_icon">
             </div>
 
             <h2>Student Added Successfully</h2>

@@ -247,6 +247,11 @@ $activePage = "dashboard"; // change per page
                 <i class="fa-solid fa-users"></i>Student List
             </a>
 
+            <a href="../banner/list.php"
+                class="<?= $activePage == 'banner' ? 'active' : '' ?>">
+                <i class="fa-solid fa-users"></i>Banner
+            </a>
+
             <a href="../auth/logout.php" class="logout-btn">Logout</a>
         </div>
 

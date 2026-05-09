@@ -16,43 +16,89 @@ if (isset($_SESSION['message'])) {
 // session history check
 
 /* ================= ADD BANK ================= */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bank_master_id'])) {
-    $bank_master_id = intval($_POST['bank_master_id']);
 
-    // Check if bank already exists
-    $check = $conn->query("SELECT * FROM banks WHERE bank_master_id='$bank_master_id'");
-    if ($check->num_rows == 0) {
-        $conn->query("INSERT INTO banks (bank_master_id) VALUES ('$bank_master_id')");
-        $message = "Bank added successfully!";
-    } else {
-        $message = "Bank already exists!";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bank_master_id'])) {
+
+    $bank_master_id = (int)($_POST['bank_master_id']);
+
+    if ($bank_master_id <= 0) {
+        $_SESSION['message'] = "Invalid bank ID!";
+        header("Location: list.php");
+        exit;
     }
+
+    /* CHECK EXISTING */
+    $stmt = $conn->prepare("SELECT id FROM banks WHERE bank_master_id = ?");
+    $stmt->bind_param("i", $bank_master_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $stmt->close();
+
+    if ($result->num_rows > 0) {
+        $_SESSION['message'] = "Bank already exists!";
+        header("Location: list.php");
+        exit;
+    }
+
+    /* INSERT */
+    $stmt = $conn->prepare("INSERT INTO banks (bank_master_id) VALUES (?)");
+    if (!$stmt) {
+        $_SESSION['message'] = "Database error!";
+        header("Location: list.php");
+        exit;
+    }
+
+    $stmt->bind_param("i", $bank_master_id);
+
+    if ($stmt->execute()) {
+        $_SESSION['message'] = "Bank added successfully!";
+    } else {
+        $_SESSION['message'] = "Insert failed!";
+    }
+
+    $stmt->close();
+
+    header("Location: list.php");
+    exit;
 }
+
 
 $activePage = "bank"; // change per page
 
 /* ================= PAGINATION ================= */
 $limit = 6;
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$page = isset($_GET['page']) && is_numeric($_GET['page'])
+    ? (int) $_GET['page']
+    : 1;
+
 $offset = ($page - 1) * $limit;
 
-// Count total banks
+/* TOTAL RECORDS */
 $total_result = $conn->query("SELECT COUNT(*) AS total FROM banks");
 $total_row = $total_result->fetch_assoc();
-$total_records = $total_row['total'];
+$total_records = (int)$total_row['total'];
+
 $total_pages = ceil($total_records / $limit);
 
-// Fetch banks for current page
+/* FETCH BANKS */
 $result = $conn->query("
-    SELECT banks.id, bank_master.bank_name, banks.bank_master_id
+    SELECT 
+        banks.id,
+        banks.bank_master_id,
+        bank_master.bank_name
     FROM banks
-    JOIN bank_master ON banks.bank_master_id = bank_master.id
+    INNER JOIN bank_master 
+        ON banks.bank_master_id = bank_master.id
     ORDER BY banks.id ASC
     LIMIT $limit OFFSET $offset
 ");
 
-// Fetch all bank_master for dropdown
-$bank_master_result = $conn->query("SELECT * FROM bank_master ORDER BY bank_name ASC");
+/* DROPDOWN DATA */
+$bank_master_result = $conn->query("
+    SELECT * 
+    FROM bank_master 
+    ORDER BY bank_name ASC
+");
 ?>
 
 <!DOCTYPE html>
@@ -366,6 +412,11 @@ $bank_master_result = $conn->query("SELECT * FROM bank_master ORDER BY bank_name
             <a href="../../src/pages/student_list/student_list.php"
                 class="<?= $activePage == 'student_list' ? 'active' : '' ?>">
                 <i class="fa-solid fa-users"></i>Student List
+            </a>
+
+            <a href="../banner/list.php"
+                class="<?= $activePage == 'banner' ? 'active' : '' ?>">
+                <i class="fa-solid fa-users"></i>Banner
             </a>
 
             <a href="../auth/logout.php" class="logout-btn">Logout</a>

@@ -15,35 +15,89 @@ if (isset($_SESSION['message'])) {
 }
 // session history check
 
-/* ================= ADD DEPARTMENT ================= */
-if (isset($_POST['add_department'])) {
-    $name = strtoupper($conn->real_escape_string($_POST['name']));
 
-    // Check if department already exists
-    $check = $conn->query("SELECT * FROM departments WHERE name='$name'");
-    if ($check->num_rows == 0) {
-        $conn->query("INSERT INTO departments (name) VALUES ('$name')");
-        $message = "Department added successfully!";
-    } else {
-        $message = "Department already exists!";
+/* ================= ADD BANNER ================= */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
+
+    $title = trim($_POST['title']);
+    $description = trim($_POST['description']);
+
+    /* VALIDATION */
+    if ($title === '' || $description === '') {
+        $_SESSION['message'] = "Invalid data!";
+        header("Location: list.php");
+        exit;
     }
+
+    if (empty($_FILES['banner_image']['name'])) {
+        $_SESSION['message'] = "Image is required!";
+        header("Location: list.php");
+        exit;
+    }
+
+    $file = $_FILES['banner_image'];
+    $file_name = time() . "_" . basename($file['name']);
+    $tmp_name = $file['tmp_name'];
+
+    $upload_path = "../uploads/banners/" . $file_name;
+
+    /* UPLOAD CHECK */
+    if (!move_uploaded_file($tmp_name, $upload_path)) {
+        $_SESSION['message'] = "Upload failed!";
+        header("Location: list.php");
+        exit;
+    }
+
+    /* INSERT */
+    $stmt = $conn->prepare("
+        INSERT INTO banners (image, title, description)
+        VALUES (?, ?, ?)
+    ");
+
+    if (!$stmt) {
+        $_SESSION['message'] = "Database error!";
+        header("Location: list.php");
+        exit;
+    }
+
+    $stmt->bind_param("sss", $file_name, $title, $description);
+
+    if ($stmt->execute()) {
+        $_SESSION['message'] = "Banner added successfully!";
+    } else {
+        $_SESSION['message'] = "Insert failed!";
+    }
+
+    $stmt->close();
+
+    header("Location: list.php");
+    exit;
 }
 
-$activePage = "department"; // change per page
+$activePage = "banner";
 
 /* ================= PAGINATION ================= */
-$limit = 6; // number of records per page
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$limit = 6;
+$page = isset($_GET['page']) && is_numeric($_GET['page'])
+    ? (int) $_GET['page']
+    : 1;
+
 $offset = ($page - 1) * $limit;
 
-// Count total departments
-$total_result = $conn->query("SELECT COUNT(*) as total FROM departments");
+/* TOTAL RECORDS */
+$total_result = $conn->query("SELECT COUNT(*) AS total FROM banners");
 $total_row = $total_result->fetch_assoc();
-$total_records = $total_row['total'];
+$total_records = (int) $total_row['total'];
+
 $total_pages = ceil($total_records / $limit);
 
-// Fetch departments for current page
-$result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit OFFSET $offset");
+/* FETCH BANNERS */
+$result = $conn->query("
+    SELECT *
+    FROM banners
+    ORDER BY id DESC
+    LIMIT $limit OFFSET $offset
+");
 ?>
 
 <!DOCTYPE html>
@@ -52,7 +106,7 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Departments</title>
+    <title>Banners</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
@@ -128,6 +182,16 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             color: #111827;
         }
 
+        .breadcrumb {
+            margin-bottom: 20px;
+            color: #6b7280;
+        }
+
+        .breadcrumb a {
+            text-decoration: none;
+            color: #2563eb;
+        }
+
         .breadcrum-header {
             width: 100%;
             display: block;
@@ -140,16 +204,6 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             letter-spacing: 0.5px;
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
             margin-bottom: 15px;
-        }
-
-        .breadcrumb {
-            margin-bottom: 20px;
-            color: #6b7280;
-        }
-
-        .breadcrumb a {
-            text-decoration: none;
-            color: #2563eb;
         }
 
         .add-btn {
@@ -241,11 +295,12 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
         }
 
         .modal-box h3 {
-            margin-bottom: 15px;
             text-align: center;
             color: #111827;
+            margin-bottom: 15px;
         }
 
+        .modal-box select,
         .modal-box input {
             width: 100%;
             padding: 12px;
@@ -276,7 +331,6 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             cursor: pointer;
         }
 
-        /* Pagination */
         .pagination {
             margin-top: 20px;
         }
@@ -295,7 +349,6 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             color: white;
         }
 
-
         .toast {
             position: fixed;
             bottom: 20px;
@@ -304,13 +357,11 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
             color: white;
             padding: 14px 18px;
             border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
             font-size: 14px;
             opacity: 0;
             transform: translateY(20px);
             transition: 0.4s ease;
             z-index: 9999;
-            min-width: 220px;
         }
 
         .toast.show {
@@ -329,9 +380,7 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
 </head>
 
 <body>
-
     <div class="container">
-
         <!-- SIDEBAR -->
         <div class="sidebar">
             <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
@@ -339,7 +388,7 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
                 <i class="fa-solid fa-gauge"></i>Dashboard
             </a>
 
-            <a href="./list.php" class="<?= $activePage == 'department' ? 'active' : '' ?>">
+            <a href="../department/list.php" class="<?= $activePage == 'department' ? 'active' : '' ?>">
                 <i class="fa-solid fa-building"></i>Department
             </a>
 
@@ -365,23 +414,17 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
                 <i class="fa-solid fa-users"></i>Student List
             </a>
 
-            <a href="../banner/list.php"
-                class="<?= $activePage == 'banner' ? 'active' : '' ?>">
+            <a href="./list.php" class="<?= $activePage == 'banner' ? 'active' : '' ?>">
                 <i class="fa-solid fa-users"></i>Banner
             </a>
 
             <a href="../auth/logout.php" class="logout-btn">Logout</a>
         </div>
 
-
-        <!-- this code is main -->
+        <!-- Main Dashboard -->
         <div class="main">
-
-            <h2 class="breadcrum-header">Departments</h2>
-
-            <div class="breadcrumb">
-                <a href="../dashboard/index.php">Dashboard</a> / Departments
-            </div>
+            <h2 class="breadcrum-header">Banner</h2>
+            <div class="breadcrumb"><a href="../dashboard/index.php">Dashboard</a> / Banner</div>
 
             <?php if ($message != ''): ?>
                 <script>
@@ -391,34 +434,48 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
                 </script>
             <?php endif; ?>
 
-            <!-- Add Department Button -->
             <a class="add-btn" href="#" onclick="document.getElementById('addModal').style.display='flex'">
-                <i class="fa fa-plus"></i> Add New Department
+                <i class="fa fa-plus"></i> Add New Banner
             </a>
 
             <table>
                 <tr>
                     <th>ID</th>
-                    <th>Department Name</th>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Description</th>
                     <th>Action</th>
                 </tr>
-                <?php while ($row = $result->fetch_assoc()) { ?>
+                <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
                         <td><?= $row['id'] ?></td>
-                        <td><?= $row['name'] ?></td>
+
+                        <td>
+                            <img src="../uploads/banners/<?= $row['image'] ?>" width="80">
+                        </td>
+
+                        <td><?= htmlspecialchars($row['title']) ?></td>
+
+                        <td><?= htmlspecialchars($row['description']) ?></td>
+
                         <td class="action">
+
                             <a href="#" class="edit" onclick="
-                                document.getElementById('dept_id').value='<?= $row['id'] ?>';
-                                document.getElementById('dept_name').value='<?= addslashes($row['name']) ?>';
-                                document.getElementById('editModal').style.display='flex';
-                            ">Edit</a>
+                document.getElementById('edit_id').value='<?= $row['id'] ?>';
+                document.getElementById('edit_title').value='<?= htmlspecialchars($row['title']) ?>';
+                document.getElementById('edit_description').value='<?= htmlspecialchars($row['description']) ?>';
+                document.getElementById('editModal').style.display='flex';
+           ">
+                                Edit
+                            </a>
 
                             <a href="#" class="delete" onclick="openDeleteModal(<?= $row['id'] ?>)">
                                 Delete
                             </a>
+
                         </td>
                     </tr>
-                <?php } ?>
+                <?php endwhile; ?>
             </table>
 
             <!-- Pagination -->
@@ -435,42 +492,67 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
                     <a href="?page=<?= $page + 1 ?>">Next</a>
                 <?php endif; ?>
             </div>
-
         </div>
     </div>
 
     <!-- ADD MODAL -->
     <div class="modal" id="addModal">
         <div class="modal-box">
-            <h3>Add Department</h3>
-            <form method="POST">
-                <input type="text" name="name" placeholder="Department Name" required>
-                <button type="submit" name="add_department" class="save-btn">Add Department</button>
+            <h3>Add Banner</h3>
+
+            <form method="POST" enctype="multipart/form-data">
+
+                <input type="text" name="title" id="edit_title" placeholder="Enter Title" required>
+
+                <input type="text" name="description" id="edit_description" placeholder="Enter Description" required>
+
+                <input type="file" name="banner_image" id="edit_image" accept="image/*" required>
+
+                <button type="submit" class="save-btn">Add Banner</button>
+
                 <button type="button" class="close-btn"
-                    onclick="document.getElementById('addModal').style.display='none'">Cancel</button>
+                    onclick="document.getElementById('addModal').style.display='none'">
+                    Cancel
+                </button>
+
             </form>
         </div>
     </div>
 
-    <!-- EDIT MODAL -->
+    <!-- EDIT BANNER MODAL -->
     <div class="modal" id="editModal">
         <div class="modal-box">
-            <h3>Edit Department</h3>
-            <form method="POST" action="edit.php">
-                <input type="hidden" name="id" id="dept_id">
-                <input type="text" name="name" id="dept_name" required>
+            <h3>Edit Banner</h3>
+
+            <form method="POST" action="edit.php" enctype="multipart/form-data">
+
+                <!-- hidden ID -->
+                <input type="hidden" name="id" id="edit_id">
+
+                <!-- title -->
+                <input type="text" name="title" id="edit_title" placeholder="Enter Title">
+
+                <!-- description -->
+                <input type="text" name="description" id="edit_description" placeholder="Enter Description">
+
+                <!-- image (optional update) -->
+                <input type="file" name="banner_image" id="edit_image" accept="image/*">
+
                 <button type="submit" class="save-btn">Update</button>
+
                 <button type="button" class="close-btn"
-                    onclick="document.getElementById('editModal').style.display='none'">Cancel</button>
+                    onclick="document.getElementById('editModal').style.display='none'">
+                    Cancel
+                </button>
+
             </form>
         </div>
     </div>
 
-
-    <!-- DELETE DEPARTMENT MODEL -->
+    <!-- DELETE BANK MODAL -->
     <div id="deleteModal" class="modal">
         <div class="modal-box">
-            <h3>Delete Department ?</h3>
+            <h3>Delete Banner ?</h3>
 
             <form method="POST" action="delete.php">
                 <input type="hidden" name="id" id="delete_id">
@@ -479,36 +561,29 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
                     Yes, Delete
                 </button>
 
-                <button type="button" class="close-btn" onclick="closeDeleteModal()">
+                <button type="button" class="close-btn"
+                    onclick="document.getElementById('deleteModal').style.display='none'">
                     Cancel
                 </button>
             </form>
         </div>
     </div>
 
+
     <!-- Toast Notification Message -->
     <div id="toast" class="toast"></div>
 
+
     <script>
-        // Uppercase input
-        document.querySelectorAll("input[type='text'], textarea").forEach(field => {
-            field.addEventListener("input", function () {
-                this.value = this.value.toUpperCase();
-            });
-        });
-
-
-        // funtion for delete model
         function openDeleteModal(id) {
             document.getElementById('delete_id').value = id;
-            document.getElementById('deleteModal').style.display = "flex";
+            document.getElementById('deleteModal').style.display = 'flex';
         }
 
         function closeDeleteModal() {
-            document.getElementById('deleteModal').style.display = "none";
+            document.getElementById("deleteModal").style.display = "none";
         }
 
-        // toast notification
         function showToast(message, type = "success") {
             const toast = document.getElementById("toast");
 
