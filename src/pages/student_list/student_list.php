@@ -132,16 +132,12 @@ $result = $conn->query($sql);
             margin-bottom: 15px;
         }
 
-        .card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
         }
 
         th {
@@ -153,11 +149,19 @@ $result = $conn->query($sql);
 
         td {
             padding: 14px;
-            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
         }
 
         tr:hover {
-            background: #f3f6ff;
+            background: #f3f4f6;
+        }
+
+        .action a {
+            padding: 6px 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            margin-right: 5px;
         }
 
         .avatar {
@@ -326,7 +330,8 @@ $result = $conn->query($sql);
                 <i class="fa-solid fa-bank"></i>Bank
             </a>
 
-            <a href="../add_student/add_students.php" class="<?= $activePage == 'add_students' ? 'active' : '' ?>" target="_BLANK">
+            <a href="../add_student/add_students.php" class="<?= $activePage == 'add_students' ? 'active' : '' ?>"
+                target="_BLANK">
                 <i class="fa-solid fa-user-plus"></i>Add Student
             </a>
 
@@ -344,42 +349,52 @@ $result = $conn->query($sql);
                 <a href="../../../admin/dashboard/index.php">Dashboard</a> / Student Lists
             </div>
 
-            <div class="card">
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Photo</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Course</th>
+                    <th>Action</th>
+                </tr>
 
-                <table>
+                <?php while ($row = $result->fetch_assoc()): ?>
                     <tr>
-                        <th>ID</th>
-                        <th>Photo</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Course</th>
-                        <th>Action</th>
+                        <td><?= $row['student_id'] ?></td>
+
+                        <td>
+                            <?php if ($row['photo']) { ?>
+                                <img src="../../../admin/uploads/student_profile/<?= $row['photo'] ?>" class="avatar">
+                            <?php } ?>
+                        </td>
+
+                        <td><?= $row['full_name'] ?></td>
+                        <td><?= $row['phone'] ?></td>
+                        <td><?= $row['course_name'] ?></td>
+
+                        <td>
+                            <button class="btn" onclick="openModal(<?= $row['id'] ?>)">View</button>
+                        </td>
                     </tr>
+                <?php endwhile; ?>
 
-                    <?php while ($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td><?= $row['student_id'] ?></td>
+            </table>
 
-                            <td>
-                                <?php if ($row['photo']) { ?>
-                                    <img src="../../../admin/uploads/student_profile/<?= $row['photo'] ?>" class="avatar">
-                                <?php } ?>
-                            </td>
+            <!-- Pagination -->
+            <div class="pagination">
+                <?php if ($page > 1): ?>
+                    <a href="?page=<?= $page - 1 ?>">Prev</a>
+                <?php endif; ?>
 
-                            <td><?= $row['full_name'] ?></td>
-                            <td><?= $row['phone'] ?></td>
-                            <td><?= $row['course_name'] ?></td>
+                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                    <a href="?page=<?= $i ?>" class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
+                <?php endfor; ?>
 
-                            <td>
-                                <button class="btn" onclick="openModal(<?= $row['id'] ?>)">View</button>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-
-                </table>
-
+                <?php if ($page < $total_pages): ?>
+                    <a href="?page=<?= $page + 1 ?>">Next</a>
+                <?php endif; ?>
             </div>
-
         </div>
     </div>
 
@@ -418,7 +433,9 @@ $result = $conn->query($sql);
                 .then(res => res.json())
                 .then(data => {
 
-                    document.getElementById("mPhoto").src = data.photo ? `uploads/${data.photo}` : `https://via.placeholder.com/80`;
+                    document.getElementById("mPhoto").src = data.photo_url
+                        ? data.photo_url
+                        : "https://via.placeholder.com/80";
                     document.getElementById("mName").innerText = data.full_name;
                     document.getElementById("mId").innerText = data.student_id;
 
@@ -489,7 +506,7 @@ $result = $conn->query($sql);
             })
                 .then(res => res.text())
                 .then(res => {
-                    alert("Updated");
+                    alert("Student Details Updated Successfully");
                     closeModal();
                     location.reload();
                 });

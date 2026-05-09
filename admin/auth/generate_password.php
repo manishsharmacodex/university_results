@@ -1,15 +1,8 @@
 <?php
+$password = "admin"; // <-- set your admin password here
 
-function generatePassword($length = 16) {
-    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+';
-    
-    $password = '';
-    for ($i = 0; $i < $length; $i++) {
-        $password .= $chars[random_int(0, strlen($chars) - 1)];
-    }
+$hash = password_hash($password, PASSWORD_BCRYPT);
 
-    return $password;
-}
-
-echo generatePassword();
+echo "Plain Password : " . $password . "<br>";
+echo "Hashed Password : " . $hash;
 ?>

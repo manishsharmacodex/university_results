@@ -416,7 +416,7 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
                 <?php } ?>
             </table>
 
-            <!-- Pagination Links -->
+            <!-- Pagination -->
             <div class="pagination">
                 <?php if ($page > 1): ?>
                     <a href="?page=<?= $page - 1 ?>">Prev</a>

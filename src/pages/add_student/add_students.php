@@ -97,7 +97,7 @@ if (isset($_POST['submit'])) {
 
     $full_name = $_POST['full_name'];
     $father_name = $_POST['father_name'];
-    $mother_name = $_POST['mother_name']; // ✅ ADDED
+    $mother_name = $_POST['mother_name'];
 
     $dob_input = $_POST['dob'];
     $admission_input = $_POST['admission_date'];
@@ -117,9 +117,8 @@ if (isset($_POST['submit'])) {
     $aadhaar_number = $_POST['aadhaar_number'];
 
     $bank_name = $_POST['bank_id'];
-
-    // $section = $_POST['section'];
-    // $section = generateSection($conn, $department, $course, $semester);
+    
+    $section = generateSection($conn, $department, $course, $semester);
 
     $semester = $_POST['semester'];
 

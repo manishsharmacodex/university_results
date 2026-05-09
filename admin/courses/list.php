@@ -48,12 +48,12 @@ $total_pages = ceil($total_records / $limit);
 
 // Fetch courses for current page
 $result = $conn->query("
-    SELECT courses.id, courses.course_name, courses.department_id, departments.name AS department_name
-    FROM courses
-    JOIN departments ON courses.department_id = departments.id
-    ORDER BY courses.id ASC
-    LIMIT $limit OFFSET $offset
-");
+        SELECT courses.id, courses.course_name, courses.department_id, departments.name AS department_name
+        FROM courses
+        JOIN departments ON courses.department_id = departments.id
+        ORDER BY courses.id ASC
+        LIMIT $limit OFFSET $offset
+    ");
 
 // Fetch all departments for dropdown
 $departments = $conn->query("SELECT * FROM departments");
@@ -229,7 +229,7 @@ $departments = $conn->query("SELECT * FROM departments");
             width: 100%;
             height: 100%;
             /* background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px); */
+                backdrop-filter: blur(8px); */
             justify-content: center;
             align-items: center;
             z-index: 999;
@@ -407,11 +407,11 @@ $departments = $conn->query("SELECT * FROM departments");
                         <td><?= $row['department_name'] ?></td>
                         <td class="action">
                             <a href="#" class="edit" onclick="
-                            document.getElementById('course_id').value='<?= $row['id'] ?>';
-                            document.getElementById('course_name').value='<?= addslashes($row['course_name']) ?>';
-                            document.getElementById('department_select').value='<?= $row['department_id'] ?>';
-                            document.getElementById('editModal').style.display='flex';
-                        ">Edit</a>
+                                document.getElementById('course_id').value='<?= $row['id'] ?>';
+                                document.getElementById('course_name').value='<?= addslashes($row['course_name']) ?>';
+                                document.getElementById('department_select').value='<?= $row['department_id'] ?>';
+                                document.getElementById('editModal').style.display='flex';
+                            ">Edit</a>
 
                             <a href="#" class="delete" onclick="openDeleteModal(<?= $row['id'] ?>)">
                                 Delete
