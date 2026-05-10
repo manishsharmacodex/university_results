@@ -1,29 +1,57 @@
 <?php
-include("../../../server/connection.php");
+
+// DB Connection
+include(__DIR__ . "/../../../server/connection.php");
 
 $message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $name = htmlspecialchars($_POST['name']);
-    $email = htmlspecialchars($_POST['email']);
+    // Safe input handling
+    $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $msg = trim($_POST['message'] ?? '');
 
-    $subject = ($_POST['subject'] == "Other")
-        ? htmlspecialchars($_POST['custom_subject'])
-        : htmlspecialchars($_POST['subject']);
+    $subject = trim($_POST['subject'] ?? '');
 
-    $msg = htmlspecialchars($_POST['message']);
+    // Handle custom subject safely (FIXED)
+    if ($subject === "Other") {
+        $custom = trim($_POST['custom_subject'] ?? '');
 
-    $stmt = $conn->prepare("INSERT INTO university_results.contact_us (name, email, subject, message) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $name, $email, $subject, $msg);
-
-    if ($stmt->execute()) {
-        $message = "✅ Thank you, $name! Your message has been sent successfully.";
-    } else {
-        $message = "❌ Something went wrong. Please try again.";
+        if ($custom !== '') {
+            $subject = $custom;
+        } else {
+            $subject = "Other";
+        }
     }
 
-    $stmt->close();
+    // Basic validation
+    if ($name === '' || $email === '' || $subject === '' || $msg === '') {
+        $message = "❌ All fields are required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $message = "❌ Invalid email format.";
+    } else {
+
+        $stmt = $conn->prepare("
+            INSERT INTO university_results.contact_us 
+            (name, email, subject, message) 
+            VALUES (?, ?, ?, ?)
+        ");
+
+        if (!$stmt) {
+            die("Prepare failed: " . $conn->error);
+        }
+
+        $stmt->bind_param("ssss", $name, $email, $subject, $msg);
+
+        if ($stmt->execute()) {
+            $message = "✅ Thank you, $name! Your message has been sent successfully.";
+        } else {
+            $message = "❌ Something went wrong. Please try again.";
+        }
+
+        $stmt->close();
+    }
 }
 ?>
 
@@ -35,6 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact Us - Alpha University</title>
     <link rel="stylesheet" type="text/css" href="../../../css/font.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
         :root {
@@ -173,6 +202,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin-bottom: 18px;
         }
 
+        .field.customSubject {
+            display: none;
+        }
+
         /* ALL INPUTS SAME HEIGHT */
         .field input,
         .field select,
@@ -191,7 +224,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             height: 120px;
             padding: 12px;
             resize: none;
-            /* ❌ REMOVE DRAG */
         }
 
         /* FOCUS EFFECT */
@@ -272,22 +304,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: #777;
             font-size: 13px;
         }
-    </style>
 
-    <script>
-        function toggleCustomSubject(val) {
-            document.getElementById("customSubject").style.display =
-                val === "Other" ? "block" : "none";
+        .info-item i {
+            margin-right: 8px;
+            color: var(--primary);
         }
-    </script>
-
+    </style>
 </head>
 
 <body>
 
     <!-- NAVBAR -->
     <div class="navbar">
-       <a href="../../../index.php">
+        <a href="../../../index.php">
             <div class="logo">Alpha University</div>
         </a>
         <ul>
@@ -306,10 +335,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <li>Contact</li>
             </a>
         </ul>
-        <!-- ✅ NEW BUTTONS -->
+        <!-- NEW BUTTONS -->
         <div class="nav-buttons">
             <button class="nav-btn student-btn">Student Login</button>
-            <a href="../../../admin/auth/login.php" target="_BLANK"><button class="nav-btn admin-btn">Admin Login</button></a>
+            <a href="../../../admin/auth/login.php" target="_BLANK"><button class="nav-btn admin-btn">Admin
+                    Login</button></a>
         </div>
     </div>
 
@@ -325,10 +355,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <!-- LEFT -->
         <div class="info-box">
             <h2>Contact Information</h2>
-            <p class="info-item">📍 Gurugram, Haryana, India</p>
-            <p class="info-item">📞 +91 9876543210</p>
-            <p class="info-item">✉️ support@alphauniversity.com</p>
-            <p class="info-item">🕒 Mon - Sat (9AM - 5PM)</p>
+            <p class="info-item"><i class="fa-solid fa-location-dot"></i> Gurugram, Haryana, India</p>
+
+            <p class="info-item"><i class="fa-solid fa-phone"></i> +91 9876543210</p>
+
+            <p class="info-item"><i class="fa-solid fa-envelope"></i> support@alphauniversity.com</p>
+
+            <p class="info-item"><i class="fa-solid fa-clock"></i> Mon - Sat (9AM - 5PM)</p>
         </div>
 
         <!-- FORM -->
@@ -345,15 +378,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form method="POST">
 
                 <div class="field">
-                    <input type="text" name="name" placeholder="Full Name" required>
+                    <input type="text" name="name" placeholder="Enter Full Name">
                 </div>
 
                 <div class="field">
-                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="email" name="email" placeholder="Enter Email Address">
                 </div>
 
                 <div class="field">
-                    <select name="subject" onchange="toggleCustomSubject(this.value)" required>
+                    <select name="subject" onchange="toggleCustomSubject(this.value)">
                         <option value="">Select Subject</option>
                         <option>Admission Inquiry</option>
                         <option>Course Details</option>
@@ -367,12 +400,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </select>
                 </div>
 
-                <div class="field" id="customSubject" style="display:none;">
+                <div class="field customSubject" id="customSubject">
                     <input type="text" name="custom_subject" placeholder="Custom Subject">
                 </div>
 
                 <div class="field">
-                    <textarea name="message" placeholder="Your Message" required></textarea>
+                    <textarea name="message" placeholder="Enter Your Message"></textarea>
                 </div>
 
                 <button class="btn">Send Message</button>
@@ -415,8 +448,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="footer-bottom">
             © 2026 Alpha University | All Rights Reserved
         </div>
-</div>
+    </div>
 
 </body>
 
 </html>
+
+<script>
+    function toggleCustomSubject(val) {
+        document.getElementById("customSubject").style.display =
+            val === "Other" ? "block" : "none";
+    }
+</script>
