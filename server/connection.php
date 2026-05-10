@@ -10,31 +10,34 @@ use Dotenv\Dotenv;
 
 try {
 
-    // FIX: point to project root (NOT /server folder)
+    // Load .env from project root
     $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
     $dotenv->load();
 
-    // Database configuration from ENV
-    $server_name = $_ENV['DB_HOST'];
-    $user_name   = $_ENV['DB_USER'];
-    $password    = $_ENV['DB_PASSWORD'];
-    $db_name     = $_ENV['DB_NAME'];
+    // Validate required ENV variables
+    if (
+        empty($_ENV['DB_HOST']) ||
+        empty($_ENV['DB_USER']) ||
+        empty($_ENV['DB_NAME'])
+    ) {
+        throw new Exception("Missing database environment variables");
+    }
 
-    // Create connection
+    // Create MySQL connection
     $conn = new mysqli(
-        $server_name,
-        $user_name,
-        $password,
-        $db_name
+        $_ENV['DB_HOST'],
+        $_ENV['DB_USER'],
+        $_ENV['DB_PASSWORD'] ?? '',
+        $_ENV['DB_NAME']
     );
 
     // Set charset
     $conn->set_charset("utf8mb4");
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
 
-    // Log actual error (never expose details to users)
-    error_log($e->getMessage());
+    // Log real error (do not expose to users)
+    error_log("DB Connection Error: " . $e->getMessage());
 
     die("Database connection failed. Please try again later.");
 }

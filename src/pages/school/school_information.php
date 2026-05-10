@@ -259,7 +259,7 @@
                 <li>Contact</li>
             </a>
         </ul>
-        <!-- ✅ NEW BUTTONS -->
+        <!-- NEW BUTTONS -->
         <div class="nav-buttons">
             <button class="nav-btn student-btn">Student Login</button>
             <a href="../../../admin/auth/login.php" target="_BLANK"><button class="nav-btn admin-btn">Admin
