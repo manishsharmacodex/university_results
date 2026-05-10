@@ -1,6 +1,10 @@
 <?php
-include("../../server/connection.php");
 session_start();
+
+// Prevent browser cache
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
 
 // If already logged in → redirect to dashboard
 if (isset($_SESSION['admin'])) {
@@ -8,11 +12,8 @@ if (isset($_SESSION['admin'])) {
     exit;
 }
 
-// Prevent browser cache
-header("Cache-Control: no-cache, no-store, must-revalidate");
-header("Pragma: no-cache");
-header("Expires: 0");
-// If already logged in → redirect to dashboard
+// DB Connection File include
+include(__DIR__ . "/../../server/connection.php");
 
 
 // Function to generate captcha
@@ -48,19 +49,27 @@ if (isset($_POST['refresh_captcha'])) {
     exit;
 }
 
+
+// login logic
 if (isset($_POST['login'])) {
 
-    $username = trim($_POST['username']);
-    $password = $_POST['password'];
-    $captcha = $_POST['captcha'];
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $captcha = $_POST['captcha'] ?? '';
 
-    // CAPTCHA check
-    if ((int) $captcha !== getCaptchaAnswer()) {
+    if ($username === '' || $password === '') {
+        $error = "All fields are required";
+        generateCaptcha();
+
+    } elseif (
+        !isset($_SESSION['num1'], $_SESSION['num2'], $_SESSION['operator']) ||
+        (int) $captcha !== getCaptchaAnswer()
+    ) {
         $error = "Wrong CAPTCHA answer";
         generateCaptcha();
+
     } else {
 
-        // 🔐 SECURE QUERY (Prepared Statement)
         $stmt = $conn->prepare("SELECT user_name, password FROM university_results.admin_user WHERE user_name = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -70,9 +79,9 @@ if (isset($_POST['login'])) {
 
             $row = $result->fetch_assoc();
 
-            // VERIFY HASH PASSWORD
             if (password_verify($password, $row['password'])) {
 
+                session_regenerate_id(true);
                 $_SESSION['admin'] = $username;
 
                 unset($_SESSION['num1'], $_SESSION['num2'], $_SESSION['operator']);
@@ -103,9 +112,13 @@ if (isset($_POST['login'])) {
     <title>ERP Admin Login</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
     <style>
-        body {
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
             background: linear-gradient(135deg, #081224, #0e1c35);
             height: 100vh;
             display: flex;
@@ -116,7 +129,7 @@ if (isset($_POST['login'])) {
         .login-box {
             background: #fff;
             padding: 40px;
-            width: 360px;
+            width: 380px;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             text-align: center;
@@ -183,7 +196,7 @@ if (isset($_POST['login'])) {
 </head>
 
 <body>
-
+    <!-- Login box -->
     <div class="login-box">
 
         <h2>ERP Admin Login</h2>
@@ -201,9 +214,9 @@ if (isset($_POST['login'])) {
             <div class="captcha-container">
                 <div class="captcha-text">
                     What is
-                    <span id="num1"><?= $_SESSION['num1'] ?></span>
-                    <span id="operator"><?= $_SESSION['operator'] ?></span>
-                    <span id="num2"><?= $_SESSION['num2'] ?></span> ?
+                    <span id="num1"><?= $_SESSION['num1'] ?? '' ?></span>
+                    <span id="operator"><?= $_SESSION['operator'] ?? '' ?></span>
+                    <span id="num2"><?= $_SESSION['num2'] ?? '' ?></span> ?
                 </div>
 
                 <button type="button" class="refresh-btn" onclick="refreshCaptcha()">↻ Refresh Captcha</button>
@@ -214,7 +227,6 @@ if (isset($_POST['login'])) {
             <input type="submit" name="login" value="LOGIN">
 
         </form>
-
     </div>
 
 </body>
@@ -224,11 +236,13 @@ if (isset($_POST['login'])) {
 <script>
     // session history
     if (window.history && window.history.pushState) {
-        window.history.pushState(null, null, window.location.href);
+        window.history.pushState(null, document.title, window.location.href);
+
         window.onpopstate = function () {
-            window.location.href = "../dashboard/index.php";
+            window.history.pushState(null, document.title, window.location.href);
         };
     }
+
 
     // function for refresh captcha code
     function refreshCaptcha() {
@@ -238,10 +252,13 @@ if (isset($_POST['login'])) {
 
         xhr.onload = function () {
             if (this.status === 200) {
-                let data = this.responseText.split("|");
-                document.getElementById("num1").innerText = data[0];
-                document.getElementById("operator").innerText = data[1];
-                document.getElementById("num2").innerText = data[2];
+                let data = this.responseText.trim().split("|");
+
+                if (data.length === 3) {
+                    document.getElementById("num1").innerText = data[0];
+                    document.getElementById("operator").innerText = data[1];
+                    document.getElementById("num2").innerText = data[2];
+                }
             }
         };
 
