@@ -2,21 +2,23 @@
 session_start();
 
 // Prevent browser cache
-header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
-header("Expires: 0");
+header("Expires: Sat, 01 Jan 2000 00:00:00 GMT");
 
-// If already logged in → redirect to dashboard
-if (isset($_SESSION['admin'])) {
+// Redirect if already logged in
+if (!empty($_SESSION['admin'])) {
     header("Location: ../dashboard/index.php");
     exit;
 }
 
-// DB Connection File include
 include(__DIR__ . "/../../server/connection.php");
 
+$error = "";
 
-// Function to generate captcha
+/* ---------------- CAPTCHA FUNCTIONS ---------------- */
+
 function generateCaptcha()
 {
     $_SESSION['num1'] = rand(1, 20);
@@ -24,65 +26,80 @@ function generateCaptcha()
     $_SESSION['operator'] = rand(0, 1) ? '+' : '-';
 }
 
-// Generate CAPTCHA initially
-if (!isset($_SESSION['num1'])) {
+function getCaptchaAnswer()
+{
+    return ($_SESSION['operator'] === '+')
+        ? $_SESSION['num1'] + $_SESSION['num2']
+        : $_SESSION['num1'] - $_SESSION['num2'];
+}
+
+function resetCaptcha()
+{
     generateCaptcha();
 }
 
-// Calculate answer
-function getCaptchaAnswer()
+/* Common error handler (FIXED: moved outside login block) */
+function setError(&$error, $msg)
 {
-    if ($_SESSION['operator'] === '+') {
-        return $_SESSION['num1'] + $_SESSION['num2'];
-    } else {
-        return $_SESSION['num1'] - $_SESSION['num2'];
-    }
+    $error = $msg;
+    resetCaptcha();
 }
 
-// error message display on login form
-$error = "";
+/* Ensure CAPTCHA exists */
+if (!isset($_SESSION['num1'], $_SESSION['num2'], $_SESSION['operator'])) {
+    generateCaptcha();
+}
 
-// AJAX request for refreshing captcha
+/* ---------------- AJAX CAPTCHA REFRESH ---------------- */
+
 if (isset($_POST['refresh_captcha'])) {
     generateCaptcha();
     echo $_SESSION['num1'] . "|" . $_SESSION['operator'] . "|" . $_SESSION['num2'];
     exit;
 }
 
+/* ---------------- LOGIN HANDLER ---------------- */
 
-// login logic
 if (isset($_POST['login'])) {
 
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     $captcha = $_POST['captcha'] ?? '';
 
-    if ($username === '' || $password === '') {
-        $error = "All fields are required";
-        generateCaptcha();
+    if ($username === '' || $password === '' || $captcha === '') {
 
-    } elseif (
-        !isset($_SESSION['num1'], $_SESSION['num2'], $_SESSION['operator']) ||
-        (int) $captcha !== getCaptchaAnswer()
-    ) {
-        $error = "Wrong CAPTCHA answer";
-        generateCaptcha();
+        setError($error, "All fields are required");
+
+    } elseif ((int) $captcha !== getCaptchaAnswer()) {
+
+        setError($error, "Wrong CAPTCHA answer");
 
     } else {
 
-        $stmt = $conn->prepare("SELECT user_name, password FROM university_results.admin_user WHERE user_name = ?");
+        $stmt = $conn->prepare("
+            SELECT user_name, password
+            FROM university_results.admin_user
+            WHERE user_name = ?
+            LIMIT 1
+        ");
+
+        if (!$stmt) {
+            die("Prepare failed: " . $conn->error);
+        }
+
         $stmt->bind_param("s", $username);
         $stmt->execute();
+
         $result = $stmt->get_result();
 
-        if ($result->num_rows > 0) {
+        if ($result && $result->num_rows === 1) {
 
             $row = $result->fetch_assoc();
 
             if (password_verify($password, $row['password'])) {
 
                 session_regenerate_id(true);
-                $_SESSION['admin'] = $username;
+                $_SESSION['admin'] = $row['user_name'];
 
                 unset($_SESSION['num1'], $_SESSION['num2'], $_SESSION['operator']);
 
@@ -90,13 +107,11 @@ if (isset($_POST['login'])) {
                 exit;
 
             } else {
-                $error = "Invalid username or password";
-                generateCaptcha();
+                setError($error, "Invalid username or password");
             }
 
         } else {
-            $error = "Invalid username or password";
-            generateCaptcha();
+            setError($error, "Invalid username or password");
         }
 
         $stmt->close();
@@ -111,6 +126,7 @@ if (isset($_POST['login'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ERP Admin Login</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
+
     <style>
         * {
             margin: 0;
@@ -138,7 +154,6 @@ if (isset($_POST['login'])) {
         .login-box h2 {
             margin-bottom: 20px;
             color: #2a5298;
-            /* text-transform: uppercase; */
             font-weight: 600;
         }
 
@@ -196,7 +211,7 @@ if (isset($_POST['login'])) {
 </head>
 
 <body>
-    <!-- Login box -->
+
     <div class="login-box">
 
         <h2>ERP Admin Login</h2>
@@ -207,22 +222,22 @@ if (isset($_POST['login'])) {
 
         <form method="POST">
 
-            <input type="text" name="username" placeholder="Username" autocomplete="off" required>
-            <input type="password" name="password" placeholder="Password" autocomplete="off" required>
+            <input type="text" name="username" placeholder="Username" autocomplete="off">
+            <input type="password" name="password" placeholder="Password" autocomplete="off">
 
             <!-- CAPTCHA -->
             <div class="captcha-container">
                 <div class="captcha-text">
                     What is
-                    <span id="num1"><?= $_SESSION['num1'] ?? '' ?></span>
-                    <span id="operator"><?= $_SESSION['operator'] ?? '' ?></span>
-                    <span id="num2"><?= $_SESSION['num2'] ?? '' ?></span> ?
+                    <span id="num1"><?= $_SESSION['num1'] ?></span>
+                    <span id="operator"><?= $_SESSION['operator'] ?></span>
+                    <span id="num2"><?= $_SESSION['num2'] ?></span> ?
                 </div>
 
                 <button type="button" class="refresh-btn" onclick="refreshCaptcha()">↻ Refresh Captcha</button>
             </div>
 
-            <input type="text" name="captcha" placeholder="Enter Answer" autocomplete="off" required>
+            <input type="text" name="captcha" placeholder="Enter Answer" autocomplete="off">
 
             <input type="submit" name="login" value="LOGIN">
 
@@ -234,7 +249,7 @@ if (isset($_POST['login'])) {
 </html>
 
 <script>
-    // session history
+    // windows history prevent to back button
     if (window.history && window.history.pushState) {
         window.history.pushState(null, document.title, window.location.href);
 
@@ -244,7 +259,7 @@ if (isset($_POST['login'])) {
     }
 
 
-    // function for refresh captcha code
+    // refresh functions
     function refreshCaptcha() {
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "", true);
