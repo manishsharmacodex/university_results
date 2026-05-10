@@ -606,11 +606,6 @@ if (isset($_POST['submit'])) {
                         ?>
                         <label>School</label>
                         <select name="department" id="department">
-                            <!-- <option value="" selected>Select Department</option>
-                            <option value="SET">SET</option>
-                            <option value="SOB">SOB</option>
-                            <option value="LLM">LLM</option>
-                            <option value="OTHER">OTHER</option> -->
                             <option value="">SELECT SCHOOL</option>
                             <?php while ($row = $deptResult->fetch_assoc()) { ?>
                                 <option value="<?= $row['id'] ?>">
@@ -643,14 +638,6 @@ if (isset($_POST['submit'])) {
 
                         </select>
                     </div>
-
-
-                    <!-- in future this option will work for live section value -->
-                    <!-- <div>
-                        <label>Section</label>
-                        <input type="text" name="section" readonly placeholder="Auto Generated Section"
-                            >
-                    </div> -->
 
                     <div>
                         <label>Admission Date</label>

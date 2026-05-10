@@ -16,15 +16,18 @@ $data = mysqli_fetch_assoc($result);
 <html>
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admission Form Settings</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
 
     <style>
-        *{
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             background: #f1f5f9;
             padding: 40px;

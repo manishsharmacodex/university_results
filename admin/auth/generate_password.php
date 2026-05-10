@@ -1,5 +1,5 @@
 <?php
-$password = "admin"; // <-- set your admin password here
+$password = "admin"; // Set Your Passwords
 
 $hash = password_hash($password, PASSWORD_BCRYPT);
 
