@@ -240,33 +240,6 @@ $activePage = "dashboard"; // change per page
             background: linear-gradient(135deg, #14b8a6, #134e4a);
         }
 
-
-
-
-        /* SLIDER */
-        /* .slider {
-            margin-top: 30px;
-            height: 300px;
-            overflow: hidden;
-            border-radius: 15px;
-            position: relative;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .slides {
-            display: flex;
-            height: 100%;
-            transition: 0.8s;
-        }
-
-        .slides img {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            flex-shrink: 0;
-        } */
-
-
         /* DROPDOWN MENU */
         .dropdown-btn {
             width: 100%;
@@ -332,12 +305,6 @@ $activePage = "dashboard"; // change per page
                 class="<?= $activePage == 'student_list' ? 'active' : '' ?>">
                 <i class="fa-solid fa-users"></i>Student List
             </a>
-
-            <!-- <a href="../banner/list.php"
-                class="<?= $activePage == 'banner' ? 'active' : '' ?>">
-                <i class="fa-solid fa-users"></i>Banner
-            </a> -->
-
 
             <!-- SHOP MENU -->
             <div class="dropdown">
@@ -416,15 +383,16 @@ $activePage = "dashboard"; // change per page
         </div>
     </div>
 
+
+    <script>
+        // Dropdown Toggle
+        const dropdownBtn = document.querySelector(".dropdown-btn");
+
+        dropdownBtn.addEventListener("click", function () {
+            this.parentElement.classList.toggle("active");
+        });
+    </script>
+
 </body>
 
 </html>
-
-<script>
-    // Dropdown Toggle
-    const dropdownBtn = document.querySelector(".dropdown-btn");
-
-    dropdownBtn.addEventListener("click", function () {
-        this.parentElement.classList.toggle("active");
-    });
-</script>

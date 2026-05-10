@@ -194,19 +194,43 @@ $bankMasterResult = $conn->query("
 
         /* SIDEBAR */
         .sidebar {
-            width: 250px;
-            background: #111827;
+            width: 260px;
+            background: linear-gradient(180deg, #111827, #0f172a);
             color: white;
             padding: 20px;
 
             height: 100vh;
-            /* full screen height */
             position: sticky;
-            /* stays fixed while page scrolls */
             top: 0;
 
             overflow-y: auto;
+            overflow-x: hidden;
+
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+
+            scrollbar-width: thin;
+            scrollbar-color: #2563eb #111827;
             /* enables vertical scroll */
+        }
+
+        /* Custom Scrollbar */
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #111827;
+            border-radius: 20px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #2563eb);
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #60a5fa, #2563eb);
         }
 
         .sidebar h2 {
@@ -216,26 +240,73 @@ $bankMasterResult = $conn->query("
 
         .sidebar a {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
             color: #cbd5e1;
             text-decoration: none;
-            padding: 12px;
-            margin: 6px 0;
-            border-radius: 8px;
-            transition: 0.3s;
+            padding: 13px 14px;
+            margin: 7px 0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar a::before {
+            content: "";
+            position: absolute;
+            left: -100%;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            transition: 0.4s;
+        }
+
+        .sidebar a:hover::before {
+            left: 0;
         }
 
         .sidebar a:hover,
         .sidebar a.active {
-            background: #2563eb;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: white;
-            transform: translateX(5px);
+            transform: translateX(6px);
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
         }
 
         .sidebar a.logout-btn {
             background: #ef4444;
             color: white;
+        }
+
+        .dropdown-container {
+            display: none;
+            padding-left: 14px;
+            margin-top: 4px;
+            border-left: 2px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .dropdown-container a {
+            font-size: 14px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .breadcrum-header {
+            width: 100%;
+            display: block;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: #ffffff !important;
+            padding: 18px 25px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            margin-bottom: 15px;
         }
 
         .main {
@@ -442,6 +513,33 @@ $bankMasterResult = $conn->query("
         .toast.error {
             background: #ef4444;
         }
+
+        /* DROPDOWN MENU */
+        .dropdown-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dropdown-container {
+            display: none;
+            padding-left: 12px;
+        }
+
+        .dropdown-container a {
+            font-size: 14px;
+            margin: 4px 0;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown.active .dropdown-container {
+            display: block;
+        }
+
+        .dropdown-icon {
+            margin-left: auto;
+        }
     </style>
 </head>
 
@@ -480,9 +578,28 @@ $bankMasterResult = $conn->query("
                 <i class="fa-solid fa-users"></i>Student List
             </a>
 
-            <a href="../banner/list.php" class="<?= $activePage == 'banner' ? 'active' : '' ?>">
-                <i class="fa-solid fa-users"></i>Banner
-            </a>
+            <!-- SHOP MENU -->
+            <div class="dropdown">
+
+                <a href="javascript:void(0);" class="dropdown-btn">
+                    <i class="fa-solid fa-shop"></i>
+                    University Manage
+                    <i class="fa-solid fa-caret-down dropdown-icon"></i>
+                </a>
+
+                <div class="dropdown-container">
+
+                    <a href="../banner/list.php" class="<?= $activePage == 'banner' ? 'active' : '' ?>">
+                        <i class="fa-solid fa-image"></i>Banner Update
+                    </a>
+
+                    <a href="../admission_form/list.php" class="<?= $activePage == 'admission_form' ? 'active' : '' ?>">
+                        <i class="fa-solid fa-file-pen"></i>Admission Form Update
+                    </a>
+
+                </div>
+
+            </div>
 
             <a href="../auth/logout.php" class="logout-btn">Logout</a>
         </div>
@@ -748,6 +865,13 @@ $bankMasterResult = $conn->query("
 
             }, 3000);
         }
+
+        // Dropdown Toggle
+        const dropdownBtn = document.querySelector(".dropdown-btn");
+
+        dropdownBtn.addEventListener("click", function () {
+            this.parentElement.classList.toggle("active");
+        });
     </script>
 
 </body>
