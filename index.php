@@ -9,9 +9,10 @@ $result = mysqli_query($conn, "SELECT * FROM admission_form_settings WHERE id='1
 $form_settings = $result ? mysqli_fetch_assoc($result) : null;
 
 /* =========================================
-   INSERT ADMISSION DATA (AJAX)
+   HANDLE ADMISSION SUBMISSION (AJAX)
 ========================================= */
-if (isset($_POST['admission_button'])) {
+
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['admission_button'])) {
 
     $full_name = trim($_POST['full_name'] ?? '');
     $email_address = trim($_POST['email_address'] ?? '');
@@ -19,16 +20,10 @@ if (isset($_POST['admission_button'])) {
     $department = trim($_POST['department'] ?? '');
     $course = trim($_POST['course'] ?? '');
 
-    /* ==============================
+    /* =========================
        VALIDATION
-    ============================== */
-    if (
-        empty($full_name) ||
-        empty($email_address) ||
-        empty($phone_number) ||
-        empty($department) ||
-        empty($course)
-    ) {
+    ========================= */
+    if ($full_name === '' || $email_address === '' || $phone_number === '' || $department === '' || $course === '') {
         echo json_encode(["status" => "error", "message" => "All fields are required"]);
         exit;
     }
@@ -43,15 +38,10 @@ if (isset($_POST['admission_button'])) {
         exit;
     }
 
-    /* ==============================
-       CHECK DUPLICATE EMAIL
-    ============================== */
+    /* =========================
+       DUPLICATE CHECK
+    ========================= */
     $check = $conn->prepare("SELECT id FROM admission_list WHERE email_address = ?");
-    if (!$check) {
-        echo json_encode(["status" => "error", "message" => "Database error (check query)"]);
-        exit;
-    }
-
     $check->bind_param("s", $email_address);
     $check->execute();
     $check->store_result();
@@ -61,84 +51,54 @@ if (isset($_POST['admission_button'])) {
         exit;
     }
 
-    /* ==============================
-       TRANSACTION START
-    ============================== */
-    $conn->begin_transaction();
+    /* =========================
+       INSERT DATA
+    ========================= */
+    $stmt = $conn->prepare("
+        INSERT INTO admission_list 
+        (full_name, email_address, phone_number, department, course)
+        VALUES (?, ?, ?, ?, ?)
+    ");
 
-    try {
-
-        /* ==============================
-           INSERT DATA
-        ============================== */
-        $stmt = $conn->prepare("
-            INSERT INTO admission_list 
-            (full_name, email_address, phone_number, department, course)
-            VALUES (?, ?, ?, ?, ?)
-        ");
-
-        if (!$stmt) {
-            throw new Exception("Insert query failed");
-        }
-
-        $stmt->bind_param(
-            "sssss",
-            $full_name,
-            $email_address,
-            $phone_number,
-            $department,
-            $course
-        );
-
-        if (!$stmt->execute()) {
-            throw new Exception("Insert execution failed");
-        }
-
-        $insert_id = $conn->insert_id;
-
-        /* ==============================
-           GENERATE ADMISSION NUMBER
-        ============================== */
-        $year = date("Y");
-
-        $dept = "DEP" . strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $department), 0, 3));
-        $crs = "CRS" . strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $course), 0, 3));
-
-        $admission_no = "AU-$year-$dept-$crs-" . str_pad($insert_id, 4, "0", STR_PAD_LEFT);
-
-        /* ==============================
-           UPDATE ADMISSION NUMBER
-        ============================== */
-        $update = $conn->prepare("UPDATE admission_list SET admission_no = ? WHERE id = ?");
-        if (!$update) {
-            throw new Exception("Update query failed");
-        }
-
-        $update->bind_param("si", $admission_no, $insert_id);
-
-        if (!$update->execute()) {
-            throw new Exception("Update execution failed");
-        }
-
-        /* ==============================
-           COMMIT
-        ============================== */
-        $conn->commit();
-
-        echo json_encode([
-            "status" => "success",
-            "message" => "Admission submitted successfully",
-            "admission_no" => $admission_no
-        ]);
-
-    } catch (Exception $e) {
-        $conn->rollback();
-
-        echo json_encode([
-            "status" => "error",
-            "message" => "Something went wrong: " . $e->getMessage()
-        ]);
+    if (!$stmt) {
+        echo json_encode(["status" => "error", "message" => "Database insert failed"]);
+        exit;
     }
+
+    $stmt->bind_param("sssss", $full_name, $email_address, $phone_number, $department, $course);
+
+    if (!$stmt->execute()) {
+        echo json_encode(["status" => "error", "message" => "Insert failed"]);
+        exit;
+    }
+
+    $insert_id = $conn->insert_id;
+
+    /* =========================
+       ADMISSION NUMBER GENERATE
+    ========================= */
+    $year = date("Y");
+
+    $dept = "DEP" . strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $department), 0, 3));
+    $crs = "CRS" . strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $course), 0, 3));
+
+    $admission_no = "AU-$year-$dept-$crs-" . str_pad($insert_id, 4, "0", STR_PAD_LEFT);
+
+    /* =========================
+       UPDATE ADMISSION NO
+    ========================= */
+    $update = $conn->prepare("UPDATE admission_list SET admission_no = ? WHERE id = ?");
+    $update->bind_param("si", $admission_no, $insert_id);
+    $update->execute();
+
+    /* =========================
+       SUCCESS RESPONSE
+    ========================= */
+    echo json_encode([
+        "status" => "success",
+        "message" => "Admission submitted successfully",
+        "admission_no" => $admission_no
+    ]);
 
     exit;
 }
@@ -765,11 +725,13 @@ if (isset($_POST['admission_button'])) {
         <div>
 
             <?php
+            $value = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore, odio architecto itaque quibusdam atque eos!";
+
             // Safe check for form settings
             $form_status = $form_settings['form_status'] ?? 'Open';
             $bg_color = $form_settings['background_color'] ?? '#ffffff';
             $title = $form_settings['form_title'] ?? 'Admission Form';
-            $description = $form_settings['form_description'] ?? '';
+            $description = $form_settings['form_description'] ?? $value;
             $button_text = $form_settings['button_text'] ?? 'Submit';
             ?>
 
@@ -781,8 +743,8 @@ if (isset($_POST['admission_button'])) {
             <?php } ?>
 
             <!-- FORM -->
-            <form action="" id="admissionForm" method="POST"
-                class="<?= $form_status === 'Closed' ? 'disabled-form' : '' ?>" <?= $form_status === 'Closed' ? 'onsubmit="return false;"' : '' ?>>
+            <form id="admissionForm" method="POST" class="<?= $form_status === 'Closed' ? 'disabled-form' : '' ?>"
+                <?= $form_status === 'Closed' ? 'onsubmit="return false;"' : '' ?>>
 
                 <div class="form-box" style="background: <?= htmlspecialchars($bg_color, ENT_QUOTES, 'UTF-8') ?>;">
 
@@ -791,23 +753,22 @@ if (isset($_POST['admission_button'])) {
                     <p><?= htmlspecialchars($description, ENT_QUOTES, 'UTF-8') ?></p>
 
                     <!-- FULL NAME -->
-                    <input type="text" name="full_name" placeholder="Enter Full Name" required>
+                    <input type="text" name="full_name" placeholder="Enter Full Name">
 
                     <!-- EMAIL -->
-                    <input type="email" name="email_address" placeholder="Email Address" required>
+                    <input type="email" name="email_address" placeholder="Email Address">
 
                     <!-- PHONE -->
-                    <input type="tel" name="phone_number" placeholder="Phone Number" maxlength="10" pattern="[0-9]{10}"
-                        required>
+                    <input type="tel" name="phone_number" placeholder="Phone Number" maxlength="10" pattern="[0-9]{10}">
 
                     <!-- DEPARTMENT -->
-                    <select name="department" id="department" required>
+                    <select name="department" id="department">
                         <option value="" selected disabled>Select Department</option>
 
                         <?php
                         $department_query = mysqli_query($conn, "SELECT id, name FROM departments ORDER BY id DESC");
 
-                        if ($department_query) {
+                        if ($department_query && mysqli_num_rows($department_query) > 0) {
                             while ($department = mysqli_fetch_assoc($department_query)) {
                                 ?>
                                 <option value="<?= $department['id'] ?>">
@@ -815,12 +776,16 @@ if (isset($_POST['admission_button'])) {
                                 </option>
                                 <?php
                             }
+                        } else {
+                            ?>
+                            <option value="" disabled>No departments available</option>
+                            <?php
                         }
                         ?>
                     </select>
 
                     <!-- COURSE -->
-                    <select name="course" id="course" required>
+                    <select name="course" id="course">
                         <option value="" selected disabled>Select Course</option>
                     </select>
 
@@ -833,7 +798,6 @@ if (isset($_POST['admission_button'])) {
             </form>
 
         </div>
-
     </div>
 
     <!-- =========================================
@@ -1094,6 +1058,7 @@ if (isset($_POST['admission_button'])) {
     });
 
 
+
     /* =========================================
 FETCH COURSE ACCORDING DEPARTMENT
 ========================================= */
@@ -1115,7 +1080,7 @@ FETCH COURSE ACCORDING DEPARTMENT
                 return;
             }
 
-            // Cancel previous request (important for production)
+            // Cancel previous request
             if (controller) {
                 controller.abort();
             }
@@ -1124,7 +1089,7 @@ FETCH COURSE ACCORDING DEPARTMENT
 
             try {
 
-                // Loading state (UX improvement)
+                // Loading state
                 course.innerHTML = "<option disabled>Loading...</option>";
 
                 const response = await fetch("./ajax/get_courses.php", {
@@ -1144,9 +1109,8 @@ FETCH COURSE ACCORDING DEPARTMENT
 
                 const data = await response.text();
 
-                // Basic safety check
-                if (!data || typeof data !== "string") {
-                    throw new Error("Invalid response");
+                if (!data) {
+                    throw new Error("Empty response");
                 }
 
                 course.innerHTML = data;
@@ -1165,40 +1129,56 @@ FETCH COURSE ACCORDING DEPARTMENT
     }
 
 
-
     /* =========================================
-   AJAX FORM SUBMIT + POPUP
-========================================= */
+    AJAX FORM SUBMIT + POPUP
+    ========================================= */
 
-    document.getElementById("admissionForm").addEventListener("submit", function (e) {
-        e.preventDefault();
+    const form = document.getElementById("admissionForm");
 
-        let formData = new FormData(this);
-        formData.append("admission_button", true);
+    if (form) {
 
-        fetch("", {
-            method: "POST",
-            body: formData
-        })
-            .then(res => res.json())
-            .then(data => {
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            let formData = new FormData(this);
+            formData.append("admission_button", true);
+
+            try {
+
+                const response = await fetch(window.location.href, {
+                    method: "POST",
+                    body: formData
+                });
+
+                const text = await response.text();
+                const data = JSON.parse(text);
 
                 if (data.status === "success") {
 
                     document.getElementById("admissionNo").innerText = data.admission_no;
                     document.getElementById("popupModal").style.display = "flex";
 
-                    document.getElementById("admissionForm").reset();
+                    form.reset();
 
                 } else {
                     alert(data.message || "Error occurred");
                 }
 
-            });
-    });
+            } catch (error) {
+                console.error("Submit Error:", error);
+                alert("Something went wrong. Please try again.");
+            }
+
+        });
+
+    }
+
+
+    /* =========================================
+    MODAL CLOSE
+    ========================================= */
 
     function closeModal() {
         document.getElementById("popupModal").style.display = "none";
     }
-
 </script>
