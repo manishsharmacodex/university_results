@@ -10,6 +10,83 @@ $form_settings = mysqli_fetch_assoc(
         "SELECT * FROM admission_form_settings WHERE id='1'"
     )
 );
+
+/* =========================================
+   INSERT ADMISSION DATA
+========================================= */
+if (isset($_POST['admission_button'])) {
+
+    $full_name = trim($_POST['full_name']);
+    $email_address = trim($_POST['email_address']);
+    $phone_number = trim($_POST['phone_number']);
+    $department = trim($_POST['department']);
+    $course = trim($_POST['course']);
+
+    // Validation
+    if (
+        empty($full_name) ||
+        empty($email_address) ||
+        empty($phone_number) ||
+        empty($department) ||
+        empty($course)
+    ) {
+
+        echo "<script>alert('All fields are required');</script>";
+        exit;
+    }
+
+    // Email validation
+    if (!filter_var($email_address, FILTER_VALIDATE_EMAIL)) {
+
+        echo "<script>alert('Invalid email address');</script>";
+        exit;
+    }
+
+    // Prepared Statement
+    $stmt = $conn->prepare("
+        INSERT INTO admission_list
+        (
+            full_name,
+            email_address,
+            phone_number,
+            department,
+            course
+        )
+        VALUES (?, ?, ?, ?, ?)
+    ");
+
+    $stmt->bind_param(
+        "sssss",
+        $full_name,
+        $email_address,
+        $phone_number,
+        $department,
+        $course
+    );
+
+    $data = $stmt->execute();
+
+    if ($data) {
+
+        echo "
+        <script>
+            alert(
+                'Your form has been submitted successfully. Our team will contact you within 24 hours.'
+            );
+
+            window.location.href='index.php';
+        </script>
+        ";
+
+    } else {
+
+        echo "
+        <script>
+            alert('Sorry! Please try again.');
+        </script>
+        ";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -18,7 +95,7 @@ $form_settings = mysqli_fetch_assoc(
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Alpha University - Homepage</title>
+    <title>Alpha University - Top University In India</title>
     <link rel="stylesheet" type="text/css" href="./css/font.css">
 
     <style>
@@ -36,10 +113,10 @@ $form_settings = mysqli_fetch_assoc(
         }
 
         body {
+            width: 100%;
+            /* height: 100vh; */
             background: radial-gradient(circle at top, #14213d, var(--bg));
             color: #fff;
-            overflow-x: hidden;
-            font-family: Arial, Helvetica, sans-serif;
         }
 
         a {
@@ -78,6 +155,7 @@ $form_settings = mysqli_fetch_assoc(
             color: var(--muted);
             transition: 0.3s;
             cursor: pointer;
+            font-size: 16px;
         }
 
         .navbar ul li:hover {
@@ -152,13 +230,18 @@ $form_settings = mysqli_fetch_assoc(
         }
 
         .caption h2 {
-            font-size: 42px;
+            font-size: 50px;
             margin-bottom: 10px;
+            background-color: #fff;
+            color: #14213d;
+            padding: 5px 20px;
         }
 
         .caption p {
             color: #ddd;
-            font-size: 16px;
+            font-size: 32px;
+            background-color: #14213d;
+            padding: 5px 20px;
         }
 
         .prev,
@@ -249,7 +332,6 @@ $form_settings = mysqli_fetch_assoc(
         ========================================= */
         .form-box {
             width: 400px;
-            background: #ffffff;
             padding: 30px;
             border-radius: var(--radius);
             color: #000;
@@ -462,29 +544,42 @@ $form_settings = mysqli_fetch_assoc(
 
             $first = true;
 
-            while ($row = mysqli_fetch_assoc($banners)) {
-                ?>
+            if (mysqli_num_rows($banners) > 0) {
 
-                <div class="slide <?= $first ? 'active' : '' ?>">
+                while ($row = mysqli_fetch_assoc($banners)) {
 
-                    <img src="./admin/uploads/banners/<?= htmlspecialchars($row['image']) ?>" alt="Banner">
+                    $image = "./admin/uploads/banners/" . $row['image'];
+                    ?>
 
-                    <div class="caption">
+                    <div class="slide <?= $first ? 'active' : '' ?>">
 
-                        <h2>
-                            <?= htmlspecialchars($row['title']) ?>
-                        </h2>
+                        <?php if (file_exists($image)) { ?>
 
-                        <p>
-                            <?= htmlspecialchars($row['description']) ?>
-                        </p>
+                            <img src="<?= htmlspecialchars($image) ?>" alt="<?= htmlspecialchars($row['title']) ?>">
+
+                        <?php } ?>
+
+                        <div class="caption">
+
+                            <h2>
+                                <?= htmlspecialchars($row['title']) ?>
+                            </h2>
+
+                            <p>
+                                <?= htmlspecialchars($row['description']) ?>
+                            </p>
+
+                        </div>
 
                     </div>
 
-                </div>
+                    <?php
+                    $first = false;
+                }
 
-                <?php
-                $first = false;
+            } else {
+
+                echo "<p>No banners found.</p>";
             }
             ?>
 
@@ -541,63 +636,43 @@ $form_settings = mysqli_fetch_assoc(
             <?php } ?>
 
             <form action="" method="POST" <?= $form_settings['form_status'] == 'Closed'
-                ? 'style="pointer-events:none;opacity:0.6;"'
-                : ''
-                ?>>
+                ? 'style="pointer-events: none; opacity: 0.6;"'
+                : '' ?>>
 
                 <div class="form-box" style="background: <?= htmlspecialchars($form_settings['background_color']) ?>;">
 
-                    <h3>
-                        <?= htmlspecialchars($form_settings['form_title']) ?>
-                    </h3>
+                    <h3><?= htmlspecialchars($form_settings['form_title']) ?></h3>
 
-                    <p>
-                        <?= htmlspecialchars($form_settings['form_description']) ?>
-                    </p>
+                    <p><?= htmlspecialchars($form_settings['form_description']) ?></p>
 
                     <input type="text" name="full_name" placeholder="Full Name" required>
 
                     <input type="email" name="email_address" placeholder="Email Address" required>
 
-                    <input type="text" name="phone_number" placeholder="Phone Number" maxlength="10" required>
+                    <input type="text" name="phone_number" maxlength="10" placeholder="Phone Number" required>
 
                     <!-- DEPARTMENT -->
                     <select name="department" id="department" required>
-
-                        <option value="">
-                            Select Department
-                        </option>
+                        <option value="" selected disabled>Select Department</option>
 
                         <?php
-                        $department_query = mysqli_query(
-                            $conn,
-                            "SELECT * FROM departments ORDER BY id DESC"
-                        );
+                        $department_query = mysqli_query($conn, "SELECT * FROM departments ORDER BY id DESC");
 
                         while ($department = mysqli_fetch_assoc($department_query)) {
                             ?>
-
                             <option value="<?= $department['id'] ?>">
-
                                 <?= htmlspecialchars($department['name']) ?>
-
                             </option>
-
                         <?php } ?>
-
                     </select>
 
                     <!-- COURSE -->
                     <select name="course" id="course" required>
-
-                        <option value="">
-                            Select Course
-                        </option>
-
+                        <option value="" selected disabled>Select Course</option>
                     </select>
 
                     <input type="submit" value="<?= htmlspecialchars($form_settings['button_text']) ?>" class="button"
-                        name="addmission_button">
+                        name="admission_button">
 
                 </div>
 
@@ -707,156 +782,113 @@ $form_settings = mysqli_fetch_assoc(
     <script>
 
         /* =========================================
-           SLIDER
-        ========================================= */
-        let slides = document.querySelectorAll(".slide");
+   SLIDER (FINAL VERSION)
+========================================= */
+
+        const slides = document.querySelectorAll(".slide");
+        const nextBtn = document.querySelector(".next");
+        const prevBtn = document.querySelector(".prev");
+        const sliderContainer = document.querySelector(".slides");
+
         let index = 0;
+        let sliderInterval;
 
-        function showSlide(i) {
+        // Exit if no slides found
+        if (slides.length > 0) {
 
-            slides.forEach(slide => {
-                slide.classList.remove("active");
+            function showSlide(i) {
+                slides.forEach(slide => slide.classList.remove("active"));
+                slides[i].classList.add("active");
+            }
+
+            function nextSlide() {
+                index = (index + 1) % slides.length;
+                showSlide(index);
+            }
+
+            function prevSlide() {
+                index = (index - 1 + slides.length) % slides.length;
+                showSlide(index);
+            }
+
+            // Auto slide
+            function startSlider() {
+                sliderInterval = setInterval(nextSlide, 10000);
+            }
+
+            function stopSlider() {
+                clearInterval(sliderInterval);
+            }
+
+            startSlider();
+
+            // Buttons (safe check)
+            if (nextBtn) {
+                nextBtn.addEventListener("click", nextSlide);
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener("click", prevSlide);
+            }
+
+            // Pause on hover (optional but useful)
+            if (sliderContainer) {
+                sliderContainer.addEventListener("mouseenter", stopSlider);
+                sliderContainer.addEventListener("mouseleave", startSlider);
+            }
+
+            // Initial slide
+            showSlide(index);
+        }
+
+
+        /* =========================================
+   FETCH COURSE ACCORDING DEPARTMENT
+========================================= */
+
+        const department = document.getElementById("department");
+        const course = document.getElementById("course");
+
+        if (department && course) {
+
+            department.addEventListener("change", function () {
+
+                const department_id = this.value;
+
+                // Reset if no selection
+                if (department_id === "") {
+                    course.innerHTML = "<option value=''>Select Course</option>";
+                    return;
+                }
+
+                const xhr = new XMLHttpRequest();
+
+                xhr.open("POST", "./ajax/get_courses.php", true);
+
+                xhr.setRequestHeader(
+                    "Content-Type",
+                    "application/x-www-form-urlencoded"
+                );
+
+                xhr.onload = function () {
+
+                    if (xhr.status === 200) {
+                        course.innerHTML = xhr.responseText;
+                    } else {
+                        course.innerHTML = "<option>Error loading courses</option>";
+                    }
+
+                };
+
+                course.innerHTML = "<option>Loading...</option>";
+
+                xhr.send("department_id=" + encodeURIComponent(department_id));
+
             });
 
-            slides[i].classList.add("active");
         }
-
-        function nextSlide() {
-
-            index = (index + 1) % slides.length;
-
-            showSlide(index);
-        }
-
-        function prevSlide() {
-
-            index = (index - 1 + slides.length) % slides.length;
-
-            showSlide(index);
-        }
-
-        setInterval(nextSlide, 4000);
-
-        document.querySelector(".next").onclick = nextSlide;
-        document.querySelector(".prev").onclick = prevSlide;
-
-
-        
-        /* =========================================
-           FETCH COURSE ACCORDING DEPARTMENT
-        ========================================= */
-        document.getElementById("department").addEventListener("change", function () {
-
-            let department_id = this.value;
-
-            let xhr = new XMLHttpRequest();
-
-            xhr.open(
-                "POST",
-                "./ajax/get_courses.php",
-                true
-            );
-
-            xhr.setRequestHeader(
-                "Content-type",
-                "application/x-www-form-urlencoded"
-            );
-
-            xhr.onload = function () {
-
-                document.getElementById("course").innerHTML = this.responseText;
-
-            };
-
-            xhr.send(
-                "department_id=" + department_id
-            );
-
-        });
-
     </script>
 
 </body>
 
 </html>
-
-<?php
-
-/* =========================================
-   INSERT ADMISSION DATA
-========================================= */
-if (isset($_POST['addmission_button'])) {
-
-    $full_name = mysqli_real_escape_string(
-        $conn,
-        $_POST['full_name']
-    );
-
-    $email_address = mysqli_real_escape_string(
-        $conn,
-        $_POST['email_address']
-    );
-
-    $phone_number = mysqli_real_escape_string(
-        $conn,
-        $_POST['phone_number']
-    );
-
-    $department = mysqli_real_escape_string(
-        $conn,
-        $_POST['department']
-    );
-
-    $course = mysqli_real_escape_string(
-        $conn,
-        $_POST['course']
-    );
-
-    $query = "
-        INSERT INTO admission_list
-        (
-            full_name,
-            email_address,
-            phone_number,
-            department,
-            course
-        )
-
-        VALUES
-        (
-            '$full_name',
-            '$email_address',
-            '$phone_number',
-            '$department',
-            '$course'
-        )
-    ";
-
-    $data = mysqli_query($conn, $query);
-
-    if ($data) {
-
-        echo "
-        <script>
-
-            alert(
-                'Your form has been submitted successfully. Our team will contact you within 24 hours.'
-            );
-
-            window.location.href='index.php';
-
-        </script>
-        ";
-
-    } else {
-
-        echo "
-        <script>
-
-            alert('Sorry! Please try again.');
-
-        </script>
-        ";
-    }
-}
-?>

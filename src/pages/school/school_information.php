@@ -21,18 +21,21 @@
             box-sizing: border-box;
         }
 
+        body {
+            width: 100%;
+            /* height: 100vh; */
+            background: radial-gradient(circle at top, #14213d, var(--bg));
+            color: #fff;
+        }
+
         a {
             text-decoration: none;
             color: inherit;
         }
 
-        body {
-            background: radial-gradient(circle at top, #14213d, var(--bg));
-            color: #fff;
-            overflow-x: hidden;
-        }
-
-        /* ================= NAVBAR ================= */
+        /* =========================================
+           NAVBAR
+        ========================================= */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -42,46 +45,44 @@
             backdrop-filter: blur(14px);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 999;
         }
 
         .logo {
+            font-size: 22px;
             font-weight: 700;
-            font-size: 20px;
             color: var(--primary);
         }
 
         .navbar ul {
             display: flex;
-            gap: 22px;
+            gap: 20px;
             list-style: none;
         }
 
         .navbar ul li {
             color: var(--muted);
-            cursor: pointer;
-            font-size: 14px;
             transition: 0.3s;
+            cursor: pointer;
+            font-size: 16px;
         }
 
         .navbar ul li:hover {
             color: var(--primary);
         }
 
-        /* ================= NAV BUTTONS (NEW) ================= */
         .nav-buttons {
             display: flex;
             gap: 10px;
         }
 
         .nav-btn {
-            padding: 8px 14px;
-            border-radius: 25px;
-            border: 1px solid transparent;
+            padding: 10px 16px;
+            border-radius: 30px;
+            border: none;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
             transition: 0.3s;
+            font-weight: 600;
         }
 
         .student-btn {
@@ -97,7 +98,6 @@
 
         .nav-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 217, 255, 0.2);
         }
 
         /* ================= PAGE HEADER ================= */
@@ -198,10 +198,12 @@
             font-weight: 600;
         }
 
-        /* ================= FOOTER ================= */
+        /* =========================================
+           FOOTER
+        ========================================= */
         .footer {
-            padding: 50px 60px;
             background: #050a14;
+            padding: 50px 60px;
         }
 
         .footer-grid {
@@ -212,36 +214,24 @@
 
         .footer h3 {
             color: var(--primary);
+            margin-bottom: 10px;
         }
 
         .footer p,
         .footer a {
             color: var(--muted);
-            font-size: 13px;
+            font-size: 14px;
+            margin-bottom: 6px;
             display: block;
-            margin-bottom: 5px;
-            text-decoration: none;
         }
 
         .footer-bottom {
             text-align: center;
-            margin-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 15px;
-            font-size: 12px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             color: #777;
-        }
-
-        /* ================= RESPONSIVE ================= */
-        @media (max-width: 900px) {
-            .navbar {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .container {
-                padding: 30px;
-            }
+            font-size: 13px;
         }
     </style>
 </head>
