@@ -3,100 +3,165 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// DB Connection File include
+/* ================= DB CONNECTION ================= */
 include(__DIR__ . "/../../server/connection.php");
-
 include("../../config/auth.php");
 
-$message = '';
+/* ================= FLASH MESSAGE ================= */
+$message = "";
+$messageType = "success";
 
-// session history check
 if (isset($_SESSION['message'])) {
-    $message = $_SESSION['message'];
+
+    // If old message format is string
+    if (is_string($_SESSION['message'])) {
+
+        $message = $_SESSION['message'];
+        $messageType = "success";
+
+    }
+
+    // If new message format is array
+    elseif (is_array($_SESSION['message'])) {
+
+        $message = $_SESSION['message']['text'] ?? "";
+        $messageType = $_SESSION['message']['type'] ?? "success";
+
+    }
+
     unset($_SESSION['message']);
 }
 
 /* ================= ADD BANK ================= */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bank_master_id'])) {
 
-    $bank_master_id = (int) ($_POST['bank_master_id']);
+    $bank_master_id = (int) $_POST['bank_master_id'];
 
     if ($bank_master_id <= 0) {
-        $_SESSION['message'] = "Invalid bank ID!";
+
+        $_SESSION['message'] = [
+            'text' => 'Invalid Bank ID!',
+            'type' => 'error'
+        ];
+
         header("Location: list.php");
         exit;
     }
 
     /* CHECK EXISTING */
-    $stmt = $conn->prepare("SELECT id FROM banks WHERE bank_master_id = ?");
-    $stmt->bind_param("i", $bank_master_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $stmt->close();
+    $checkStmt = $conn->prepare("
+        SELECT id 
+        FROM banks 
+        WHERE bank_master_id = ?
+    ");
 
-    if ($result->num_rows > 0) {
-        $_SESSION['message'] = "Bank already exists!";
+    $checkStmt->bind_param("i", $bank_master_id);
+    $checkStmt->execute();
+
+    $checkResult = $checkStmt->get_result();
+
+    if ($checkResult->num_rows > 0) {
+
+        $_SESSION['message'] = [
+            'text' => 'Bank already exists!',
+            'type' => 'error'
+        ];
+
+        $checkStmt->close();
+
         header("Location: list.php");
         exit;
     }
 
-    /* INSERT */
-    $stmt = $conn->prepare("INSERT INTO banks (bank_master_id) VALUES (?)");
-    if (!$stmt) {
-        $_SESSION['message'] = "Database error!";
+    $checkStmt->close();
+
+    /* INSERT BANK */
+    $insertStmt = $conn->prepare("
+        INSERT INTO banks (bank_master_id)
+        VALUES (?)
+    ");
+
+    if (!$insertStmt) {
+
+        $_SESSION['message'] = [
+            'text' => 'Database error!',
+            'type' => 'error'
+        ];
+
         header("Location: list.php");
         exit;
     }
 
-    $stmt->bind_param("i", $bank_master_id);
+    $insertStmt->bind_param("i", $bank_master_id);
 
-    if ($stmt->execute()) {
-        $_SESSION['message'] = "Bank added successfully!";
+    if ($insertStmt->execute()) {
+
+        $_SESSION['message'] = [
+            'text' => 'Bank added successfully!',
+            'type' => 'success'
+        ];
+
     } else {
-        $_SESSION['message'] = "Insert failed!";
+
+        $_SESSION['message'] = [
+            'text' => 'Insert failed!',
+            'type' => 'error'
+        ];
     }
 
-    $stmt->close();
+    $insertStmt->close();
 
     header("Location: list.php");
     exit;
 }
 
-
-$activePage = "bank"; // change per page
+$activePage = "bank";
 
 /* ================= PAGINATION ================= */
 $limit = 6;
+
 $page = isset($_GET['page']) && is_numeric($_GET['page'])
     ? (int) $_GET['page']
     : 1;
 
+if ($page < 1) {
+    $page = 1;
+}
+
 $offset = ($page - 1) * $limit;
 
-/* TOTAL RECORDS */
-$total_result = $conn->query("SELECT COUNT(*) AS total FROM banks");
-$total_row = $total_result->fetch_assoc();
-$total_records = (int) $total_row['total'];
+$limit = (int) $limit;
+$offset = (int) $offset;
 
-$total_pages = ceil($total_records / $limit);
+/* ================= TOTAL RECORDS ================= */
+$totalResult = $conn->query("
+    SELECT COUNT(*) AS total 
+    FROM banks
+");
 
-/* FETCH BANKS */
+$totalRow = $totalResult->fetch_assoc();
+
+$totalRecords = (int) $totalRow['total'];
+
+$totalPages = ceil($totalRecords / $limit);
+
+/* ================= FETCH BANKS ================= */
 $result = $conn->query("
     SELECT 
         banks.id,
         banks.bank_master_id,
         bank_master.bank_name
     FROM banks
-    INNER JOIN bank_master 
+    INNER JOIN bank_master
         ON banks.bank_master_id = bank_master.id
     ORDER BY banks.id ASC
     LIMIT $limit OFFSET $offset
 ");
 
-/* DROPDOWN DATA */
-$bank_master_result = $conn->query("
-    SELECT * 
-    FROM bank_master 
+/* ================= DROPDOWN BANKS ================= */
+$bankMasterResult = $conn->query("
+    SELECT *
+    FROM bank_master
     ORDER BY bank_name ASC
 ");
 ?>
@@ -426,12 +491,19 @@ $bank_master_result = $conn->query("
             <h2 class="breadcrum-header">Banks</h2>
             <div class="breadcrumb"><a href="../dashboard/index.php">Dashboard</a> / Banks</div>
 
-            <?php if ($message != ''): ?>
+            <?php if ($message != ""): ?>
+
                 <script>
                     document.addEventListener("DOMContentLoaded", function () {
-                        showToast("<?= $message ?>", "success");
+
+                        showToast(
+                            "<?= htmlspecialchars($message, ENT_QUOTES) ?>",
+                            "<?= htmlspecialchars($messageType) ?>"
+                        );
+
                     });
                 </script>
+
             <?php endif; ?>
 
             <a class="add-btn" href="#" onclick="document.getElementById('addModal').style.display='flex'">
@@ -444,123 +516,235 @@ $bank_master_result = $conn->query("
                     <th>Bank Name</th>
                     <th>Action</th>
                 </tr>
-                <?php while ($row = $result->fetch_assoc()): ?>
+                <?php if ($result->num_rows > 0): ?>
+
+                    <?php while ($row = $result->fetch_assoc()): ?>
+
+                        <tr>
+
+                            <td><?= (int) $row['id'] ?></td>
+
+                            <td>
+                                <?= htmlspecialchars($row['bank_name']) ?>
+                            </td>
+
+                            <td class="action">
+
+                                <a href="#" class="edit" onclick="
+                                    document.getElementById('edit_bank_id').value='<?= (int) $row['id'] ?>';
+                                    document.getElementById('edit_bank_master_id').value='<?= (int) $row['bank_master_id'] ?>';
+                                    document.getElementById('editModal').style.display='flex';
+                                ">
+                                    Edit
+                                </a>
+
+                                <a href="#" class="delete" onclick="openDeleteModal(<?= (int) $row['id'] ?>)">
+                                    Delete
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endwhile; ?>
+
+                <?php else: ?>
+
                     <tr>
-                        <td><?= $row['id'] ?></td>
-                        <td><?= $row['bank_name'] ?></td>
-                        <td class="action">
-                            <a href="#" class="edit" onclick="
-                        document.getElementById('edit_bank_id').value='<?= $row['id'] ?>';
-                        document.getElementById('edit_bank_master_id').value='<?= $row['bank_master_id'] ?>';
-                        document.getElementById('editModal').style.display='flex';
-                    ">Edit</a>
-                            <a href="#" class="delete" onclick="openDeleteModal(<?= $row['id'] ?>)">
-                                Delete
-                            </a>
+                        <td colspan="3" style="text-align:center;">
+                            No banks found
                         </td>
                     </tr>
-                <?php endwhile; ?>
+
+                <?php endif; ?>
             </table>
 
-            <!-- Pagination -->
+            <!-- PAGINATION -->
             <div class="pagination">
+
                 <?php if ($page > 1): ?>
                     <a href="?page=<?= $page - 1 ?>">Prev</a>
                 <?php endif; ?>
 
-                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                    <a href="?page=<?= $i ?>" class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+
+                    <a href="?page=<?= $i ?>" class="<?= $i == $page ? 'active' : '' ?>">
+
+                        <?= $i ?>
+
+                    </a>
+
                 <?php endfor; ?>
 
-                <?php if ($page < $total_pages): ?>
+                <?php if ($page < $totalPages): ?>
                     <a href="?page=<?= $page + 1 ?>">Next</a>
                 <?php endif; ?>
+
             </div>
         </div>
     </div>
 
-    <!-- ADD BANK MODAL -->
+    <!-- ADD MODAL -->
     <div class="modal" id="addModal">
+
         <div class="modal-box">
+
             <h3>Add Bank</h3>
+
             <form method="POST">
+
                 <select name="bank_master_id" required>
+
                     <option value="">Select Bank</option>
-                    <?php while ($bank = $bank_master_result->fetch_assoc()): ?>
-                        <option value="<?= $bank['id'] ?>"><?= $bank['bank_name'] ?></option>
+
+                    <?php while ($bank = $bankMasterResult->fetch_assoc()): ?>
+
+                        <option value="<?= (int) $bank['id'] ?>">
+
+                            <?= htmlspecialchars($bank['bank_name']) ?>
+
+                        </option>
+
                     <?php endwhile; ?>
+
                 </select>
-                <button type="submit" class="save-btn">Add Bank</button>
-                <button type="button" class="close-btn"
-                    onclick="document.getElementById('addModal').style.display='none'">Cancel</button>
+
+                <button type="submit" class="save-btn">
+                    Add Bank
+                </button>
+
+                <button type="button" class="close-btn" onclick="closeModal('addModal')">
+
+                    Cancel
+
+                </button>
+
             </form>
+
         </div>
+
     </div>
 
-    <!-- EDIT BANK MODAL -->
+    <!-- EDIT MODAL -->
     <div class="modal" id="editModal">
+
         <div class="modal-box">
+
             <h3>Edit Bank</h3>
+
             <form method="POST" action="edit.php">
+
                 <input type="hidden" name="id" id="edit_bank_id">
+
                 <select name="bank_master_id" id="edit_bank_master_id" required>
+
                     <option value="">Select Bank</option>
+
                     <?php
-                    $bank_master_edit = $conn->query("SELECT * FROM bank_master ORDER BY bank_name ASC");
-                    while ($bank = $bank_master_edit->fetch_assoc()): ?>
-                        <option value="<?= $bank['id'] ?>"><?= $bank['bank_name'] ?></option>
+                    $bankMasterEdit = $conn->query("
+                    SELECT *
+                    FROM bank_master
+                    ORDER BY bank_name ASC
+                ");
+
+                    while ($bank = $bankMasterEdit->fetch_assoc()):
+                        ?>
+
+                        <option value="<?= (int) $bank['id'] ?>">
+
+                            <?= htmlspecialchars($bank['bank_name']) ?>
+
+                        </option>
+
                     <?php endwhile; ?>
+
                 </select>
-                <button type="submit" class="save-btn">Update</button>
-                <button type="button" class="close-btn"
-                    onclick="document.getElementById('editModal').style.display='none'">Cancel</button>
+
+                <button type="submit" class="save-btn">
+                    Update
+                </button>
+
+                <button type="button" class="close-btn" onclick="closeModal('editModal')">
+
+                    Cancel
+
+                </button>
+
             </form>
+
         </div>
+
     </div>
 
-    <!-- DELETE BANK MODAL -->
-    <div id="deleteModal" class="modal">
+    <!-- DELETE MODAL -->
+    <div class="modal" id="deleteModal">
+
         <div class="modal-box">
-            <h3>Delete Bank ?</h3>
+
+            <h3>Delete Bank?</h3>
 
             <form method="POST" action="delete.php">
-                <input type="hidden" name="id" id="delete_id">
+
+                <input type="hidden" name="id" id="delete_id" required>
 
                 <button type="submit" class="save-btn delete-btn">
+
                     Yes, Delete
+
                 </button>
 
-                <button type="button" class="close-btn"
-                    onclick="document.getElementById('deleteModal').style.display='none'">
+                <button type="button" class="close-btn" onclick="closeModal('deleteModal')">
+
                     Cancel
+
                 </button>
+
             </form>
+
         </div>
+
     </div>
 
-
-    <!-- Toast Notification Message -->
+    <!-- TOAST -->
     <div id="toast" class="toast"></div>
-
 
     <script>
         function openDeleteModal(id) {
+
             document.getElementById('delete_id').value = id;
+
             document.getElementById('deleteModal').style.display = 'flex';
         }
 
-        function closeDeleteModal() {
-            document.getElementById("deleteModal").style.display = "none";
+        function closeModal(id) {
+
+            document.getElementById(id).style.display = 'none';
         }
 
+        window.onclick = function (e) {
+
+            const modals = document.querySelectorAll(".modal");
+
+            modals.forEach(modal => {
+
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+
+            });
+        }
         function showToast(message, type = "success") {
+
             const toast = document.getElementById("toast");
 
             toast.className = "toast show " + type;
+
             toast.innerText = message;
 
             setTimeout(() => {
+
                 toast.classList.remove("show");
+
             }, 3000);
         }
     </script>
