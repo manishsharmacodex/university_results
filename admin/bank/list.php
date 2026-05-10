@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 /* ================= DB CONNECTION ================= */
 include(__DIR__ . "/../../server/connection.php");
+
 include("../../config/auth.php");
 
 /* ================= FLASH MESSAGE ================= */

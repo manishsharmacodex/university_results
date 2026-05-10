@@ -1,28 +1,27 @@
 <?php
+// DB Connection
 include(__DIR__ . "/server/connection.php");
 
 /* =========================================
    FETCH ADMISSION FORM SETTINGS
 ========================================= */
-$form_settings = mysqli_fetch_assoc(
-    mysqli_query(
-        $conn,
-        "SELECT * FROM admission_form_settings WHERE id='1'"
-    )
-);
+$result = mysqli_query($conn, "SELECT * FROM admission_form_settings WHERE id='1'");
+$form_settings = $result ? mysqli_fetch_assoc($result) : null;
 
 /* =========================================
    INSERT ADMISSION DATA (AJAX)
 ========================================= */
 if (isset($_POST['admission_button'])) {
 
-    $full_name = trim($_POST['full_name']);
-    $email_address = trim($_POST['email_address']);
-    $phone_number = trim($_POST['phone_number']);
-    $department = trim($_POST['department']);
-    $course = trim($_POST['course']);
+    $full_name = trim($_POST['full_name'] ?? '');
+    $email_address = trim($_POST['email_address'] ?? '');
+    $phone_number = trim($_POST['phone_number'] ?? '');
+    $department = trim($_POST['department'] ?? '');
+    $course = trim($_POST['course'] ?? '');
 
-    // Validation
+    /* ==============================
+       VALIDATION
+    ============================== */
     if (
         empty($full_name) ||
         empty($email_address) ||
@@ -35,54 +34,112 @@ if (isset($_POST['admission_button'])) {
     }
 
     if (!filter_var($email_address, FILTER_VALIDATE_EMAIL)) {
-        echo json_encode(["status" => "error", "message" => "Invalid email"]);
+        echo json_encode(["status" => "error", "message" => "Invalid email address"]);
         exit;
     }
 
-    /* =========================================
-       GENERATE ADMISSION NUMBER (FIXED)
-    ========================================= */
-    $year = date("Y");
+    if (!preg_match('/^[0-9]{10,15}$/', $phone_number)) {
+        echo json_encode(["status" => "error", "message" => "Invalid phone number"]);
+        exit;
+    }
 
-    $dept = "DEP" . $department;
-    $crs = "CRS" . $course;
+    /* ==============================
+       CHECK DUPLICATE EMAIL
+    ============================== */
+    $check = $conn->prepare("SELECT id FROM admission_list WHERE email_address = ?");
+    if (!$check) {
+        echo json_encode(["status" => "error", "message" => "Database error (check query)"]);
+        exit;
+    }
 
-    $result = mysqli_query($conn, "SELECT _id FROM admission_list ORDER BY _id DESC LIMIT 1");
-    $row = mysqli_fetch_assoc($result);
+    $check->bind_param("s", $email_address);
+    $check->execute();
+    $check->store_result();
 
-    $next_id = ($row['_id'] ?? 0) + 1;
+    if ($check->num_rows > 0) {
+        echo json_encode(["status" => "error", "message" => "Email already registered"]);
+        exit;
+    }
 
-    $admission_no = "AU-$year-$dept-$crs-" . str_pad($next_id, 3, "0", STR_PAD_LEFT);
+    /* ==============================
+       TRANSACTION START
+    ============================== */
+    $conn->begin_transaction();
 
-    /* =========================================
-       INSERT DATA
-    ========================================= */
-    $stmt = $conn->prepare("
-        INSERT INTO admission_list
-        (full_name, email_address, phone_number, department, course, admission_no)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ");
+    try {
 
-    $stmt->bind_param(
-        "ssssss",
-        $full_name,
-        $email_address,
-        $phone_number,
-        $department,
-        $course,
-        $admission_no
-    );
+        /* ==============================
+           INSERT DATA
+        ============================== */
+        $stmt = $conn->prepare("
+            INSERT INTO admission_list 
+            (full_name, email_address, phone_number, department, course)
+            VALUES (?, ?, ?, ?, ?)
+        ");
 
-    if ($stmt->execute()) {
+        if (!$stmt) {
+            throw new Exception("Insert query failed");
+        }
+
+        $stmt->bind_param(
+            "sssss",
+            $full_name,
+            $email_address,
+            $phone_number,
+            $department,
+            $course
+        );
+
+        if (!$stmt->execute()) {
+            throw new Exception("Insert execution failed");
+        }
+
+        $insert_id = $conn->insert_id;
+
+        /* ==============================
+           GENERATE ADMISSION NUMBER
+        ============================== */
+        $year = date("Y");
+
+        $dept = "DEP" . strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $department), 0, 3));
+        $crs = "CRS" . strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $course), 0, 3));
+
+        $admission_no = "AU-$year-$dept-$crs-" . str_pad($insert_id, 4, "0", STR_PAD_LEFT);
+
+        /* ==============================
+           UPDATE ADMISSION NUMBER
+        ============================== */
+        $update = $conn->prepare("UPDATE admission_list SET admission_no = ? WHERE id = ?");
+        if (!$update) {
+            throw new Exception("Update query failed");
+        }
+
+        $update->bind_param("si", $admission_no, $insert_id);
+
+        if (!$update->execute()) {
+            throw new Exception("Update execution failed");
+        }
+
+        /* ==============================
+           COMMIT
+        ============================== */
+        $conn->commit();
+
         echo json_encode([
             "status" => "success",
+            "message" => "Admission submitted successfully",
             "admission_no" => $admission_no
         ]);
-    } else {
+
+    } catch (Exception $e) {
+        $conn->rollback();
+
         echo json_encode([
-            "status" => "error"
+            "status" => "error",
+            "message" => "Something went wrong: " . $e->getMessage()
         ]);
     }
+
     exit;
 }
 ?>
@@ -508,7 +565,7 @@ if (isset($_POST['admission_button'])) {
 ================================= */
         .modal-content {
             width: 100%;
-            max-width: 380px;
+            max-width: 500px;
             background: linear-gradient(145deg, #ffffff, #f3f6ff);
             border-radius: 18px;
             padding: 28px 24px;
@@ -564,6 +621,11 @@ if (isset($_POST['admission_button'])) {
         .success_icon {
             width: 100px;
             height: 60px;
+        }
+
+        .disabled-form {
+            pointer-events: none;
+            opacity: 0.6;
         }
     </style>
 
@@ -624,40 +686,28 @@ if (isset($_POST['admission_button'])) {
     <div class="slider">
 
         <div class="slides">
-
             <?php
-            $banners = mysqli_query(
-                $conn,
-                "SELECT * FROM banners ORDER BY id DESC"
-            );
+            $banners = mysqli_query($conn, "SELECT title, description, image FROM banners ORDER BY id DESC");
 
             $first = true;
 
-            if (mysqli_num_rows($banners) > 0) {
+            if ($banners && mysqli_num_rows($banners) > 0) {
 
                 while ($row = mysqli_fetch_assoc($banners)) {
 
                     $image = "./admin/uploads/banners/" . $row['image'];
+                    $serverImage = __DIR__ . "/admin/uploads/banners/" . $row['image'];
                     ?>
 
                     <div class="slide <?= $first ? 'active' : '' ?>">
 
-                        <?php if (file_exists($image)) { ?>
-
+                        <?php if (file_exists($serverImage)) { ?>
                             <img src="<?= htmlspecialchars($image) ?>" alt="<?= htmlspecialchars($row['title']) ?>">
-
                         <?php } ?>
 
                         <div class="caption">
-
-                            <h2>
-                                <?= htmlspecialchars($row['title']) ?>
-                            </h2>
-
-                            <p>
-                                <?= htmlspecialchars($row['description']) ?>
-                            </p>
-
+                            <h2><?= htmlspecialchars($row['title']) ?></h2>
+                            <p><?= htmlspecialchars($row['description']) ?></p>
                         </div>
 
                     </div>
@@ -667,11 +717,9 @@ if (isset($_POST['admission_button'])) {
                 }
 
             } else {
-
                 echo "<div class='no-banners'>No banners found</div>";
             }
             ?>
-
         </div>
 
         <button class="prev">&#10094;</button>
@@ -716,43 +764,59 @@ if (isset($_POST['admission_button'])) {
         <!-- RIGHT FORM -->
         <div>
 
-            <?php if ($form_settings['form_status'] == 'Closed') { ?>
+            <?php
+            // Safe check for form settings
+            $form_status = $form_settings['form_status'] ?? 'Open';
+            $bg_color = $form_settings['background_color'] ?? '#ffffff';
+            $title = $form_settings['form_title'] ?? 'Admission Form';
+            $description = $form_settings['form_description'] ?? '';
+            $button_text = $form_settings['button_text'] ?? 'Submit';
+            ?>
 
+            <!-- CLOSED MESSAGE -->
+            <?php if ($form_status === 'Closed') { ?>
                 <div class="closed-message">
                     Admissions Are Currently Closed
                 </div>
-
             <?php } ?>
 
-            <form action="" id="admissionForm" method="POST" <?= $form_settings['form_status'] == 'Closed'
-                ? 'style="pointer-events: none; opacity: 0.6;"'
-                : '' ?>>
+            <!-- FORM -->
+            <form action="" id="admissionForm" method="POST"
+                class="<?= $form_status === 'Closed' ? 'disabled-form' : '' ?>" <?= $form_status === 'Closed' ? 'onsubmit="return false;"' : '' ?>>
 
-                <div class="form-box" style="background: <?= htmlspecialchars($form_settings['background_color']) ?>;">
+                <div class="form-box" style="background: <?= htmlspecialchars($bg_color, ENT_QUOTES, 'UTF-8') ?>;">
 
-                    <h3><?= htmlspecialchars($form_settings['form_title']) ?></h3>
+                    <h3><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h3>
 
-                    <p><?= htmlspecialchars($form_settings['form_description']) ?></p>
+                    <p><?= htmlspecialchars($description, ENT_QUOTES, 'UTF-8') ?></p>
 
-                    <input type="text" name="full_name" placeholder="Full Name" required>
+                    <!-- FULL NAME -->
+                    <input type="text" name="full_name" placeholder="Enter Full Name" required>
 
+                    <!-- EMAIL -->
                     <input type="email" name="email_address" placeholder="Email Address" required>
 
-                    <input type="text" name="phone_number" maxlength="10" placeholder="Phone Number" required>
+                    <!-- PHONE -->
+                    <input type="tel" name="phone_number" placeholder="Phone Number" maxlength="10" pattern="[0-9]{10}"
+                        required>
 
                     <!-- DEPARTMENT -->
                     <select name="department" id="department" required>
                         <option value="" selected disabled>Select Department</option>
 
                         <?php
-                        $department_query = mysqli_query($conn, "SELECT * FROM departments ORDER BY id DESC");
+                        $department_query = mysqli_query($conn, "SELECT id, name FROM departments ORDER BY id DESC");
 
-                        while ($department = mysqli_fetch_assoc($department_query)) {
-                            ?>
-                            <option value="<?= $department['id'] ?>">
-                                <?= htmlspecialchars($department['name']) ?>
-                            </option>
-                        <?php } ?>
+                        if ($department_query) {
+                            while ($department = mysqli_fetch_assoc($department_query)) {
+                                ?>
+                                <option value="<?= $department['id'] ?>">
+                                    <?= htmlspecialchars($department['name'], ENT_QUOTES, 'UTF-8') ?>
+                                </option>
+                                <?php
+                            }
+                        }
+                        ?>
                     </select>
 
                     <!-- COURSE -->
@@ -760,8 +824,9 @@ if (isset($_POST['admission_button'])) {
                         <option value="" selected disabled>Select Course</option>
                     </select>
 
-                    <input type="submit" value="<?= htmlspecialchars($form_settings['button_text']) ?>" class="button"
-                        name="admission_button">
+                    <!-- SUBMIT -->
+                    <input type="submit" value="<?= htmlspecialchars($button_text, ENT_QUOTES, 'UTF-8') ?>"
+                        class="button" name="admission_button" <?= $form_status === 'Closed' ? 'disabled' : '' ?>>
 
                 </div>
 
