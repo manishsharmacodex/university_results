@@ -1,5 +1,6 @@
 <?php
-include("../../server/connection.php");
+// DB Connection
+include(__DIR__ . "/../../server/connection.php");
 include("../../config/auth.php");
 
 
@@ -412,40 +413,18 @@ $activePage = "dashboard"; // change per page
                 </div>
 
             </div>
-
-
-
-            <!-- SLIDER -->
-            <!-- <div class="slider">
-                <div class="slides" id="slides">
-                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644">
-                    <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d">
-                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b">
-                </div>
-            </div> -->
-
         </div>
     </div>
-
-    <script>
-        // Script for the Slider
-        // let index = 0;
-        // const slides = document.getElementById("slides");
-        // const totalSlides = slides.children.length;
-
-        // setInterval(() => {
-        //     index = (index + 1) % totalSlides;
-        //     slides.style.transform = "translateX(" + (-index * 100) + "%)";
-        // }, 3000);
-
-        // Dropdown Toggle
-        const dropdownBtn = document.querySelector(".dropdown-btn");
-
-        dropdownBtn.addEventListener("click", function () {
-            this.parentElement.classList.toggle("active");
-        });
-    </script>
 
 </body>
 
 </html>
+
+<script>
+    // Dropdown Toggle
+    const dropdownBtn = document.querySelector(".dropdown-btn");
+
+    dropdownBtn.addEventListener("click", function () {
+        this.parentElement.classList.toggle("active");
+    });
+</script>
