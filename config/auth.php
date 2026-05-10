@@ -3,17 +3,19 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Prevent cache
-header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
+// Prevent caching
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-// Security headers (optional but good)
+// Security headers
 header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 header("X-XSS-Protection: 1; mode=block");
+header("Referrer-Policy: no-referrer");
+header("Permissions-Policy: geolocation=(), microphone=(), camera=()");
 
-// Check login
+// Check admin login
 if (empty($_SESSION['admin'])) {
     header("Location: ../auth/login.php");
     exit;

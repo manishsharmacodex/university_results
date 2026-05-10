@@ -1,25 +1,25 @@
 <?php
-include("../../server/connection.php");
-include("../../config/auth.php");
-
-// session history check
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// DB Connection File include
+include(__DIR__ . "/../../server/connection.php");
+
+include("../../config/auth.php");
+
 $message = '';
 
+// session history check
 if (isset($_SESSION['message'])) {
     $message = $_SESSION['message'];
     unset($_SESSION['message']);
 }
-// session history check
 
 /* ================= ADD BANK ================= */
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bank_master_id'])) {
 
-    $bank_master_id = (int)($_POST['bank_master_id']);
+    $bank_master_id = (int) ($_POST['bank_master_id']);
 
     if ($bank_master_id <= 0) {
         $_SESSION['message'] = "Invalid bank ID!";
@@ -76,7 +76,7 @@ $offset = ($page - 1) * $limit;
 /* TOTAL RECORDS */
 $total_result = $conn->query("SELECT COUNT(*) AS total FROM banks");
 $total_row = $total_result->fetch_assoc();
-$total_records = (int)$total_row['total'];
+$total_records = (int) $total_row['total'];
 
 $total_pages = ceil($total_records / $limit);
 
@@ -414,8 +414,7 @@ $bank_master_result = $conn->query("
                 <i class="fa-solid fa-users"></i>Student List
             </a>
 
-            <a href="../banner/list.php"
-                class="<?= $activePage == 'banner' ? 'active' : '' ?>">
+            <a href="../banner/list.php" class="<?= $activePage == 'banner' ? 'active' : '' ?>">
                 <i class="fa-solid fa-users"></i>Banner
             </a>
 
