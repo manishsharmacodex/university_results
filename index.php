@@ -1,5 +1,5 @@
 <?php
-include("./server/connection.php");
+include(__DIR__ . "/server/connection.php");
 
 /* =========================================
    FETCH ADMISSION FORM SETTINGS
@@ -12,7 +12,7 @@ $form_settings = mysqli_fetch_assoc(
 );
 
 /* =========================================
-   INSERT ADMISSION DATA
+   INSERT ADMISSION DATA (AJAX)
 ========================================= */
 if (isset($_POST['admission_button'])) {
 
@@ -30,62 +30,60 @@ if (isset($_POST['admission_button'])) {
         empty($department) ||
         empty($course)
     ) {
-
-        echo "<script>alert('All fields are required');</script>";
+        echo json_encode(["status" => "error", "message" => "All fields are required"]);
         exit;
     }
 
-    // Email validation
     if (!filter_var($email_address, FILTER_VALIDATE_EMAIL)) {
-
-        echo "<script>alert('Invalid email address');</script>";
+        echo json_encode(["status" => "error", "message" => "Invalid email"]);
         exit;
     }
 
-    // Prepared Statement
+    /* =========================================
+       GENERATE ADMISSION NUMBER (FIXED)
+    ========================================= */
+    $year = date("Y");
+
+    $dept = "DEP" . $department;
+    $crs = "CRS" . $course;
+
+    $result = mysqli_query($conn, "SELECT _id FROM admission_list ORDER BY _id DESC LIMIT 1");
+    $row = mysqli_fetch_assoc($result);
+
+    $next_id = ($row['_id'] ?? 0) + 1;
+
+    $admission_no = "AU-$year-$dept-$crs-" . str_pad($next_id, 3, "0", STR_PAD_LEFT);
+
+    /* =========================================
+       INSERT DATA
+    ========================================= */
     $stmt = $conn->prepare("
         INSERT INTO admission_list
-        (
-            full_name,
-            email_address,
-            phone_number,
-            department,
-            course
-        )
-        VALUES (?, ?, ?, ?, ?)
+        (full_name, email_address, phone_number, department, course, admission_no)
+        VALUES (?, ?, ?, ?, ?, ?)
     ");
 
     $stmt->bind_param(
-        "sssss",
+        "ssssss",
         $full_name,
         $email_address,
         $phone_number,
         $department,
-        $course
+        $course,
+        $admission_no
     );
 
-    $data = $stmt->execute();
-
-    if ($data) {
-
-        echo "
-        <script>
-            alert(
-                'Your form has been submitted successfully. Our team will contact you within 24 hours.'
-            );
-
-            window.location.href='index.php';
-        </script>
-        ";
-
+    if ($stmt->execute()) {
+        echo json_encode([
+            "status" => "success",
+            "admission_no" => $admission_no
+        ]);
     } else {
-
-        echo "
-        <script>
-            alert('Sorry! Please try again.');
-        </script>
-        ";
+        echo json_encode([
+            "status" => "error"
+        ]);
     }
+    exit;
 }
 ?>
 
@@ -476,6 +474,97 @@ if (isset($_POST['admission_button'])) {
             color: #777;
             font-size: 13px;
         }
+
+        .no-banners {
+            width: 100%;
+            height: 450px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* ===============================
+   MODAL BACKDROP (GLASS EFFECT)
+================================= */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 15, 25, 0.75);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.25s ease-in-out;
+            /* backdrop-filter: blur(8px); */
+            /* -webkit-backdrop-filter: blur(8px); */
+        }
+
+        /* ===============================
+   MODAL BOX
+================================= */
+        .modal-content {
+            width: 100%;
+            max-width: 380px;
+            background: linear-gradient(145deg, #ffffff, #f3f6ff);
+            border-radius: 18px;
+            padding: 28px 24px;
+            text-align: center;
+            color: #111;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            transform: translateY(20px);
+            animation: slideUp 0.3s ease forwards;
+            position: relative;
+        }
+
+        .modal-content h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0b1220;
+            margin-bottom: 10px;
+        }
+
+        /* ===============================
+   ADMISSION NUMBER
+================================= */
+        .modal-content h3 {
+            color: #00bcd4;
+            font-size: 22px;
+            font-weight: 800;
+            margin: 12px 0;
+            letter-spacing: 1px;
+        }
+
+        .modal-content p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .modal-content button {
+            margin-top: 15px;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #00d9ff;
+            color: #000;
+            font-weight: 600;
+            transition: all 0.25s ease;
+        }
+
+        .modal-content button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .success_icon {
+            width: 100px;
+            height: 60px;
+        }
     </style>
 
 </head>
@@ -579,7 +668,7 @@ if (isset($_POST['admission_button'])) {
 
             } else {
 
-                echo "<p>No banners found.</p>";
+                echo "<div class='no-banners'>No banners found</div>";
             }
             ?>
 
@@ -635,7 +724,7 @@ if (isset($_POST['admission_button'])) {
 
             <?php } ?>
 
-            <form action="" method="POST" <?= $form_settings['form_status'] == 'Closed'
+            <form action="" id="admissionForm" method="POST" <?= $form_settings['form_status'] == 'Closed'
                 ? 'style="pointer-events: none; opacity: 0.6;"'
                 : '' ?>>
 
@@ -778,117 +867,273 @@ if (isset($_POST['admission_button'])) {
 
     </div>
 
+    <!-- MODAL -->
+    <div id="popupModal" class="modal">
+        <div class="modal-content">
+            <img src="./src/assets/success_icon.png" alt="Success Icon" class="success_icon">
+            <h2>Application Submitted Successfully</h2>
+            <p>Your Admission Number:</p>
+            <h3 id="admissionNo"></h3>
+            <button onclick="closeModal()">OK</button>
+        </div>
+    </div>
 
-    <script>
-
-        /* =========================================
-   SLIDER (FINAL VERSION)
-========================================= */
-
-        const slides = document.querySelectorAll(".slide");
-        const nextBtn = document.querySelector(".next");
-        const prevBtn = document.querySelector(".prev");
-        const sliderContainer = document.querySelector(".slides");
-
-        let index = 0;
-        let sliderInterval;
-
-        // Exit if no slides found
-        if (slides.length > 0) {
-
-            function showSlide(i) {
-                slides.forEach(slide => slide.classList.remove("active"));
-                slides[i].classList.add("active");
-            }
-
-            function nextSlide() {
-                index = (index + 1) % slides.length;
-                showSlide(index);
-            }
-
-            function prevSlide() {
-                index = (index - 1 + slides.length) % slides.length;
-                showSlide(index);
-            }
-
-            // Auto slide
-            function startSlider() {
-                sliderInterval = setInterval(nextSlide, 10000);
-            }
-
-            function stopSlider() {
-                clearInterval(sliderInterval);
-            }
-
-            startSlider();
-
-            // Buttons (safe check)
-            if (nextBtn) {
-                nextBtn.addEventListener("click", nextSlide);
-            }
-
-            if (prevBtn) {
-                prevBtn.addEventListener("click", prevSlide);
-            }
-
-            // Pause on hover (optional but useful)
-            if (sliderContainer) {
-                sliderContainer.addEventListener("mouseenter", stopSlider);
-                sliderContainer.addEventListener("mouseleave", startSlider);
-            }
-
-            // Initial slide
-            showSlide(index);
-        }
-
-
-        /* =========================================
-   FETCH COURSE ACCORDING DEPARTMENT
-========================================= */
-
-        const department = document.getElementById("department");
-        const course = document.getElementById("course");
-
-        if (department && course) {
-
-            department.addEventListener("change", function () {
-
-                const department_id = this.value;
-
-                // Reset if no selection
-                if (department_id === "") {
-                    course.innerHTML = "<option value=''>Select Course</option>";
-                    return;
-                }
-
-                const xhr = new XMLHttpRequest();
-
-                xhr.open("POST", "./ajax/get_courses.php", true);
-
-                xhr.setRequestHeader(
-                    "Content-Type",
-                    "application/x-www-form-urlencoded"
-                );
-
-                xhr.onload = function () {
-
-                    if (xhr.status === 200) {
-                        course.innerHTML = xhr.responseText;
-                    } else {
-                        course.innerHTML = "<option>Error loading courses</option>";
-                    }
-
-                };
-
-                course.innerHTML = "<option>Loading...</option>";
-
-                xhr.send("department_id=" + encodeURIComponent(department_id));
-
-            });
-
-        }
-    </script>
 
 </body>
 
 </html>
+
+<script>
+    class Slider {
+        constructor({
+            containerSelector = ".slides",
+            slideSelector = ".slide",
+            nextBtnSelector = ".next",
+            prevBtnSelector = ".prev",
+            intervalTime = 10000
+        } = {}) {
+
+            // Elements
+            this.container = document.querySelector(containerSelector);
+            this.slides = document.querySelectorAll(slideSelector);
+            this.nextBtn = document.querySelector(nextBtnSelector);
+            this.prevBtn = document.querySelector(prevBtnSelector);
+
+            // State
+            this.index = 0;
+            this.intervalTime = intervalTime;
+            this.interval = null;
+
+            // Swipe
+            this.startX = 0;
+            this.endX = 0;
+
+            if (!this.slides.length || !this.container) return;
+
+            this.init();
+        }
+
+        init() {
+            this.showSlide(this.index);
+            this.startAuto();
+
+            this.bindEvents();
+        }
+
+        /* -------------------------
+           Core Functions
+        --------------------------*/
+
+        showSlide(i) {
+            const total = this.slides.length;
+
+            this.slides.forEach(slide => slide.classList.remove("active"));
+
+            this.index = (i + total) % total;
+            this.slides[this.index].classList.add("active");
+        }
+
+        nextSlide = () => {
+            this.showSlide(this.index + 1);
+        };
+
+        prevSlide = () => {
+            this.showSlide(this.index - 1);
+        };
+
+        /* -------------------------
+           Auto Slide (safe)
+        --------------------------*/
+
+        startAuto() {
+            this.stopAuto(); // prevent multiple intervals
+            this.interval = setInterval(this.nextSlide, this.intervalTime);
+        }
+
+        stopAuto() {
+            if (this.interval) {
+                clearInterval(this.interval);
+                this.interval = null;
+            }
+        }
+
+        /* -------------------------
+           Events
+        --------------------------*/
+
+        bindEvents() {
+
+            // Buttons
+            this.nextBtn?.addEventListener("click", () => {
+                this.nextSlide();
+                this.restartAuto();
+            });
+
+            this.prevBtn?.addEventListener("click", () => {
+                this.prevSlide();
+                this.restartAuto();
+            });
+
+            // Pause on hover
+            this.container.addEventListener("mouseenter", () => this.stopAuto());
+            this.container.addEventListener("mouseleave", () => this.startAuto());
+
+            // Keyboard support
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "ArrowRight") {
+                    this.nextSlide();
+                    this.restartAuto();
+                }
+                if (e.key === "ArrowLeft") {
+                    this.prevSlide();
+                    this.restartAuto();
+                }
+            });
+
+            // Touch support (mobile swipe)
+            this.container.addEventListener("touchstart", (e) => {
+                this.startX = e.touches[0].clientX;
+            });
+
+            this.container.addEventListener("touchend", (e) => {
+                this.endX = e.changedTouches[0].clientX;
+                this.handleSwipe();
+            });
+        }
+
+        handleSwipe() {
+            const diff = this.startX - this.endX;
+
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) this.nextSlide();
+                else this.prevSlide();
+
+                this.restartAuto();
+            }
+        }
+
+        restartAuto() {
+            this.stopAuto();
+            this.startAuto();
+        }
+    }
+
+    /* -------------------------
+       INIT SLIDER
+    --------------------------*/
+
+    document.addEventListener("DOMContentLoaded", () => {
+        new Slider({
+            intervalTime: 10000
+        });
+    });
+
+
+    /* =========================================
+FETCH COURSE ACCORDING DEPARTMENT
+========================================= */
+
+    const department = document.getElementById("department");
+    const course = document.getElementById("course");
+
+    let controller = null;
+
+    if (department && course) {
+
+        department.addEventListener("change", async function () {
+
+            const departmentId = this.value;
+
+            // Reset
+            if (!departmentId) {
+                course.innerHTML = "<option value=''>Select Course</option>";
+                return;
+            }
+
+            // Cancel previous request (important for production)
+            if (controller) {
+                controller.abort();
+            }
+
+            controller = new AbortController();
+
+            try {
+
+                // Loading state (UX improvement)
+                course.innerHTML = "<option disabled>Loading...</option>";
+
+                const response = await fetch("./ajax/get_courses.php", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({
+                        department_id: departmentId
+                    }),
+                    signal: controller.signal
+                });
+
+                if (!response.ok) {
+                    throw new Error("Server error");
+                }
+
+                const data = await response.text();
+
+                // Basic safety check
+                if (!data || typeof data !== "string") {
+                    throw new Error("Invalid response");
+                }
+
+                course.innerHTML = data;
+
+            } catch (error) {
+
+                if (error.name === "AbortError") return;
+
+                console.error(error);
+                course.innerHTML = "<option>Error loading courses</option>";
+
+            }
+
+        });
+
+    }
+
+
+
+    /* =========================================
+   AJAX FORM SUBMIT + POPUP
+========================================= */
+
+    document.getElementById("admissionForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        let formData = new FormData(this);
+        formData.append("admission_button", true);
+
+        fetch("", {
+            method: "POST",
+            body: formData
+        })
+            .then(res => res.json())
+            .then(data => {
+
+                if (data.status === "success") {
+
+                    document.getElementById("admissionNo").innerText = data.admission_no;
+                    document.getElementById("popupModal").style.display = "flex";
+
+                    document.getElementById("admissionForm").reset();
+
+                } else {
+                    alert(data.message || "Error occurred");
+                }
+
+            });
+    });
+
+    function closeModal() {
+        document.getElementById("popupModal").style.display = "none";
+    }
+
+</script>
