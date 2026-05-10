@@ -1,31 +1,50 @@
 <?php
-include("../../server/connection.php");
-include("../../config/auth.php");
-
-if (!isset($_SESSION['admin'])) {
-    header("Location: ../auth/login.php");
-    exit;
-}
+// DB Connection
+include(__DIR__ . "/../../server/connection.php");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $form_title = mysqli_real_escape_string($conn, $_POST['form_title']);
-    $form_description = mysqli_real_escape_string($conn, $_POST['form_description']);
-    $button_text = mysqli_real_escape_string($conn, $_POST['button_text']);
-    $background_color = mysqli_real_escape_string($conn, $_POST['background_color']);
-    $form_status = mysqli_real_escape_string($conn, $_POST['form_status']);
+    $id = 1;
 
-    $update = mysqli_query($conn, "
-        UPDATE admission_form_settings SET
-            form_title='$form_title',
-            form_description='$form_description',
-            button_text='$button_text',
-            background_color='$background_color',
-            form_status='$form_status'
-        WHERE id='1'
+    $form_title = $_POST['form_title'] ?? '';
+    $form_description = $_POST['form_description'] ?? '';
+    $button_text = $_POST['button_text'] ?? '';
+    $background_color = $_POST['background_color'] ?? '#ffffff';
+    $form_status = $_POST['form_status'] ?? '';
+
+    // Basic validation (important)
+    if (
+        empty($form_title) ||
+        empty($form_description) ||
+        empty($button_text) ||
+        !in_array($form_status, ['Open', 'Closed'])
+    ) {
+        echo "<script>alert('Invalid input data'); window.history.back();</script>";
+        exit;
+    }
+
+    // Prepared statement (secure way)
+    $stmt = $conn->prepare("
+        UPDATE admission_form_settings 
+        SET form_title = ?, 
+            form_description = ?, 
+            button_text = ?, 
+            background_color = ?, 
+            form_status = ?
+        WHERE id = ?
     ");
 
-    if ($update) {
+    $stmt->bind_param(
+        "sssssi",
+        $form_title,
+        $form_description,
+        $button_text,
+        $background_color,
+        $form_status,
+        $id
+    );
+
+    if ($stmt->execute()) {
         echo "
         <script>
             alert('Admission Form Updated Successfully');
@@ -40,5 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </script>
         ";
     }
+
+    $stmt->close();
 }
 ?>

@@ -1,15 +1,20 @@
 <?php
-include("../../server/connection.php");
-include("../../config/auth.php");
+// DB Connection
+include(__DIR__ . "/../../server/connection.php");
 
-if (!isset($_SESSION['admin'])) {
-    header("Location: ../auth/login.php");
-    exit;
+/* FETCH DATA SAFELY */
+$id = 1;
+
+$stmt = $conn->prepare("SELECT * FROM admission_form_settings WHERE id = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+
+$result = $stmt->get_result();
+$data = $result->fetch_assoc();
+
+if (!$data) {
+    die("No admission form settings found.");
 }
-
-/* FETCH DATA */
-$result = mysqli_query($conn, "SELECT * FROM admission_form_settings WHERE id='1'");
-$data = mysqli_fetch_assoc($result);
 ?>
 
 <!DOCTYPE html>
@@ -31,6 +36,7 @@ $data = mysqli_fetch_assoc($result);
         body {
             background: #f1f5f9;
             padding: 40px;
+            font-family: Arial, sans-serif;
         }
 
         .container {
@@ -92,21 +98,27 @@ $data = mysqli_fetch_assoc($result);
         <form method="POST" action="./update_form.php">
 
             <label>Form Title</label>
-            <input type="text" name="form_title" value="<?= htmlspecialchars($data['form_title']) ?>" required>
+            <input type="text" name="form_title" value="<?= htmlspecialchars($data['form_title'] ?? '') ?>" required>
 
             <label>Form Description</label>
-            <textarea name="form_description" required><?= htmlspecialchars($data['form_description']) ?></textarea>
+            <textarea name="form_description"
+                required><?= htmlspecialchars($data['form_description'] ?? '') ?></textarea>
 
             <label>Button Text</label>
-            <input type="text" name="button_text" value="<?= htmlspecialchars($data['button_text']) ?>" required>
+            <input type="text" name="button_text" value="<?= htmlspecialchars($data['button_text'] ?? '') ?>" required>
 
             <label>Background Color</label>
-            <input type="color" name="background_color" value="<?= htmlspecialchars($data['background_color']) ?>">
+            <input type="color" name="background_color"
+                value="<?= htmlspecialchars($data['background_color'] ?? '#ffffff') ?>">
 
             <label>Admission Status</label>
             <select name="form_status">
-                <option value="Open" <?= $data['form_status'] == 'Open' ? 'selected' : '' ?>>Open</option>
-                <option value="Closed" <?= $data['form_status'] == 'Closed' ? 'selected' : '' ?>>Closed</option>
+                <option value="Open" <?= (($data['form_status'] ?? '') === 'Open') ? 'selected' : '' ?>>
+                    Open
+                </option>
+                <option value="Closed" <?= (($data['form_status'] ?? '') === 'Closed') ? 'selected' : '' ?>>
+                    Closed
+                </option>
             </select>
 
             <button type="submit">
