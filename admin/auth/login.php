@@ -129,7 +129,7 @@ if (isset($_POST['login'])) {
         .login-box {
             background: #fff;
             padding: 40px;
-            width: 380px;
+            width: 400px;
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             text-align: center;
