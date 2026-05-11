@@ -86,3 +86,49 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
     </form>
 
 </div>
+
+
+
+<!-- MODAL -->
+<div id="popupModal" class="modal">
+    <div class="modal-content">
+        <img src="./src/assets/success_icon.png" alt="Success Icon" class="success_icon">
+        <h2>Application Submitted Successfully</h2>
+        <p>Your Admission Number:</p>
+        <h3 id="admissionNo"></h3>
+        <button onclick="closeModal()">OK</button>
+    </div>
+</div>
+
+
+
+<script>
+    document.querySelector("#admissionForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        let formData = {
+            full_name: document.querySelector("[name='full_name']").value,
+            email_address: document.querySelector("[name='email_address']").value,
+            phone_number: document.querySelector("[name='phone_number']").value,
+            department: document.querySelector("[name='department']").value,
+            course: document.querySelector("[name='course']").value
+        };
+
+        let response = await fetch(`${BASE_URL}/backend/ajax/get_courses.php`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
+        });
+
+        let result = await response.json();
+
+        if (result.status === "success") {
+            document.getElementById("admissionNo").innerText = result.admission_no;
+            document.getElementById("popupModal").style.display = "block";
+        } else {
+            alert(result.message);
+        }
+    });
+</script>

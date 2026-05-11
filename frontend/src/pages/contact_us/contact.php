@@ -1,59 +1,7 @@
 <?php
-
-// DB Connection
-include(__DIR__ . "/../../../../backend/server/connection.php");
-
-$message = "";
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-    // Safe input handling
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $msg = trim($_POST['message'] ?? '');
-
-    $subject = trim($_POST['subject'] ?? '');
-
-    // Handle custom subject safely (FIXED)
-    if ($subject === "Other") {
-        $custom = trim($_POST['custom_subject'] ?? '');
-
-        if ($custom !== '') {
-            $subject = $custom;
-        } else {
-            $subject = "Other";
-        }
-    }
-
-    // Basic validation
-    if ($name === '' || $email === '' || $subject === '' || $msg === '') {
-        $message = "❌ All fields are required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $message = "❌ Invalid email format.";
-    } else {
-
-        $stmt = $conn->prepare("
-            INSERT INTO university_results.contact_us 
-            (name, email, subject, message) 
-            VALUES (?, ?, ?, ?)
-        ");
-
-        if (!$stmt) {
-            die("Prepare failed: " . $conn->error);
-        }
-
-        $stmt->bind_param("ssss", $name, $email, $subject, $msg);
-
-        if ($stmt->execute()) {
-            $message = "✅ Thank you, $name! Your message has been sent successfully.";
-        } else {
-            $message = "❌ Something went wrong. Please try again.";
-        }
-
-        $stmt->close();
-    }
-}
+require_once(__DIR__ . "/../../../../backend/config/config.php");
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -67,16 +15,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" type="text/css" href="../../css/global.css">
     <link rel="stylesheet" type="text/css" href="../../css/contact.css">
     <style>
-        
+
     </style>
 </head>
 
 <body>
 
     <!-- NAVBAR -->
-     <?php
-        include("../../components/navbar/navbar.php");
-     ?>
+    <?php
+    include("../../components/navbar/navbar.php");
+    ?>
 
     <!-- HERO -->
     <div class="hero">
@@ -104,13 +52,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <h2>Send Message</h2>
 
-            <?php if ($message) { ?>
-                <div class="<?= strpos($message, '✅') !== false ? 'success' : 'error' ?>">
-                    <?= $message ?>
-                </div>
-            <?php } ?>
+            <div id="responseMsg"></div>
 
-            <form method="POST">
+            <form id="contactForm">
 
                 <div class="field">
                     <input type="text" name="name" placeholder="Enter Full Name">
@@ -151,12 +95,50 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <!-- FOOTER -->
-     <?php
-        include("../../components/footer/footer.php");
-     ?>
+    <?php
+    include("../../components/footer/footer.php");
+    ?>
 
     <script type="text/javascript" src="../../js/contactSubjectToggle.js"></script>
 
 </body>
 
 </html>
+
+
+<script>
+    document.getElementById("contactForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const formData = {
+            name: document.querySelector("[name='name']").value,
+            email: document.querySelector("[name='email']").value,
+            subject: document.querySelector("[name='subject']").value,
+            custom_subject: document.querySelector("[name='custom_subject']").value,
+            message: document.querySelector("[name='message']").value
+        };
+
+        try {
+            const res = await fetch("/backend/api/contact.php", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                alert("✅ " + data.message);
+                document.getElementById("contactForm").reset();
+            } else {
+                alert("❌ " + data.message);
+            }
+
+        } catch (err) {
+            alert("❌ Server error");
+            console.error(err);
+        }
+    });
+</script>
