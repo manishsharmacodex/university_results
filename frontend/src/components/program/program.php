@@ -5,7 +5,7 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
 <link rel="stylesheet" href="<?= BASE_URL ?>/frontend/src/components/program/program.css">
 
 
-
+<!-- Program Section -->
 <div class="section">
 
     <h2>Our Popular Programs</h2>

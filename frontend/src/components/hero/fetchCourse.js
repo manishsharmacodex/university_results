@@ -26,16 +26,19 @@ if (department && course) {
       // Loading state
       course.innerHTML = "<option disabled>Loading...</option>";
 
-      const response = await fetch("/../../../../backend/ajax/get_courses.php", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+      const response = await fetch(
+        `${BASE_URL}/backend/ajax/get_courses.php`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            department_id: departmentId,
+          }),
+          signal: controller.signal,
         },
-        body: new URLSearchParams({
-          department_id: departmentId,
-        }),
-        signal: controller.signal,
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Server error");
@@ -52,6 +55,7 @@ if (department && course) {
       if (error.name === "AbortError") return;
 
       console.error(error);
+
       course.innerHTML = "<option>Error loading courses</option>";
     }
   });

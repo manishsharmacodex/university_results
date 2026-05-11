@@ -5,38 +5,44 @@ class Slider {
     nextBtnSelector = ".next",
     prevBtnSelector = ".prev",
     intervalTime = 10000,
+    swipeThreshold = 50,
   } = {}) {
     // Elements
     this.container = document.querySelector(containerSelector);
-    this.slides = document.querySelectorAll(slideSelector);
+    this.slides = this.container
+      ? this.container.querySelectorAll(slideSelector)
+      : [];
     this.nextBtn = document.querySelector(nextBtnSelector);
     this.prevBtn = document.querySelector(prevBtnSelector);
+
+    // Guard clause
+    if (!this.container || !this.slides.length) return;
 
     // State
     this.index = 0;
     this.intervalTime = intervalTime;
     this.interval = null;
+    this.swipeThreshold = swipeThreshold;
 
-    // Swipe
+    // Touch
     this.startX = 0;
     this.endX = 0;
-
-    if (!this.slides.length || !this.container) return;
 
     this.init();
   }
 
+  /* -------------------------
+        INIT
+  --------------------------*/
   init() {
     this.showSlide(this.index);
     this.startAuto();
-
     this.bindEvents();
   }
 
   /* -------------------------
-           Core Functions
-        --------------------------*/
-
+        CORE
+  --------------------------*/
   showSlide(i) {
     const total = this.slides.length;
 
@@ -55,25 +61,27 @@ class Slider {
   };
 
   /* -------------------------
-           Auto Slide (safe)
-        --------------------------*/
-
+        AUTO PLAY
+  --------------------------*/
   startAuto() {
-    this.stopAuto(); // prevent multiple intervals
-    this.interval = setInterval(this.nextSlide, this.intervalTime);
+    this.stopAuto();
+    this.interval = setInterval(() => {
+      this.nextSlide();
+    }, this.intervalTime);
   }
 
   stopAuto() {
-    if (this.interval) {
-      clearInterval(this.interval);
-      this.interval = null;
-    }
+    clearInterval(this.interval);
+    this.interval = null;
+  }
+
+  restartAuto() {
+    this.startAuto();
   }
 
   /* -------------------------
-           Events
-        --------------------------*/
-
+        EVENTS
+  --------------------------*/
   bindEvents() {
     // Buttons
     this.nextBtn?.addEventListener("click", () => {
@@ -90,50 +98,50 @@ class Slider {
     this.container.addEventListener("mouseenter", () => this.stopAuto());
     this.container.addEventListener("mouseleave", () => this.startAuto());
 
-    // Keyboard support
+    // Keyboard
     document.addEventListener("keydown", (e) => {
       if (e.key === "ArrowRight") {
         this.nextSlide();
         this.restartAuto();
       }
+
       if (e.key === "ArrowLeft") {
         this.prevSlide();
         this.restartAuto();
       }
     });
 
-    // Touch support (mobile swipe)
+    // Touch
     this.container.addEventListener("touchstart", (e) => {
       this.startX = e.touches[0].clientX;
+      this.stopAuto();
     });
 
     this.container.addEventListener("touchend", (e) => {
       this.endX = e.changedTouches[0].clientX;
       this.handleSwipe();
+      this.startAuto();
     });
   }
 
+  /* -------------------------
+        SWIPE
+  --------------------------*/
   handleSwipe() {
     const diff = this.startX - this.endX;
 
-    if (Math.abs(diff) > 50) {
+    if (Math.abs(diff) > this.swipeThreshold) {
       if (diff > 0) this.nextSlide();
       else this.prevSlide();
 
       this.restartAuto();
     }
   }
-
-  restartAuto() {
-    this.stopAuto();
-    this.startAuto();
-  }
 }
 
 /* -------------------------
-       INIT SLIDER
-    --------------------------*/
-
+        INIT
+--------------------------*/
 document.addEventListener("DOMContentLoaded", () => {
   new Slider({
     intervalTime: 10000,

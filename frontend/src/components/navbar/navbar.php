@@ -5,9 +5,7 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
 <link rel="stylesheet" href="<?= BASE_URL ?>/frontend/src/components/navbar/navbar.css">
 
 
-<!-- =========================================
-            Navbar
-    ========================================= -->
+<!-- Navbar -->
 <div class="navbar">
 
     <a href="<?= BASE_URL ?>/index.php">

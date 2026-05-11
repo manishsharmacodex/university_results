@@ -5,9 +5,7 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
 <link rel="stylesheet" href="<?= BASE_URL ?>/frontend/src/components/footer/footer.css">
 
 
-<!-- =========================================
-         FOOTER
-    ========================================= -->
+<!-- FOOTER -->
 <div class="footer">
 
     <div class="footer-grid">

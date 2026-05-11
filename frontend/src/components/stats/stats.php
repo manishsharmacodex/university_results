@@ -5,7 +5,7 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
 <link rel="stylesheet" href="<?= BASE_URL ?>/frontend/src/components/stats/stats.css">
 
 
-
+<!-- Stats Section -->
 <div class="stats">
 
     <div class="stat">
