@@ -1,0 +1,107 @@
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 80px 60px;
+  align-items: flex-start;
+}
+
+.hero-text {
+  max-width: 550px;
+}
+
+.hero-text h1 {
+  font-size: 55px;
+  line-height: 1.2;
+}
+
+.hero-text span {
+  color: #00d9ff;
+}
+
+.hero-text p {
+  margin-top: 15px;
+  color: #b8c1d1;
+  line-height: 1.7;
+}
+
+.hero-buttons {
+  margin-top: 20px;
+}
+
+.hero-buttons button {
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.primary {
+  background: #00d9ff;
+  color: #000;
+}
+
+.secondary {
+  background: transparent;
+  border: 1px solid #00d9ff;
+  color: #00d9ff;
+}
+
+/* Form CSS */
+.form-box {
+  width: 400px;
+  padding: 30px;
+  border-radius: 14px;
+  color: #000;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.form-box h3 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.form-box p {
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.form-box input,
+.form-box select {
+  width: 100%;
+  padding: 13px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  outline: none;
+}
+
+.form-box input:focus,
+.form-box select:focus {
+  border-color: #00d9ff;
+}
+
+.button {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  background: #00d9ff;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+
+/* Closed Message */
+.closed-message {
+  background: red;
+  color: white;
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: 600;
+}

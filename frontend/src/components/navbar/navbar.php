@@ -4,34 +4,40 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/frontend/src/components/navbar/navbar.css">
 
+
+<!-- =========================================
+            Navbar
+    ========================================= -->
 <div class="navbar">
 
-    <a href="<?= BASE_URL ?>index.php">
+    <a href="<?= BASE_URL ?>/index.php">
         <div class="logo">Alpha University</div>
     </a>
 
     <ul>
-
-        <a href="<?= BASE_URL ?>index.php">
-            <li>Home</li>
-        </a>
+        <li><a href="<?= BASE_URL ?>/index.php">Home</a></li>
 
         <li>Programs</li>
 
         <li>Admissions</li>
 
-        <a href="<?= BASE_URL ?>/frontend/src/pages/results/results.php" target="_blank">
-            <li>Exam & Results</li>
-        </a>
+        <li>
+            <a href="<?= BASE_URL ?>/frontend/src/pages/results/results.php" target="_blank">
+                Exam & Results
+            </a>
+        </li>
 
-        <a href="<?= BASE_URL ?>/frontend/src/pages/school/school_information.php">
-            <li>School Informations</li>
-        </a>
+        <li>
+            <a href="<?= BASE_URL ?>/frontend/src/pages/school/school_information.php">
+                School Informations
+            </a>
+        </li>
 
-        <a href="<?= BASE_URL ?>/frontend/src/pages/contact_us/contact.php">
-            <li>Contact</li>
-        </a>
-
+        <li>
+            <a href="<?= BASE_URL ?>/frontend/src/pages/contact_us/contact.php">
+                Contact
+            </a>
+        </li>
     </ul>
 
     <div class="nav-buttons">
@@ -40,10 +46,8 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
             Student Login
         </button>
 
-        <a href="<?= BASE_URL ?>/backend/admin/auth/login.php" target="_blank">
-            <button class="nav-btn admin-btn">
-                Admin Login
-            </button>
+        <a class="nav-btn admin-btn" href="<?= BASE_URL ?>/backend/admin/auth/login.php" target="_blank">
+            Admin Login
         </a>
 
     </div>

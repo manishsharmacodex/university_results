@@ -26,7 +26,7 @@ if (department && course) {
       // Loading state
       course.innerHTML = "<option disabled>Loading...</option>";
 
-      const response = await fetch("/../../../backend/ajax/get_courses.php", {
+      const response = await fetch("/../../../../backend/ajax/get_courses.php", {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
