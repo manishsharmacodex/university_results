@@ -126,88 +126,7 @@ if (isset($_POST['login'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ERP Admin Login</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(135deg, #081224, #0e1c35);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .login-box {
-            background: #fff;
-            padding: 40px;
-            width: 400px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            text-align: center;
-        }
-
-        .login-box h2 {
-            margin-bottom: 20px;
-            color: #2a5298;
-            font-weight: 600;
-        }
-
-        .login-box input[type="text"],
-        .login-box input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            outline: none;
-        }
-
-        .login-box input[type="submit"] {
-            width: 100%;
-            padding: 12px;
-            margin-top: 15px;
-            background: #2a5298;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .login-box input[type="submit"]:hover {
-            background: #1e3c72;
-        }
-
-        .captcha-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .captcha-text {
-            font-weight: bold;
-        }
-
-        .refresh-btn {
-            padding: 6px 10px;
-            background: #2a5298;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .error {
-            color: red;
-            margin-bottom: 10px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="./src/login.css">
 </head>
 
 <body>
@@ -244,39 +163,8 @@ if (isset($_POST['login'])) {
         </form>
     </div>
 
+    <script type="text/javascript" src="./src/login.js"></script>
+
 </body>
 
 </html>
-
-<script>
-    // windows history prevent to back button
-    if (window.history && window.history.pushState) {
-        window.history.pushState(null, document.title, window.location.href);
-
-        window.onpopstate = function () {
-            window.history.pushState(null, document.title, window.location.href);
-        };
-    }
-
-
-    // refresh functions
-    function refreshCaptcha() {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "", true);
-        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-        xhr.onload = function () {
-            if (this.status === 200) {
-                let data = this.responseText.trim().split("|");
-
-                if (data.length === 3) {
-                    document.getElementById("num1").innerText = data[0];
-                    document.getElementById("operator").innerText = data[1];
-                    document.getElementById("num2").innerText = data[2];
-                }
-            }
-        };
-
-        xhr.send("refresh_captcha=1");
-    }
-</script>

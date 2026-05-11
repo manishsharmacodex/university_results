@@ -40,267 +40,7 @@ $result = $conn->query($sql);
     <title>Student List</title>
     <link rel="stylesheet" type="text/css" href="../../../css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(120deg, #eef2ff, #f8fafc);
-        }
-
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 250px;
-            background: #111827;
-            color: white;
-            padding: 20px;
-
-            height: 100vh;
-            /* full screen height */
-            position: sticky;
-            /* stays fixed while page scrolls */
-            top: 0;
-
-            overflow-y: auto;
-            /* enables vertical scroll */
-        }
-
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .sidebar a {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            color: #cbd5e1;
-            text-decoration: none;
-            padding: 12px;
-            margin: 6px 0;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.active {
-            background: #2563eb;
-            color: white;
-            transform: translateX(5px);
-        }
-
-        .sidebar a.logout-btn {
-            background: #ef4444;
-            color: white;
-        }
-
-        .main {
-            flex: 1;
-            padding: 25px;
-        }
-
-        .breadcrumb {
-            margin-bottom: 20px;
-            color: #6b7280;
-        }
-
-        .breadcrumb a {
-            text-decoration: none;
-            color: #2563eb;
-        }
-
-        .breadcrum-header {
-            width: 100%;
-            display: block;
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            color: #ffffff !important;
-            padding: 18px 25px;
-            border-radius: 10px;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-            margin-bottom: 15px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        th {
-            background: #111827;
-            color: white;
-            padding: 14px;
-            text-align: left;
-        }
-
-        td {
-            padding: 14px;
-            border-bottom: 1px solid #eee;
-        }
-
-        tr:hover {
-            background: #f3f4f6;
-        }
-
-        .action a {
-            padding: 6px 10px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 13px;
-            margin-right: 5px;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-        }
-
-        .btn {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .btn-edit {
-            background: #f59e0b;
-        }
-
-        .btn-save {
-            background: #22c55e;
-        }
-
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .panel {
-            width: 95%;
-            max-width: 1050px;
-            background: #fff;
-            border-radius: 16px;
-            overflow: hidden;
-            max-height: 92vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .hero {
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            color: white;
-            padding: 18px 22px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .hero img {
-            width: 75px;
-            height: 75px;
-            border-radius: 12px;
-            object-fit: cover;
-            border: 2px solid white;
-        }
-
-        .content {
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .section {
-            background: #f8fafc;
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 14px;
-            border: 1px solid #e5e7eb;
-        }
-
-        .section-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: #2563eb;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-
-        .row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-
-        .item {
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #eee;
-        }
-
-        .input {
-            width: 100%;
-            border: 1px solid #ddd;
-            padding: 6px;
-            border-radius: 6px;
-        }
-
-        .footer {
-            padding: 12px;
-            text-align: right;
-            border-top: 1px solid #eee;
-        }
-
-        .close-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
-            padding: 9px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .pagination {
-            margin-top: 15px;
-            padding: 10px;
-        }
-
-        .pagination a {
-            padding: 6px 10px;
-            background: #f3f4f6;
-            margin-right: 5px;
-            border-radius: 6px;
-            text-decoration: none;
-            color: #111827;
-        }
-
-        .pagination a.active {
-            background: #2563eb;
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="../../../admin/css/sidebar.css">
 </head>
 
 <body>
@@ -339,10 +79,27 @@ $result = $conn->query($sql);
                 <i class="fa-solid fa-users"></i>Student List
             </a>
 
-            <a href="../../../admin/banner/list.php"
-                class="<?= $activePage == 'banner' ? 'active' : '' ?>">
-                <i class="fa-solid fa-users"></i>Banner
-            </a>
+            <!-- SHOP MENU -->
+            <div class="dropdown">
+
+                <a href="javascript:void(0);" class="dropdown-btn">
+                    <i class="fa-solid fa-shop"></i>
+                    University Manage
+                    <i class="fa-solid fa-caret-down dropdown-icon"></i>
+                </a>
+
+                <div class="dropdown-container">
+
+                    <a href="../../../admin/banner/list.php" class="<?= $activePage == 'banner' ? 'active' : '' ?>">
+                        <i class="fa-solid fa-image"></i>Banner Update
+                    </a>
+
+                    <a href="../../../admin/admission_form/list.php" class="<?= $activePage == 'admission_form' ? 'active' : '' ?>">
+                        <i class="fa-solid fa-file-pen"></i>Admission Form Update
+                    </a>
+
+                </div>
+            </div>
 
             <a href="../auth/logout.php" class="logout-btn">Logout</a>
         </div>
@@ -523,6 +280,8 @@ $result = $conn->query($sql);
         }
 
     </script>
+
+    <script type="text/javascript" src="../../../admin/js/dropdownToggle.js"></script>
 
 </body>
 

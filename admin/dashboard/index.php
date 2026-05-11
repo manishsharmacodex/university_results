@@ -34,245 +34,11 @@ $activePage = "dashboard"; // change per page
     <title>Admin Dashboard</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(120deg, #eef2ff, #f8fafc);
-        }
-
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 260px;
-            background: linear-gradient(180deg, #111827, #0f172a);
-            color: white;
-            padding: 20px;
-
-            height: 100vh;
-            position: sticky;
-            top: 0;
-
-            overflow-y: auto;
-            overflow-x: hidden;
-
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-
-            scrollbar-width: thin;
-            scrollbar-color: #2563eb #111827;
-            /* enables vertical scroll */
-        }
-
-        /* Custom Scrollbar */
-        .sidebar::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .sidebar::-webkit-scrollbar-track {
-            background: #111827;
-            border-radius: 20px;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #3b82f6, #2563eb);
-            border-radius: 20px;
-            transition: 0.3s;
-        }
-
-        .sidebar::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #60a5fa, #2563eb);
-        }
-
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .sidebar a {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            color: #cbd5e1;
-            text-decoration: none;
-            padding: 13px 14px;
-            margin: 7px 0;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            font-size: 15px;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sidebar a::before {
-            content: "";
-            position: absolute;
-            left: -100%;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.08);
-            transition: 0.4s;
-        }
-
-        .sidebar a:hover::before {
-            left: 0;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.active {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            color: white;
-            transform: translateX(6px);
-            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
-        }
-
-        .sidebar a.logout-btn {
-            background: #ef4444;
-            color: white;
-        }
-
-        .dropdown-container {
-            display: none;
-            padding-left: 14px;
-            margin-top: 4px;
-            border-left: 2px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .dropdown-container a {
-            font-size: 14px;
-            margin: 5px 0;
-            background: rgba(255, 255, 255, 0.04);
-        }
-
-        .breadcrum-header {
-            width: 100%;
-            display: block;
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            color: #ffffff !important;
-            padding: 18px 25px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-            margin-bottom: 15px;
-        }
-
-        /* MAIN */
-        .main {
-            flex: 1;
-            padding: 30px;
-        }
-
-        /* CARDS */
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
-            padding: 20px;
-            border-radius: 15px;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            transition: 0.3s;
-            cursor: pointer;
-        }
-
-        .card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-        }
-
-        .card i {
-            font-size: 40px;
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            opacity: 0.2;
-        }
-
-        .card h3 {
-            font-size: 14px;
-            letter-spacing: 1px;
-        }
-
-        .card p {
-            font-size: 32px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        /* COLORS */
-        .blue {
-            background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-        }
-
-        .green {
-            background: linear-gradient(135deg, #10b981, #065f46);
-        }
-
-        .orange {
-            background: linear-gradient(135deg, #f59e0b, #7c2d12);
-        }
-
-        .purple {
-            background: linear-gradient(135deg, #8b5cf6, #4c1d95);
-        }
-
-        .pink {
-            background: linear-gradient(135deg, #ec4899, #831843);
-        }
-
-        .teal {
-            background: linear-gradient(135deg, #14b8a6, #134e4a);
-        }
-
-        /* DROPDOWN MENU */
-        .dropdown-btn {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .dropdown-container {
-            display: none;
-            padding-left: 12px;
-        }
-
-        .dropdown-container a {
-            font-size: 14px;
-            margin: 4px 0;
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .dropdown.active .dropdown-container {
-            display: block;
-        }
-
-        .dropdown-icon {
-            margin-left: auto;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="../css/sidebar.css">
 </head>
 
 <body>
-
     <div class="container">
-
         <!-- SIDEBAR -->
         <div class="sidebar">
             <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
@@ -336,8 +102,8 @@ $activePage = "dashboard"; // change per page
         <div class="main">
 
             <div class="breadcrum-header">
-                <h1>Dashboard Overview</h1>
-                <p>Welcome back, Admin</p>
+                <h1 class="dashboard-title">Dashboard Overview</h1>
+                <p class="dashboard-desc">Welcome back, Admin</p>
             </div>
 
             <!-- CARDS -->
@@ -383,15 +149,7 @@ $activePage = "dashboard"; // change per page
         </div>
     </div>
 
-
-    <script>
-        // Dropdown Toggle
-        const dropdownBtn = document.querySelector(".dropdown-btn");
-
-        dropdownBtn.addEventListener("click", function () {
-            this.parentElement.classList.toggle("active");
-        });
-    </script>
+    <script type="text/javascript" src="../js/dropdownToggle.js"></script>
 
 </body>
 

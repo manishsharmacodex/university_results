@@ -1,0 +1,522 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(120deg, #eef2ff, #f8fafc);
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px;
+  background: linear-gradient(180deg, #111827, #0f172a);
+  color: white;
+  padding: 20px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  scrollbar-width: thin;
+  scrollbar-color: #2563eb #111827;
+  /* enables vertical scroll */
+}
+
+/* Custom Scrollbar */
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: #111827;
+  border-radius: 20px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  border-radius: 20px;
+  transition: 0.3s;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #60a5fa, #2563eb);
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.sidebar a {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 13px 14px;
+  margin: 7px 0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  font-size: 15px;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar a::before {
+  content: "";
+  position: absolute;
+  left: -100%;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  transition: 0.4s;
+}
+
+.sidebar a:hover::before {
+  left: 0;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  transform: translateX(6px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+.sidebar a.logout-btn {
+  background: #ef4444;
+  color: white;
+}
+
+/* DROPDOWN MENU */
+.dropdown-container {
+  display: none;
+  padding-left: 14px;
+  margin-top: 4px;
+  border-left: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.dropdown-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dropdown-container a {
+  font-size: 14px;
+  margin: 4px 0;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.dropdown.active .dropdown-container {
+  display: block;
+}
+
+.dropdown-icon {
+  margin-left: auto;
+}
+
+/* css for main */
+.main {
+  flex: 1;
+  padding: 30px;
+}
+
+.main h2 {
+  margin-bottom: 10px;
+  color: #111827;
+}
+
+.breadcrumb {
+  margin-bottom: 20px;
+  color: #6b7280;
+}
+
+.breadcrumb a {
+  text-decoration: none;
+  color: #2563eb;
+}
+
+.breadcrum-header {
+  width: 100%;
+  display: block;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: #ffffff !important;
+  padding: 18px 25px;
+  border-radius: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  margin-bottom: 15px;
+}
+
+.add-btn {
+  display: inline-block;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+th {
+  background: #111827;
+  color: white;
+  padding: 14px;
+  text-align: left;
+}
+
+td {
+  padding: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+  background: #f3f4f6;
+}
+
+.action a {
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+  margin-right: 5px;
+}
+
+.edit {
+  background: #f59e0b;
+  color: white;
+}
+
+.delete {
+  background: #ef4444;
+  color: white;
+}
+
+.save-btn.delete-btn {
+  background: #ef4444;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px); */
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-box {
+  width: 360px;
+  background: #fff;
+  padding: 25px;
+  border-radius: 14px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  transform: translateY(-20px) scale(0.95);
+  animation: modalShow 0.25s ease forwards;
+  text-align: center;
+}
+
+@keyframes modalShow {
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-box h3 {
+  text-align: center;
+  color: #111827;
+  margin-bottom: 15px;
+}
+
+.modal-box select,
+.modal-box input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #ef4444;
+  color: white;
+  cursor: pointer;
+}
+
+.pagination {
+  margin-top: 20px;
+}
+
+.pagination a {
+  padding: 6px 12px;
+  margin-right: 4px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #111827;
+  background: #f3f4f6;
+}
+
+.pagination a.active {
+  background: #2563eb;
+  color: white;
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #111827;
+  color: white;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: 0.4s ease;
+  z-index: 9999;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.success {
+  background: #16a34a;
+}
+
+.toast.error {
+  background: #ef4444;
+}
+
+/* css for student list */
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-edit {
+  background: #f59e0b;
+}
+
+.btn-save {
+  background: #22c55e;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.panel {
+  width: 95%;
+  max-width: 1050px;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: white;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.hero img {
+  width: 75px;
+  height: 75px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 2px solid white;
+}
+
+.content {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.section {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+  border: 1px solid #e5e7eb;
+}
+
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2563eb;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.item {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid #ddd;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.footer {
+  padding: 12px;
+  text-align: right;
+  border-top: 1px solid #eee;
+}
+
+/* css for dashboard */
+/* CARDS */
+.dashboard-title{
+    font-size: 30px;
+}
+
+.dashboard-desc{
+    font-size: 20px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  padding: 20px;
+  border-radius: 15px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.card i {
+  font-size: 40px;
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  opacity: 0.2;
+}
+
+.card h3 {
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+.card p {
+  font-size: 32px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* COLORS */
+.blue {
+  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+}
+
+.green {
+  background: linear-gradient(135deg, #10b981, #065f46);
+}
+
+.orange {
+  background: linear-gradient(135deg, #f59e0b, #7c2d12);
+}
+
+.purple {
+  background: linear-gradient(135deg, #8b5cf6, #4c1d95);
+}
+
+.pink {
+  background: linear-gradient(135deg, #ec4899, #831843);
+}
+
+.teal {
+  background: linear-gradient(135deg, #14b8a6, #134e4a);
+}

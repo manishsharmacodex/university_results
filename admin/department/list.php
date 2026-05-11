@@ -1,331 +1,178 @@
 <?php
-include("../../server/connection.php");
-include("../../config/auth.php");
-
-// session history check
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$message = '';
+/* ================= DB CONNECTION ================= */
+include("../../server/connection.php");
+include("../../config/auth.php");
+
+/* ================= FLASH MESSAGE ================= */
+$message = "";
+$messageType = "success";
 
 if (isset($_SESSION['message'])) {
-    $message = $_SESSION['message'];
+
+    // Old message format
+    if (is_string($_SESSION['message'])) {
+
+        $message = $_SESSION['message'];
+        $messageType = "success";
+
+    }
+
+    // New message format
+    elseif (is_array($_SESSION['message'])) {
+
+        $message = $_SESSION['message']['text'] ?? "";
+        $messageType = $_SESSION['message']['type'] ?? "success";
+
+    }
+
     unset($_SESSION['message']);
 }
-// session history check
 
 /* ================= ADD DEPARTMENT ================= */
-if (isset($_POST['add_department'])) {
-    $name = strtoupper($conn->real_escape_string($_POST['name']));
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_department'])) {
 
-    // Check if department already exists
-    $check = $conn->query("SELECT * FROM departments WHERE name='$name'");
-    if ($check->num_rows == 0) {
-        $conn->query("INSERT INTO departments (name) VALUES ('$name')");
-        $message = "Department added successfully!";
-    } else {
-        $message = "Department already exists!";
+    $name = strtoupper(trim($_POST['name']));
+
+    /* VALIDATION */
+    if ($name === '') {
+
+        $_SESSION['message'] = [
+            'text' => 'Invalid department name!',
+            'type' => 'error'
+        ];
+
+        header("Location: list.php");
+        exit;
     }
+
+    /* CHECK EXISTING */
+    $checkStmt = $conn->prepare("
+        SELECT id
+        FROM departments
+        WHERE name = ?
+    ");
+
+    $checkStmt->bind_param("s", $name);
+
+    $checkStmt->execute();
+
+    $checkResult = $checkStmt->get_result();
+
+    if ($checkResult->num_rows > 0) {
+
+        $_SESSION['message'] = [
+            'text' => 'Department already exists!',
+            'type' => 'error'
+        ];
+
+        $checkStmt->close();
+
+        header("Location: list.php");
+        exit;
+    }
+
+    $checkStmt->close();
+
+    /* INSERT DEPARTMENT */
+    $insertStmt = $conn->prepare("
+        INSERT INTO departments (name)
+        VALUES (?)
+    ");
+
+    if (!$insertStmt) {
+
+        $_SESSION['message'] = [
+            'text' => 'Database error!',
+            'type' => 'error'
+        ];
+
+        header("Location: list.php");
+        exit;
+    }
+
+    $insertStmt->bind_param("s", $name);
+
+    if ($insertStmt->execute()) {
+
+        $_SESSION['message'] = [
+            'text' => 'Department added successfully!',
+            'type' => 'success'
+        ];
+
+    } else {
+
+        $_SESSION['message'] = [
+            'text' => 'Insert failed!',
+            'type' => 'error'
+        ];
+    }
+
+    $insertStmt->close();
+
+    header("Location: list.php");
+    exit;
 }
 
-$activePage = "department"; // change per page
+$activePage = "department";
 
 /* ================= PAGINATION ================= */
-$limit = 6; // number of records per page
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int) $_GET['page'] : 1;
+$limit = 6;
+
+$page = isset($_GET['page']) && is_numeric($_GET['page'])
+    ? (int) $_GET['page']
+    : 1;
+
+if ($page < 1) {
+    $page = 1;
+}
+
 $offset = ($page - 1) * $limit;
 
-// Count total departments
-$total_result = $conn->query("SELECT COUNT(*) as total FROM departments");
+$limit = (int) $limit;
+$offset = (int) $offset;
+
+/* ================= TOTAL RECORDS ================= */
+$total_result = $conn->query("
+    SELECT COUNT(*) AS total
+    FROM departments
+");
+
 $total_row = $total_result->fetch_assoc();
-$total_records = $total_row['total'];
+
+$total_records = (int) $total_row['total'];
+
 $total_pages = ceil($total_records / $limit);
 
-// Fetch departments for current page
-$result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit OFFSET $offset");
+/* ================= FETCH DEPARTMENTS ================= */
+$result = $conn->query("
+    SELECT *
+    FROM departments
+    ORDER BY id ASC
+    LIMIT $limit OFFSET $offset
+");
 ?>
 
 <!DOCTYPE html>
 <html>
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Departments</title>
+
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <link rel="stylesheet" type="text/css" href="../css/sidebar.css">
 
-        body {
-            background: linear-gradient(120deg, #eef2ff, #f8fafc);
-        }
-
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 250px;
-            background: #111827;
-            color: white;
-            padding: 20px;
-
-            height: 100vh;
-            /* full screen height */
-            position: sticky;
-            /* stays fixed while page scrolls */
-            top: 0;
-
-            overflow-y: auto;
-            /* enables vertical scroll */
-        }
-
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .sidebar a {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            color: #cbd5e1;
-            text-decoration: none;
-            padding: 12px;
-            margin: 6px 0;
-            border-radius: 8px;
-            transition: 0.3s;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.active {
-            background: #2563eb;
-            color: white;
-            transform: translateX(5px);
-        }
-
-        .sidebar a.logout-btn {
-            background: #ef4444;
-            color: white;
-        }
-
-        .main {
-            flex: 1;
-            padding: 30px;
-        }
-
-        .main h2 {
-            margin-bottom: 10px;
-            color: #111827;
-        }
-
-        .breadcrum-header {
-            width: 100%;
-            display: block;
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            color: #ffffff !important;
-            padding: 18px 25px;
-            border-radius: 10px;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-            margin-bottom: 15px;
-        }
-
-        .breadcrumb {
-            margin-bottom: 20px;
-            color: #6b7280;
-        }
-
-        .breadcrumb a {
-            text-decoration: none;
-            color: #2563eb;
-        }
-
-        .add-btn {
-            display: inline-block;
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        th {
-            background: #111827;
-            color: white;
-            padding: 14px;
-            text-align: left;
-        }
-
-        td {
-            padding: 14px;
-            border-bottom: 1px solid #eee;
-        }
-
-        tr:hover {
-            background: #f3f4f6;
-        }
-
-        .action a {
-            padding: 6px 10px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 13px;
-            margin-right: 5px;
-        }
-
-        .edit {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .delete {
-            background: #ef4444;
-            color: white;
-        }
-
-        .save-btn.delete-btn {
-            background: #ef4444;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(8px); */
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-
-        .modal-box {
-            width: 360px;
-            background: #fff;
-            padding: 25px;
-            border-radius: 14px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
-            transform: translateY(-20px) scale(0.95);
-            animation: modalShow 0.25s ease forwards;
-            text-align: center;
-        }
-
-        @keyframes modalShow {
-            to {
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .modal-box h3 {
-            margin-bottom: 15px;
-            text-align: center;
-            color: #111827;
-        }
-
-        .modal-box input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-        }
-
-        .save-btn {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background: #2563eb;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close-btn {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border: none;
-            border-radius: 8px;
-            background: #ef4444;
-            color: white;
-            cursor: pointer;
-        }
-
-        /* Pagination */
-        .pagination {
-            margin-top: 20px;
-        }
-
-        .pagination a {
-            padding: 6px 12px;
-            margin-right: 4px;
-            border-radius: 4px;
-            text-decoration: none;
-            color: #111827;
-            background: #f3f4f6;
-        }
-
-        .pagination a.active {
-            background: #2563eb;
-            color: white;
-        }
-
-
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #111827;
-            color: white;
-            padding: 14px 18px;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
-            font-size: 14px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: 0.4s ease;
-            z-index: 9999;
-            min-width: 220px;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .toast.success {
-            background: #16a34a;
-        }
-
-        .toast.error {
-            background: #ef4444;
-        }
-    </style>
 </head>
 
 <body>
@@ -334,192 +181,358 @@ $result = $conn->query("SELECT * FROM departments ORDER BY id ASC LIMIT $limit O
 
         <!-- SIDEBAR -->
         <div class="sidebar">
+
             <h2><i class="fa-solid fa-user-shield"></i> Admin</h2>
+
             <a href="../dashboard/index.php" class="<?= $activePage == 'dashboard' ? 'active' : '' ?>">
+
                 <i class="fa-solid fa-gauge"></i>Dashboard
+
             </a>
 
             <a href="./list.php" class="<?= $activePage == 'department' ? 'active' : '' ?>">
+
                 <i class="fa-solid fa-building"></i>Department
+
             </a>
 
             <a href="../courses/list.php" class="<?= $activePage == 'courses' ? 'active' : '' ?>">
+
                 <i class="fa-solid fa-book"></i>Courses
+
             </a>
 
             <a href="../semesters/list.php" class="<?= $activePage == 'semester' ? 'active' : '' ?>">
+
                 <i class="fa-solid fa-calendar"></i>Semester
+
             </a>
 
             <a href="../bank/list.php" class="<?= $activePage == 'bank' ? 'active' : '' ?>">
+
                 <i class="fa-solid fa-bank"></i>Bank
+
             </a>
 
             <a href="../../src/pages/add_student/add_students.php"
                 class="<?= $activePage == 'add_students' ? 'active' : '' ?>" target="_BLANK">
+
                 <i class="fa-solid fa-user-plus"></i>Add Student
+
             </a>
 
             <a href="../../src/pages/student_list/student_list.php"
                 class="<?= $activePage == 'student_list' ? 'active' : '' ?>">
+
                 <i class="fa-solid fa-users"></i>Student List
+
             </a>
 
-            <a href="../banner/list.php"
-                class="<?= $activePage == 'banner' ? 'active' : '' ?>">
-                <i class="fa-solid fa-users"></i>Banner
+            <!-- DROPDOWN -->
+            <div class="dropdown">
+
+                <a href="javascript:void(0);" class="dropdown-btn">
+
+                    <i class="fa-solid fa-shop"></i>
+
+                    University Manage
+
+                    <i class="fa-solid fa-caret-down dropdown-icon"></i>
+
+                </a>
+
+                <div class="dropdown-container">
+
+                    <a href="../banner/list.php" class="<?= $activePage == 'banner' ? 'active' : '' ?>">
+
+                        <i class="fa-solid fa-image"></i>Banner Update
+
+                    </a>
+
+                    <a href="../admission_form/list.php" class="<?= $activePage == 'admission_form' ? 'active' : '' ?>">
+
+                        <i class="fa-solid fa-file-pen"></i>Admission Form Update
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <a href="../auth/logout.php" class="logout-btn">
+
+                Logout
+
             </a>
 
-            <a href="../auth/logout.php" class="logout-btn">Logout</a>
         </div>
 
-
-        <!-- this code is main -->
+        <!-- MAIN -->
         <div class="main">
 
             <h2 class="breadcrum-header">Departments</h2>
 
             <div class="breadcrumb">
+
                 <a href="../dashboard/index.php">Dashboard</a> / Departments
+
             </div>
 
-            <?php if ($message != ''): ?>
+            <?php if ($message != ""): ?>
+
                 <script>
+
                     document.addEventListener("DOMContentLoaded", function () {
-                        showToast("<?= $message ?>", "success");
+
+                        showToast(
+                            "<?= htmlspecialchars($message, ENT_QUOTES) ?>",
+                            "<?= htmlspecialchars($messageType) ?>"
+                        );
+
                     });
+
                 </script>
+
             <?php endif; ?>
 
-            <!-- Add Department Button -->
+            <!-- ADD BUTTON -->
             <a class="add-btn" href="#" onclick="document.getElementById('addModal').style.display='flex'">
+
                 <i class="fa fa-plus"></i> Add New Department
+
             </a>
 
             <table>
-                <tr>
-                    <th>ID</th>
-                    <th>Department Name</th>
-                    <th>Action</th>
-                </tr>
-                <?php while ($row = $result->fetch_assoc()) { ?>
-                    <tr>
-                        <td><?= $row['id'] ?></td>
-                        <td><?= $row['name'] ?></td>
-                        <td class="action">
-                            <a href="#" class="edit" onclick="
-                                document.getElementById('dept_id').value='<?= $row['id'] ?>';
-                                document.getElementById('dept_name').value='<?= addslashes($row['name']) ?>';
-                                document.getElementById('editModal').style.display='flex';
-                            ">Edit</a>
 
-                            <a href="#" class="delete" onclick="openDeleteModal(<?= $row['id'] ?>)">
-                                Delete
-                            </a>
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Department Name</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+                <?php if ($result->num_rows > 0): ?>
+
+                    <?php while ($row = $result->fetch_assoc()): ?>
+
+                        <tr>
+
+                            <td><?= (int) $row['id'] ?></td>
+
+                            <td>
+
+                                <?= htmlspecialchars($row['name']) ?>
+
+                            </td>
+
+                            <td class="action">
+
+                                <a href="#" class="edit" onclick="
+                                        document.getElementById('dept_id').value='<?= (int) $row['id'] ?>';
+                                        document.getElementById('dept_name').value='<?= htmlspecialchars($row['name'], ENT_QUOTES) ?>';
+                                        document.getElementById('editModal').style.display='flex';
+                                    ">
+
+                                    Edit
+
+                                </a>
+
+                                <a href="#" class="delete" onclick="openDeleteModal(<?= (int) $row['id'] ?>)">
+
+                                    Delete
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    <?php endwhile; ?>
+
+                <?php else: ?>
+
+                    <tr>
+
+                        <td colspan="3" style="text-align:center;">
+
+                            No departments found
+
                         </td>
+
                     </tr>
-                <?php } ?>
+
+                <?php endif; ?>
+
             </table>
 
-            <!-- Pagination -->
+            <!-- PAGINATION -->
             <div class="pagination">
+
                 <?php if ($page > 1): ?>
-                    <a href="?page=<?= $page - 1 ?>">Prev</a>
+
+                    <a href="?page=<?= $page - 1 ?>">
+
+                        Prev
+
+                    </a>
+
                 <?php endif; ?>
 
                 <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                    <a href="?page=<?= $i ?>" class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
+
+                    <a href="?page=<?= $i ?>" class="<?= $i == $page ? 'active' : '' ?>">
+
+                        <?= $i ?>
+
+                    </a>
+
                 <?php endfor; ?>
 
                 <?php if ($page < $total_pages): ?>
-                    <a href="?page=<?= $page + 1 ?>">Next</a>
+
+                    <a href="?page=<?= $page + 1 ?>">
+
+                        Next
+
+                    </a>
+
                 <?php endif; ?>
+
             </div>
 
         </div>
+
     </div>
 
     <!-- ADD MODAL -->
     <div class="modal" id="addModal">
+
         <div class="modal-box">
+
             <h3>Add Department</h3>
+
             <form method="POST">
+
                 <input type="text" name="name" placeholder="Department Name" required>
-                <button type="submit" name="add_department" class="save-btn">Add Department</button>
-                <button type="button" class="close-btn"
-                    onclick="document.getElementById('addModal').style.display='none'">Cancel</button>
+
+                <button type="submit" name="add_department" class="save-btn">
+
+                    Add Department
+
+                </button>
+
+                <button type="button" class="close-btn" onclick="closeModal('addModal')">
+
+                    Cancel
+
+                </button>
+
             </form>
+
         </div>
+
     </div>
 
     <!-- EDIT MODAL -->
     <div class="modal" id="editModal">
+
         <div class="modal-box">
+
             <h3>Edit Department</h3>
+
             <form method="POST" action="edit.php">
+
                 <input type="hidden" name="id" id="dept_id">
+
                 <input type="text" name="name" id="dept_name" required>
-                <button type="submit" class="save-btn">Update</button>
-                <button type="button" class="close-btn"
-                    onclick="document.getElementById('editModal').style.display='none'">Cancel</button>
+
+                <button type="submit" class="save-btn">
+
+                    Update
+
+                </button>
+
+                <button type="button" class="close-btn" onclick="closeModal('editModal')">
+
+                    Cancel
+
+                </button>
+
             </form>
+
         </div>
+
     </div>
 
+    <!-- DELETE MODAL -->
+    <div class="modal" id="deleteModal">
 
-    <!-- DELETE DEPARTMENT MODEL -->
-    <div id="deleteModal" class="modal">
         <div class="modal-box">
-            <h3>Delete Department ?</h3>
+
+            <h3>Delete Department?</h3>
 
             <form method="POST" action="delete.php">
-                <input type="hidden" name="id" id="delete_id">
+
+                <input type="hidden" name="id" id="delete_id" required>
 
                 <button type="submit" class="save-btn delete-btn">
+
                     Yes, Delete
+
                 </button>
 
-                <button type="button" class="close-btn" onclick="closeDeleteModal()">
+                <button type="button" class="close-btn" onclick="closeModal('deleteModal')">
+
                     Cancel
+
                 </button>
+
             </form>
+
         </div>
+
     </div>
 
-    <!-- Toast Notification Message -->
+    <!-- TOAST -->
     <div id="toast" class="toast"></div>
 
     <script>
-        // Uppercase input
-        document.querySelectorAll("input[type='text'], textarea").forEach(field => {
-            field.addEventListener("input", function () {
-                this.value = this.value.toUpperCase();
-            });
-        });
 
-
-        // funtion for delete model
         function openDeleteModal(id) {
+
             document.getElementById('delete_id').value = id;
-            document.getElementById('deleteModal').style.display = "flex";
+
+            document.getElementById('deleteModal').style.display = 'flex';
         }
 
-        function closeDeleteModal() {
-            document.getElementById('deleteModal').style.display = "none";
+        function closeModal(id) {
+
+            document.getElementById(id).style.display = 'none';
         }
 
-        // toast notification
-        function showToast(message, type = "success") {
-            const toast = document.getElementById("toast");
+        window.onclick = function (e) {
 
-            toast.className = "toast show " + type;
-            toast.innerText = message;
+            const modals = document.querySelectorAll(".modal");
 
-            setTimeout(() => {
-                toast.classList.remove("show");
-            }, 3000);
+            modals.forEach(modal => {
+
+                if (e.target === modal) {
+
+                    modal.style.display = "none";
+                }
+            });
         }
+
     </script>
+
+    <script type="text/javascript" src="../js/dropdownToggle.js"></script>
+
+    <script type="text/javascript" src="../js/toastNotification.js"></script>
+
+    <script type="text/javascript" src="../js/upperCase.js"></script>
 
 </body>
 
