@@ -2,7 +2,7 @@
 require_once(__DIR__ . "/../../../../backend/config/config.php");
 ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>frontend/src/components/navbar/navbar.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/frontend/src/components/navbar/navbar.css">
 
 <div class="navbar">
 
@@ -20,15 +20,15 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
 
         <li>Admissions</li>
 
-        <a href="<?= BASE_URL ?>src/pages/results/results.php" target="_blank">
+        <a href="<?= BASE_URL ?>/frontend/src/pages/results/results.php" target="_blank">
             <li>Exam & Results</li>
         </a>
 
-        <a href="<?= BASE_URL ?>src/pages/school/school_information.php">
+        <a href="<?= BASE_URL ?>/frontend/src/pages/school/school_information.php">
             <li>School Informations</li>
         </a>
 
-        <a href="<?= BASE_URL ?>src/pages/contact_us/contact.php">
+        <a href="<?= BASE_URL ?>/frontend/src/pages/contact_us/contact.php">
             <li>Contact</li>
         </a>
 
@@ -40,7 +40,7 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
             Student Login
         </button>
 
-        <a href="<?= BASE_URL ?>admin/auth/login.php" target="_blank">
+        <a href="<?= BASE_URL ?>/backend/admin/auth/login.php" target="_blank">
             <button class="nav-btn admin-btn">
                 Admin Login
             </button>

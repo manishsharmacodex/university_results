@@ -5,19 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Information - Alpha University</title>
-    <link rel="stylesheet" type="text/css" href="../../../css/font.css">
-    <link rel="stylesheet" type="text/css" href="../../../css/index.css">
-    <link rel="stylesheet" type="text/css" href="../../../css/school_information.css">
-    <link rel="stylesheet" type="text/css" href="../../../css/navbar.css">
-    <link rel="stylesheet" type="text/css" href="../../../css/footer.css">
-    <link rel="stylesheet" type="text/css" href="../../../css/global.css">
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
+    <link rel="stylesheet" type="text/css" href="../../css/global.css">
+    <link rel="stylesheet" type="text/css" href="../../css/school_information.css">
 </head>
 
 <body>
 
     <!-- NAVBAR -->
      <?php
-        include("../../../root/navbar/navbar.php");
+        include("../../components/navbar/navbar.php");
      ?>
 
     <!-- PAGE -->
@@ -107,7 +104,7 @@
 
     <!-- FOOTER -->
     <?php
-        include("../../../root/footer/footer.php");
+        include("../../components/footer/footer.php");
      ?>
 
 </body>

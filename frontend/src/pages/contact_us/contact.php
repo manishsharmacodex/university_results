@@ -1,7 +1,7 @@
 <?php
 
 // DB Connection
-include(__DIR__ . "/../../../server/connection.php");
+include(__DIR__ . "/../../../../backend/server/connection.php");
 
 $message = "";
 
@@ -62,13 +62,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact Us - Alpha University</title>
-    <link rel="stylesheet" type="text/css" href="../../../css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="../../../css/navbar.css">
-    <link rel="stylesheet" type="text/css" href="../../../css/footer.css">
-    <link rel="stylesheet" type="text/css" href="../../../css/contact.css">
-    <link rel="stylesheet" type="text/css" href="../../../css/global.css">
-
+    <link rel="stylesheet" type="text/css" href="../../css/font.css">
+    <link rel="stylesheet" type="text/css" href="../../css/global.css">
+    <link rel="stylesheet" type="text/css" href="../../css/contact.css">
     <style>
         
     </style>
@@ -78,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- NAVBAR -->
      <?php
-        include("../../../root/navbar/navbar.php");
+        include("../../components/navbar/navbar.php");
      ?>
 
     <!-- HERO -->
@@ -155,10 +152,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- FOOTER -->
      <?php
-        include("../../../root/footer/footer.php");
+        include("../../components/footer/footer.php");
      ?>
 
-    <script type="text/javascript" src="../../../js/contactSubjectToggle.js"></script>
+    <script type="text/javascript" src="../../js/contactSubjectToggle.js"></script>
 
 </body>
 

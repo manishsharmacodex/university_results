@@ -112,9 +112,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['admission_button'])) 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Alpha University - Top University In India</title>
     <link rel="stylesheet" type="text/css" href="./src/css/font.css">
-    <link rel="stylesheet" type="text/css" href="./css/index.css">
     <link rel="stylesheet" type="text/css" href="./src/css/global.css">
-
+    <link rel="stylesheet" type="text/css" href="./src/css/index.css">
 </head>
 
 <body>
@@ -345,7 +344,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['admission_button'])) 
          FOOTER
     ========================================= -->
     <?php
-    // include($_SERVER['DOCUMENT_ROOT'] . "/university_results/root/footer/footer.php");
     require_once(__DIR__ . "/./src/components/footer/footer.php");
     ?>
 
@@ -363,9 +361,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['admission_button'])) 
 
 
     <!-- JS File Connected -->
-    <script type="text/javascript" src="./js/slider.js"></script>
-    <script type="text/javascript" src="./js/fetchCourse.js"></script>
-    <script type="text/javascript" src="./js/ajaxFormSubmission.js"></script>
+    <script type="text/javascript" src="./src/js/slider.js"></script>
+    <script type="text/javascript" src="./src/js/fetchCourse.js"></script>
+    <script type="text/javascript" src="./src/js/ajaxFormSubmission.js"></script>
 
 </body>
 
