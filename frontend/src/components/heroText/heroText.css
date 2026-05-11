@@ -1,0 +1,41 @@
+.hero-text {
+  max-width: 550px;
+}
+
+.hero-text h1 {
+  font-size: 55px;
+  line-height: 1.2;
+}
+
+.hero-text span {
+  color: #00d9ff;
+}
+
+.hero-text p {
+  margin-top: 15px;
+  color: #b8c1d1;
+  line-height: 1.7;
+}
+
+.hero-buttons {
+  margin-top: 20px;
+}
+
+.hero-buttons button {
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.primary {
+  background: #00d9ff;
+  color: #000;
+}
+
+.secondary {
+  background: transparent;
+  border: 1px solid #00d9ff;
+  color: #00d9ff;
+}

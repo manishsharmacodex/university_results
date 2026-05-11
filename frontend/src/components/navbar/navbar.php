@@ -8,31 +8,31 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
 <!-- NAVBAR SECTION -->
 <div class="navbar">
 
-    <a href="<?= BASE_URL ?>/index.php">
+    <a href="<?= BASE_URL ?>index.php">
         <div class="logo">Alpha University</div>
     </a>
 
     <ul>
-        <li><a href="<?= BASE_URL ?>/index.php">Home</a></li>
+        <li><a href="<?= BASE_URL ?>index.php">Home</a></li>
 
         <li>Programs</li>
 
         <li>Admissions</li>
 
         <li>
-            <a href="<?= BASE_URL ?>/frontend/src/pages/results/results.php" target="_blank">
+            <a href="<?= BASE_URL ?>frontend/src/pages/results/results.php" target="_blank">
                 Exam & Results
             </a>
         </li>
 
         <li>
-            <a href="<?= BASE_URL ?>/frontend/src/pages/school/school_information.php">
+            <a href="<?= BASE_URL ?>frontend/src/pages/school/school_information.php">
                 School Informations
             </a>
         </li>
 
         <li>
-            <a href="<?= BASE_URL ?>/frontend/src/pages/contact_us/contact.php">
+            <a href="<?= BASE_URL ?>frontend/src/pages/contact_us/contact.php">
                 Contact
             </a>
         </li>
