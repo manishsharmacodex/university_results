@@ -2,10 +2,12 @@
 require_once(__DIR__ . "/../../../../backend/config/config.php");
 ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>/frontend/src/components/slider/slider.css">
+<link rel="stylesheet" type="text/css" href="<?= BASE_URL ?>/frontend/src/components/slider/slider.css">
 
-<script src="<?= BASE_URL ?>/frontend/src/components/slider/slider.js"></script>
+<script type="text/javascript" src="<?= BASE_URL ?>/frontend/src/components/slider/slider.js"></script>
 
+
+<!-- SLIDER SECTION -->
 <div class="slider">
 
     <div class="slides">

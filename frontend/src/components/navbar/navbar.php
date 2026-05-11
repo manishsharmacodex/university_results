@@ -2,10 +2,10 @@
 require_once(__DIR__ . "/../../../../backend/config/config.php");
 ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>/frontend/src/components/navbar/navbar.css">
+<link rel="stylesheet" type="text/css" href="<?= BASE_URL ?>/frontend/src/components/navbar/navbar.css">
 
 
-<!-- Navbar -->
+<!-- NAVBAR SECTION -->
 <div class="navbar">
 
     <a href="<?= BASE_URL ?>/index.php">

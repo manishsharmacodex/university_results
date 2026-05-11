@@ -2,10 +2,10 @@
 require_once(__DIR__ . "/../../../../backend/config/config.php");
 ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>/frontend/src/components/program/program.css">
+<link rel="stylesheet" type="text/css" href="<?= BASE_URL ?>/frontend/src/components/program/program.css">
 
 
-<!-- Program Section -->
+<!-- PROGRAM SECTION -->
 <div class="section">
 
     <h2>Our Popular Programs</h2>

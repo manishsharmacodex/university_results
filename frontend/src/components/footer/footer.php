@@ -2,10 +2,10 @@
 require_once(__DIR__ . "/../../../../backend/config/config.php");
 ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>/frontend/src/components/footer/footer.css">
+<link rel="stylesheet" type="text/css" href="<?= BASE_URL ?>/frontend/src/components/footer/footer.css">
 
 
-<!-- FOOTER -->
+<!-- FOOTER SECTION -->
 <div class="footer">
 
     <div class="footer-grid">
@@ -39,7 +39,7 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
     </div>
 
     <div class="footer-bottom">
-        © 2026 Alpha University | All Rights Reserved
+        &copy; 2026 Alpha University | All Rights Reserved
     </div>
 
 </div>
