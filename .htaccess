@@ -1,0 +1,7 @@
+RewriteEngine On
+
+# If not a real file/folder, load frontend
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^$ frontend/ [L]

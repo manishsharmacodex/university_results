@@ -1,7 +1,0 @@
-CREATE TABLE banners (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    image VARCHAR(255) NOT NULL,
-    title VARCHAR(255),
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);

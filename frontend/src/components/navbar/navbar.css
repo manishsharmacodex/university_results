@@ -1,0 +1,63 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 60px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 700;
+  color: #00d9ff;
+}
+
+.navbar ul {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+}
+
+.navbar ul li {
+  color: #b8c1d1;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.navbar ul li:hover {
+  color: #00d9ff;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-btn {
+  padding: 10px 16px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 600;
+}
+
+.student-btn {
+  background: #00d9ff;
+  color: #000;
+}
+
+.admin-btn {
+  background: transparent;
+  border: 1px solid #00d9ff;
+  color: #00d9ff;
+}
+
+.nav-btn:hover {
+  transform: translateY(-2px);
+}

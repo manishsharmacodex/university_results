@@ -1,0 +1,32 @@
+.footer {
+  background: #050a14;
+  padding: 50px 60px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.footer h3 {
+  color: #00d9ff;
+  margin-bottom: 10px;
+}
+
+.footer p,
+.footer a {
+  color: #b8c1d1;
+  font-size: 14px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: #777;
+  font-size: 13px;
+}
