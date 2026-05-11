@@ -159,13 +159,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['admission_button'])) 
         </div>
     </div>
 
-
-
-    <!-- JS File Connected -->
-    <script type="text/javascript" src="./src/js/slider.js"></script>
-    <!-- <script type="text/javascript" src="./src/js/fetchCourse.js"></script> -->
-    <script type="text/javascript" src="./src/js/ajaxFormSubmission.js"></script>
-
 </body>
 
 </html>

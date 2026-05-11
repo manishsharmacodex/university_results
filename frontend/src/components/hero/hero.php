@@ -5,6 +5,7 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
 <link rel="stylesheet" href="<?= BASE_URL ?>/frontend/src/components/hero/hero.css">
 
 <script type="text/javascript" src="<?= BASE_URL ?>/frontend/src/components/hero/fetchCourse.js"></script>
+<script type="text/javascript" src="<?= BASE_URL ?>/frontend/src/components/hero/ajaxFormSubmission.js"></script>
 
 
 

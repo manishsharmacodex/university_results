@@ -3,6 +3,7 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
 ?>
 
 <link rel="stylesheet" href="<?= BASE_URL ?>/frontend/src/components/slider/slider.css">
+<script src="<?= BASE_URL ?>/frontend/src/components/slider/slider.js"></script>
 
 
 <div class="slider">
