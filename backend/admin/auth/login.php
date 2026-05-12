@@ -15,6 +15,9 @@ if (!empty($_SESSION['admin'])) {
 
 include(__DIR__ . "/../../server/connection.php");
 
+
+require_once (__DIR__ . "/../../config/config.php");
+
 $error = "";
 
 /* ---------------- CAPTCHA FUNCTIONS ---------------- */
@@ -117,6 +120,10 @@ if (isset($_POST['login'])) {
         $stmt->close();
     }
 }
+
+
+
+
 ?>
 
 <html>
@@ -126,7 +133,8 @@ if (isset($_POST['login'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ERP Admin Login</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
-    <link rel="stylesheet" type="text/css" href="./src/login.css">
+    <!-- <link rel="stylesheet" type="text/css" href="./src/login.css"> -->
+     <link rel="stylesheet" href="<?= BASE_URL ?>backend/admin/auth/src/login.css">
 </head>
 
 <body>
@@ -163,7 +171,8 @@ if (isset($_POST['login'])) {
         </form>
     </div>
 
-    <script type="text/javascript" src="./src/login.js"></script>
+    <!-- <script type="text/javascript" src="./src/login.js"></script> -->
+     <script src="<?= BASE_URL?>backend/admin/auth/src/login.js"></script>
 
 </body>
 

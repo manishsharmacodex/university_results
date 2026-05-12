@@ -1,3 +1,7 @@
+<?php
+require_once(__DIR__ . "/../../../../backend/config/config.php");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,9 +9,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Information - Alpha University</title>
-    <link rel="stylesheet" type="text/css" href="../../css/font.css">
-    <link rel="stylesheet" type="text/css" href="../../css/global.css">
-    <link rel="stylesheet" type="text/css" href="../../css/school_information.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../../css/font.css"> -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>frontend/src/css/font.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../../css/global.css"> -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>frontend/src/css/global.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../../css/school_information.css"> -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>frontend/src/css/school_information.css">
 </head>
 
 <body>

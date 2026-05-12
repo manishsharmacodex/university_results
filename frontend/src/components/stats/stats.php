@@ -1,8 +1,8 @@
 <?php
-require_once(__DIR__ . "/../../../../backend/config/config.php");
+require_once __DIR__ . "/../../../../backend/config/config.php";
 ?>
 
-<link rel="stylesheet" type="text/css" href="<?= BASE_URL ?>/frontend/src/components/stats/stats.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>frontend/src/components/stats/stats.css">
 
 
 <!-- STATS SECTION -->

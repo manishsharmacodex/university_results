@@ -6,27 +6,28 @@
 }
 
 .slides {
-  width: 100%;
+  display: flex;
   height: 100%;
+  transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
 }
 
 .slide {
-  width: 100%;
+  min-width: 100%;
   height: 100%;
-  display: none;
+  flex-shrink: 0;
   position: relative;
 }
 
-.slide.active {
-  display: block;
-}
-
+/* Image */
 .slide img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
+/* Caption */
 .caption {
   position: absolute;
   left: 60px;
@@ -48,6 +49,7 @@
   padding: 5px 20px;
 }
 
+/* Buttons */
 .prev,
 .next {
   position: absolute;
@@ -73,12 +75,11 @@
 .prev {
   left: 20px;
 }
-
 .next {
   right: 20px;
 }
 
-/* No Banners */
+/* No banners */
 .no-banners {
   width: 100%;
   height: 450px;
@@ -88,5 +89,4 @@
   color: #fff;
   font-size: 20px;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.05);
 }

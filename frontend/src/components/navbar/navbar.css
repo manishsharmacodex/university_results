@@ -26,7 +26,7 @@
 .navbar ul li {
   color: #b8c1d1;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   transition: 0.3s;
 }
 
@@ -46,19 +46,20 @@
   cursor: pointer;
   transition: 0.3s;
   font-weight: 600;
-}
-
-.student-btn {
-  background: #00d9ff;
-  color: #000;
-}
-
-.admin-btn {
-  background: transparent;
-  border: 1px solid #00d9ff;
-  color: #00d9ff;
+  font-size: 15px;
 }
 
 .nav-btn:hover {
   transform: translateY(-2px);
+}
+
+.nav-btn.student-btn {
+  background: #00d9ff;
+  color: #000;
+}
+
+.nav-btn.admin-btn {
+  background: transparent;
+  border: 1px solid #00d9ff;
+  color: #00d9ff;
 }

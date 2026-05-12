@@ -1,8 +1,8 @@
 <?php
-require_once(__DIR__ . "/../../../../backend/config/config.php");
+require_once __DIR__ . "/../../../../backend/config/config.php";
 ?>
 
-<link rel="stylesheet" type="text/css" href="<?= BASE_URL ?>/frontend/src/components/footer/footer.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>frontend/src/components/footer/footer.css">
 
 
 <!-- FOOTER SECTION -->
@@ -12,9 +12,7 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
 
         <div>
             <h3>About</h3>
-            <p>
-                Top private university in India focused on innovation.
-            </p>
+            <p>Top private university in India focused on innovation.</p>
         </div>
 
         <div>

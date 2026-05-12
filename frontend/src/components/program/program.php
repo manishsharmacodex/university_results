@@ -2,7 +2,7 @@
 require_once(__DIR__ . "/../../../../backend/config/config.php");
 ?>
 
-<link rel="stylesheet" type="text/css" href="<?= BASE_URL ?>/frontend/src/components/program/program.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>frontend/src/components/program/program.css">
 
 
 <!-- PROGRAM SECTION -->

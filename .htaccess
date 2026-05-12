@@ -1,0 +1,17 @@
+RewriteEngine On
+RewriteBase /university_results/
+
+# Home
+RewriteRule ^$ frontend/main.php [L]
+
+# Admin login
+RewriteRule ^login/?$ backend/admin/auth/login.php [L]
+
+# Results
+RewriteRule ^results/?$ frontend/src/pages/results/results.php [L]
+
+# School info
+RewriteRule ^school-information/?$ frontend/src/pages/school/school_information.php [L]
+
+# Contact
+RewriteRule ^contact/?$ frontend/src/pages/contact_us/contact.php [L]

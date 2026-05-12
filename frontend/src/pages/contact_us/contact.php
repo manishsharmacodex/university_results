@@ -11,9 +11,12 @@ require_once(__DIR__ . "/../../../../backend/config/config.php");
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact Us - Alpha University</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="../../css/font.css">
-    <link rel="stylesheet" type="text/css" href="../../css/global.css">
-    <link rel="stylesheet" type="text/css" href="../../css/contact.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../../css/font.css"> -->
+    <link rel="stylesheet" href="<?= BASE_URL?>frontend/src/css/font.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../../css/global.css"> -->
+    <link rel="stylesheet" href="<?= BASE_URL?>frontend/src/css/global.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../../css/contact.css"> -->
+    <link rel="stylesheet" href="<?= BASE_URL?>frontend/src/css/contact.css">
     <style>
 
     </style>

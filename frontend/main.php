@@ -8,6 +8,8 @@ include(__DIR__ . "/../backend/server/connection.php");
 $result = mysqli_query($conn, "SELECT * FROM admission_form_settings WHERE id='1'");
 $form_settings = $result ? mysqli_fetch_assoc($result) : null;
 
+require_once(__DIR__ . "/../backend/config/config.php");
+
 ?>
 
 <!DOCTYPE html>
@@ -17,9 +19,11 @@ $form_settings = $result ? mysqli_fetch_assoc($result) : null;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Alpha University - Top University In India</title>
-    <link rel="stylesheet" type="text/css" href="./src/css/font.css">
-    <link rel="stylesheet" type="text/css" href="./src/css/global.css">
-    <link rel="stylesheet" type="text/css" href="./src/css/index.css">
+    <!-- <link rel="stylesheet" type="text/css" href="./src/css/font.css"> -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>frontend/src/css/font.css">
+    <!-- <link rel="stylesheet" type="text/css" href="./src/css/global.css"> -->
+    <link rel="stylesheet" type="text/css" href="<?= BASE_URL ?>frontend/src/css/global.css"">
+    <!-- <link rel="stylesheet" type="text/css" href="./src/css/index.css"> -->
 </head>
 
 <body>
