@@ -3,21 +3,35 @@
 require_once __DIR__ . "/backend/config/config.php";
 
 /*
-|--------------------------------------
-| Safe redirect (production safe)
-|--------------------------------------
+|-----------------------------------------
+| Validate BASE_URL
+|-----------------------------------------
 */
-
-// ensure BASE_URL exists
 if (!defined('BASE_URL')) {
-    die("BASE_URL is not defined in config");
+    http_response_code(500);
+    die("Configuration error: BASE_URL not defined");
 }
 
-// build safe URL
-$redirectUrl = rtrim(BASE_URL, '/') . '/frontend/main.php';
+/*
+|-----------------------------------------
+| Prevent header issues
+|-----------------------------------------
+*/
+if (headers_sent()) {
+    die("Redirect failed: headers already sent");
+}
 
-// redirect
+/*
+|-----------------------------------------
+| Build Safe URL
+|-----------------------------------------
+*/
+$redirectUrl = BASE_URL . 'frontend/main.php';
+
+/*
+|-----------------------------------------
+| Redirect (SEO-safe temporary redirect)
+|-----------------------------------------
+*/
 header("Location: $redirectUrl", true, 302);
 exit;
-
-?>

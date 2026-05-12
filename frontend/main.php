@@ -26,32 +26,32 @@ $form_settings = $result ? mysqli_fetch_assoc($result) : null;
 
     <!-- Navbar -->
     <?php
-    require_once(__DIR__ . "/./src/components/navbar/navbar.php");
+    require_once(__DIR__ . "/src/components/navbar/navbar.php");
     ?>
 
     <!-- Slider -->
     <?php
-    require_once(__DIR__ . "/./src/components/slider/slider.php");
+    require_once(__DIR__ . "/src/components/slider/slider.php");
     ?>
 
     <!-- Hero Section -->
     <?php
-    require_once(__DIR__ . "/./src/components/hero/hero.php");
+    require_once(__DIR__ . "/src/components/hero/hero.php");
     ?>
 
     <!-- Stats Section -->
     <?php
-    require_once(__DIR__ . "/./src/components/stats/stats.php");
+    require_once(__DIR__ . "/src/components/stats/stats.php");
     ?>
 
     <!-- Program Section -->
     <?php
-    require_once(__DIR__ . "/./src/components/program/program.php");
+    require_once(__DIR__ . "/src/components/program/program.php");
     ?>
 
     <!-- Footer -->
     <?php
-    require_once(__DIR__ . "/./src/components/footer/footer.php");
+    require_once(__DIR__ . "/src/components/footer/footer.php");
     ?>
 
 </body>

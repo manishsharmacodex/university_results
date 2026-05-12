@@ -28,7 +28,8 @@ if (file_exists($envFile)) {
             continue;
         }
 
-        if (strpos($line, '=') === false) continue;
+        if (strpos($line, '=') === false)
+            continue;
 
         [$key, $value] = explode('=', $line, 2);
 
