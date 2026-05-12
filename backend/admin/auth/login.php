@@ -1,4 +1,5 @@
 <?php
+require_once(__DIR__ . "/../../config/config.php");
 session_start();
 
 // Prevent browser cache
@@ -9,14 +10,16 @@ header("Expires: Sat, 01 Jan 2000 00:00:00 GMT");
 
 // Redirect if already logged in
 if (!empty($_SESSION['admin'])) {
-    header("Location: ../dashboard/index.php");
+    // header("Location: ../dashboard/index.php");
+    // exit;
+
+    header("Location: " . BASE_URL . "dashboard");
     exit;
 }
 
 include(__DIR__ . "/../../server/connection.php");
 
 
-require_once (__DIR__ . "/../../config/config.php");
 
 $error = "";
 
@@ -106,7 +109,10 @@ if (isset($_POST['login'])) {
 
                 unset($_SESSION['num1'], $_SESSION['num2'], $_SESSION['operator']);
 
-                header("Location: ../dashboard/index.php");
+                // header("Location: ../dashboard/index.php");
+                // exit;
+
+                header("Location: " . BASE_URL . "dashboard");
                 exit;
 
             } else {
@@ -134,7 +140,7 @@ if (isset($_POST['login'])) {
     <title>ERP Admin Login</title>
     <link rel="stylesheet" type="text/css" href="../../css/font.css">
     <!-- <link rel="stylesheet" type="text/css" href="./src/login.css"> -->
-     <link rel="stylesheet" href="<?= BASE_URL ?>backend/admin/auth/src/login.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>backend/admin/auth/src/login.css">
 </head>
 
 <body>
@@ -172,7 +178,7 @@ if (isset($_POST['login'])) {
     </div>
 
     <!-- <script type="text/javascript" src="./src/login.js"></script> -->
-     <script src="<?= BASE_URL?>backend/admin/auth/src/login.js"></script>
+    <script src="<?= BASE_URL ?>backend/admin/auth/src/login.js"></script>
 
 </body>
 

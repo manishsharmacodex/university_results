@@ -3,6 +3,8 @@
 include(__DIR__ . "/../../server/connection.php");
 include("../../config/auth.php");
 
+require_once(__DIR__ . "/../../config/config.php");
+
 
 // session for login
 header("Cache-Control: no-cache, no-store, must-revalidate, max-age=0");
@@ -32,9 +34,11 @@ $activePage = "dashboard"; // change per page
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" type="text/css" href="../../css/font.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../../css/font.css"> -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>frontend/src/css/font.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" type="text/css" href="../css/sidebar.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../css/sidebar.css"> -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>backend/admin/css/sidebar.css">
 </head>
 
 <body>
@@ -46,7 +50,11 @@ $activePage = "dashboard"; // change per page
                 <i class="fa-solid fa-gauge"></i>Dashboard
             </a>
 
-            <a href="../department/list.php" class="<?= $activePage == 'department' ? 'active' : '' ?>">
+            <!-- <a href="../department/list.php" class="<?= $activePage == 'department' ? 'active' : '' ?>">
+                <i class="fa-solid fa-building"></i>Department
+            </a> -->
+
+            <a href="<?= BASE_URL ?>department" class="<?= $activePage == 'department' ? 'active' : '' ?>">
                 <i class="fa-solid fa-building"></i>Department
             </a>
 

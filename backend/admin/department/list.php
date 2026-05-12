@@ -7,6 +7,8 @@ if (session_status() === PHP_SESSION_NONE) {
 include("../../server/connection.php");
 include("../../config/auth.php");
 
+require_once(__DIR__ . "/../../config/config.php");
+
 /* ================= FLASH MESSAGE ================= */
 $message = "";
 $messageType = "success";
@@ -171,7 +173,8 @@ $result = $conn->query("
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <link rel="stylesheet" type="text/css" href="../css/sidebar.css">
+    <!-- <link rel="stylesheet" type="text/css" href="../css/sidebar.css"> -->
+    <link rel="stylesheet" href="<?= BASE_URL?>backend/admin/css/sidebar.css">
 
 </head>
 

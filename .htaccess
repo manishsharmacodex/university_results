@@ -15,3 +15,9 @@ RewriteRule ^school-information/?$ frontend/src/pages/school/school_information.
 
 # Contact
 RewriteRule ^contact/?$ frontend/src/pages/contact_us/contact.php [L]
+
+# Dashboard
+RewriteRule ^dashboard/?$ backend/admin/dashboard/index.php [L]
+
+# Department
+RewriteRule ^department/?$ backend/admin/department/list.php [L]
