@@ -1,0 +1,147 @@
+CREATE TABLE admin_user (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    user_name VARCHAR(150) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    pin VARCHAR(255) DEFAULT NULL,
+    profile_pic VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+
+
+
+CREATE TABLE admission_form_settings (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    form_title VARCHAR(255) DEFAULT NULL,
+    form_description TEXT DEFAULT NULL,
+    button_text VARCHAR(100) DEFAULT NULL,
+    background_color VARCHAR(50) DEFAULT NULL,
+    form_status ENUM('Open','Closed') DEFAULT 'Open',
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+
+
+CREATE TABLE admission_list (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    full_name VARCHAR(100) NOT NULL,
+    email_address VARCHAR(100) NOT NULL UNIQUE,
+    phone_number VARCHAR(10) NOT NULL,
+    course VARCHAR(50) NOT NULL,
+    department VARCHAR(255) DEFAULT NULL,
+    admission_no VARCHAR(50) UNIQUE DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+
+CREATE TABLE bank_master (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    bank_name VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+
+
+CREATE TABLE banks (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    bank_master_id INT(11) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY bank_master_id (bank_master_id)
+);
+
+
+
+CREATE TABLE banners (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    image VARCHAR(255) NOT NULL,
+    title VARCHAR(255) DEFAULT NULL,
+    description TEXT DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+
+
+
+CREATE TABLE departments (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100) DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+
+
+CREATE TABLE courses (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    department_id INT(11) DEFAULT NULL,
+    course_name VARCHAR(100) DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY department_id (department_id)
+);
+
+
+CREATE TABLE semesters (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    semester_name VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+
+
+CREATE TABLE contact_us (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100) DEFAULT NULL,
+    email VARCHAR(100) DEFAULT NULL,
+    subject VARCHAR(255) DEFAULT NULL,
+    message TEXT DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+
+
+CREATE TABLE student_details (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    student_id VARCHAR(50) UNIQUE DEFAULT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    father_name VARCHAR(100) DEFAULT NULL,
+    mother_name VARCHAR(100) DEFAULT NULL,
+    dob DATE DEFAULT NULL,
+    gender ENUM('Male','Female','Other') DEFAULT NULL,
+    email VARCHAR(100) DEFAULT NULL,
+    phone VARCHAR(15) DEFAULT NULL,
+    address TEXT DEFAULT NULL,
+    course VARCHAR(50) DEFAULT NULL,
+    department VARCHAR(100) DEFAULT NULL,
+    semester VARCHAR(20) DEFAULT NULL,
+    section VARCHAR(10) NOT NULL,
+    university VARCHAR(255) NOT NULL,
+    admission_date DATE DEFAULT NULL,
+    aadhaar_number VARCHAR(12) DEFAULT NULL,
+    bank_name VARCHAR(255) DEFAULT NULL,
+    photo VARCHAR(255) DEFAULT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+
+CREATE TABLE student_results (
+    id INT(11) NOT NULL AUTO_INCREMENT,
+    roll_number VARCHAR(50) DEFAULT NULL,
+    department VARCHAR(50) DEFAULT NULL,
+    year VARCHAR(20) DEFAULT NULL,
+    semester VARCHAR(20) DEFAULT NULL,
+    subject_name VARCHAR(100) DEFAULT NULL,
+    marks INT(11) DEFAULT NULL,
+    exam_status VARCHAR(20) DEFAULT 'Present',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);

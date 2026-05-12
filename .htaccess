@@ -21,3 +21,6 @@ RewriteRule ^dashboard/?$ backend/admin/dashboard/index.php [L]
 
 # Department
 RewriteRule ^department/?$ backend/admin/department/list.php [L]
+
+
+ErrorDocument 404 /university_results/404.php
