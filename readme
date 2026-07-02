@@ -1,5 +1,144 @@
-Backend Folder
-Frontend Folder
-.htaccess
-404.php
-index.php
+Folder Structure
+    1.Frontend Folder
+        /src
+            /assets
+                success_icon.png
+            /components
+                /admissionForm
+                    admissionForm.php
+                    admissionForm.css
+                    ajaxFormSubmission.js
+                    fetchCourse.js
+                /footer
+                    footer.php
+                    footer.css
+                /hero
+                    hero.php
+                    hero.css
+                /heroText
+                    heroText.php
+                    heroText.css
+                /navbar
+                    navbar.php
+                    navbar.css
+                /program
+                    program.php
+                    program.css
+                /slider
+                    slider.php
+                    slider.css
+                    slider.js
+                /stats
+                    stats.php
+                    stats.css
+            /css
+                contact.css
+                font.css
+                global.css
+                index.css
+                school_informations.css
+            /js
+                contactSubjectToggle.js
+            /pages
+                /contact_us
+                /results
+                /school
+        main.php
+    2.Backend Folder
+        /admin
+            /add_student
+                add_student.php
+                get_courses.php
+            /admission_form
+                list.php
+                update_form.php
+            /auth
+                /src
+                    login.css
+                    login.js
+                generate_password.php
+                login.php
+                logout.php
+            /bank
+                delete.php
+                edit.php
+                list.php
+            /banner
+                delete.php
+                edit.php
+                list.php
+            /courses
+                delete.php
+                edit.php
+                list.php
+            /css
+                sidebar.css
+            /dashboard
+                index.php
+            /department
+                delete.php
+                edit.php
+                list.php
+            /js
+                dropdownToggle.js
+                toastNotification.js
+                upperCase.js
+            /semesters
+                delete.php
+                edit.php
+                list.php
+            /student_list
+                get_student.php
+                student_list.php
+                update_student.php
+            /uploads
+                /banners
+                /student_profile
+        /ajax
+            get_courses.php
+        /api
+            admission_create.php
+            contact.php
+        /config
+            auth.php
+            config.php
+        /server
+            /SQL
+            connection.php
+        /vendor
+            /composer
+            /graham-campbell
+            /phpoption
+            /symfony
+            /vlucas
+            autoload.php
+        .env
+        .env.example
+        .gitignore
+        composer.json
+        composer.lock
+        readme
+    3.htaccess
+    4.404.php
+    5.index.php
+
+Project Language Uses
+    1.HTML5
+    2.CSS3
+    3.JavaScript
+    4.php
+
+Deployment Website
+    1.GitHub
+    2.Vercel
+    3.VPS Server
+
+CI CD Pipeline 
+    1.GitHub
+    2.Docker
+    3.AWS
+        1.EC2 (Elactics Cloud Computing)
+        2.S3 Bucket
+        3.CodePipeLine
+        4.CI CD Pipeline
+        5.CodeDeploy
