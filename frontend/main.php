@@ -23,7 +23,7 @@ require_once(__DIR__ . "/../backend/config/config.php");
     <link rel="stylesheet" href="<?= BASE_URL ?>frontend/src/css/font.css">
     <!-- <link rel="stylesheet" type="text/css" href="./src/css/global.css"> -->
     <link rel="stylesheet" type="text/css" href="<?= BASE_URL ?>frontend/src/css/global.css"">
-    <!-- <link rel="stylesheet" type="text/css" href="./src/css/index.css"> -->
+    <!-- <link rel=" stylesheet" type="text/css" href="./src/css/index.css"> -->
 </head>
 
 <body>
